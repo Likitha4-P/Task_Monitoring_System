@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Dashboard - College Task Monitoring System</title>
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FullCalendar CSS & JS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+
+</head>
+
+
+<body>
+    <div class="dashboard-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2 id="sidebarTitle" class="sidebar-title"></h2>
+            <img src="assets/images/icons8-customer-50.png" alt="User Avatar">
+
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" onclick="toggleVisibility('mainpage')"><i data-lucide="folder"></i>
+                    Overview</a>
+                <a href="#" class="menu-item" id="showusers"><i data-lucide="users"></i>
+                    User & Role Management</a>
+                <a href="#" class="menu-item" id="showevents"><i data-lucide="calendar"></i> Event Management</a>
+                <a href="#" id="showtasks" class="menu-item"><i data-lucide="clipboard"></i> Task & File Allocation</a>
+                <a href="#" class="menu-item" id="showreports"><i data-lucide="bar-chart-2"></i> Reports & Analytics</a>
+                <a href="#" id="logoutBtn" class="menu-item logout"><i data-lucide="log-out"></i> Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="mainpage" class="page main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <h1 class="gradient-text">OverView of Tasks</h1>
+                <div class="user-info">
+                    <div class="user-avatar"></div>
+                    <span></span>
+                    <button class="logout-btn"><i data-lucide="log-out"></i></button>
+                </div>
+            </header>
+
+            <!-- Overview Cards -->
+            <section class="overview-cards">
+                <div class="card pending">
+                    <i data-lucide="clipboard"></i>
+                    <div class="card-info">
+                        <span>Pending Tasks</span>
+                        <strong>12</strong>
+                    </div>
+                </div>
+                <div class="card inprogress">
+                    <i data-lucide="clock"></i>
+                    <div class="card-info">
+                        <span>In Progress</span>
+                        <strong>5</strong>
+                    </div>
+                </div>
+                <div class="card completed">
+                    <i data-lucide="check-circle"></i>
+                    <div class="card-info">
+                        <span>Completed</span>
+                        <strong>20</strong>
+                    </div>
+                </div>
+                <div class="card overdue">
+                    <i data-lucide="alert-triangle"></i>
+                    <div class="card-info">
+                        <span>Overdue</span>
+                        <strong>3</strong>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Workflow & Event Calendar -->
+            <section class="dashboard-panels">
+               <div class="workflow-panel glass animate-fade-in-up">
+  <h2>System Alerts</h2>
+  <div class="bg-yellow-100 p-4 rounded-xl shadow-md mb-8">
+    <h3 class="text-yellow-700 font-semibold text-lg mb-2">⚠️ System Alerts</h3>
+    <ul id="system-alerts" class="list-disc ml-6 text-gray-700">
+      <li>Loading alerts...</li>
+    </ul>
+  </div>
+</div>
+                <div class="events-panel glass animate-fade-in-up delay-200">
+                    <h2>Event Calendar View</h2>
+                    <div id="calendar"></div>
+                </div>
+            </section>
+        </main>
+        <div id="taskManagement" class="page">
+            <div class="tasks-container">
+                <!-- Header Section -->
+                <div class="tasks-header">
+                    <h1><i class="fas fa-tasks"></i> Task Management</h1>
+                    <p>Organize and track project tasks and assignments</p>
+                </div>
+                <div id="createTaskModal" class="tasks-modal">
+                    <div class="tasks-modal-content">
+                        <div class="tasks-modal-header">
+                            <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
+                            <button class="tasks-close-btn" onclick="closeTaskModal()">&times;</button>
+                        </div>
+                        <div class="tasks-modal-body">
+                            <form id="createTaskForm">
+
+
+                                <div class="tasks-form-group">
+                                    <label for="taskTitle">Task Title</label>
+                                    <input type="text" id="taskTitle" name="taskTitle" placeholder="Enter task title"
+                                        required>
+                                </div>
+
+                                <div class="tasks-form-group">
+                                    <label for="taskDescription">Description</label>
+                                    <textarea id="taskDescription" name="taskDescription"
+                                        placeholder="Enter task description" required></textarea>
+                                </div>
+
+                                <div class="tasks-form-group">
+                                    <label for="taskAssignedTo" id="taskAssignedToLabel">Assigned To</label>
+                                    <select id="taskAssignedTo" name="taskAssignedTo" required>
+
+                                    </select>
+                                </div>
+
+                                <input type="hidden" id="hiddenAssignedTo" name="hiddenAssignedTo" />
+                                <div class="tasks-form-group">
+                                    <label for="taskPriority">Priority</label>
+                                    <select id="taskPriority" name="taskPriority" required>
+                                        <option value="Low">Low</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="High">High</option>
+                                    </select>
+                                </div>
+
+                                <div class="tasks-form-group">
+                                    <label for="taskStatus">Status</label>
+                                    <select id="taskStatus" name="taskStatus" required>
+                                        <option value="Pending">Pending</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Submitted">Submitted</option>
+                                        <option value="Verified">Verified</option>
+
+                                    </select>
+                                </div>
+
+                                <div class="tasks-form-group">
+                                    <label for="taskDueDate">Due Date</label>
+                                    <input type="date" id="taskDueDate" name="taskDueDate" required>
+                                </div>
+
+
+                                <div class="tasks-form-actions">
+                                    <button type="button" class="tasks-btn-cancel"
+                                        onclick="closeTaskModal()">Cancel</button>
+                                    <button type="submit" class="tasks-btn-submit">Create Task</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Table Section -->
+                <div class="tasks-table-section">
+                    <div class="tasks-table-header">
+                        <h2 class="tasks-table-title">All Tasks</h2>
+                        <button class="tasks-create-btn" onclick="openTaskModal()">
+                            <i class="fas fa-plus"></i>
+                            Create Task
+                        </button>
+                    </div>
+
+                    <div class="scrollable-table-container">
+                        <table id="tasksTable" class="tasks-table">
+                            <thead id="taskTableHeader">
+
+                            </thead>
+                            <tbody id="taskrows"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="userManagement" class="page">
+        <!-- Header Section -->
+        <div class="header">
+            <h1><i class="fas fa-users"></i> User Management</h1>
+            <p>Manage your team members and their access levels</p>
+        </div>
+
+        <!-- Create User Modal -->
+        <div id="createUserModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-user-plus"></i> Create New User</h2>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="createUserForm">
+
+
+                        <div class="form-group">
+                            <label for="userName">Full Name</label>
+                            <input type="text" id="userName" name="userName" placeholder="Enter full name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userEmail">Email Address</label>
+                            <input type="email" id="userEmail" name="userEmail" placeholder="Enter email address"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userPass">User Password</label>
+                            <input type="password" id="userPass" name="userPass" placeholder="Enter user Password"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userRole">Role</label>
+                            <select id="userRole" name="userRole" required>
+                                <option value="">Select a role</option>
+                                <option value="Department Head">Department Head</option>
+                                <option value="Professor Incharge">Professor Incharge</option>
+                                <option value="Faculty/File Incharge">Faculty/File Incharge</option>
+                                <option value="Principal/Management">Principal/Management</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userDepartment">Department</label>
+                            <select id="userDepartment" name="userDepartment" required>
+                                <option value="">Select department</option>
+                                <option value="CSE">Computer Science</option>
+                                <option value="ECE">Electronics</option>
+                                <option value="EEE">Electrical</option>
+                                <option value="MECH">Mechanical</option>
+                                <option value="CIVIL">Civil</option>
+                                <option value="PLACEMENT CELL">Placement Cell</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                            <button type="submit" class="btn-submit">CreateUser</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Table Section -->
+        <div class="table-section">
+            <div class="table-header">
+                <h2 class="table-title">All Users</h2>
+                <button class="create-btn" onclick="openModal()">
+                    <i class="fas fa-plus"></i>
+                    Create User
+                </button>
+            </div>
+
+            <div class="scrollable-table-container">
+                <table id="usersTable">
+                    <thead>
+                        <tr>
+
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Modify</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableRows"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="eventManagement" class="page">
+        <div class="events-container">
+            <!-- Header Section -->
+            <div class="events-header">
+                <h1><i class="fas fa-calendar-alt"></i> Event Management</h1>
+                <p>Organize and manage company events and activities</p>
+            </div>
+
+            <!-- Table Section -->
+            <div class="events-table-section">
+                <div class="events-table-header">
+                    <h2 class="events-table-title">All Events</h2>
+                    <button class="events-propose-btn" onclick="openEventModal()">
+                        <i class="fas fa-plus"></i>
+                        Propose Event
+                    </button>
+                </div>
+
+                <div class="scrollable-table-container">
+                    <table id="eventsTable" class="events-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Department</th>
+                                <th>Proposed At</th>
+                                <th>Event Date</th>
+                                <th>Participants</th>
+                                <th>Status</th>
+                                <th>Created By</th>
+
+                                <th>Approve/Reject</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventRows">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Propose Event -->
+        <div id="proposeEventModal" class="events-modal">
+            <div class="events-modal-content">
+                <div class="events-modal-header">
+                    <h2><i class="fas fa-calendar-plus"></i> Propose New Event</h2>
+                    <button class="events-close-btn" onclick="closeEventModal()">&times;</button>
+                </div>
+                <div class="events-modal-body">
+                    <form id="proposeEventForm">
+
+
+                        <div class="events-form-group">
+                            <label for="eventTitle">Event Title</label>
+                            <input type="text" id="eventTitle" name="eventTitle" placeholder="Enter event title"
+                                required>
+                        </div>
+
+                        <div class="events-form-group">
+                            <label for="eventDepartment">Department</label>
+                            <select id="eventDepartment" name="eventDepartment" required>
+                                <option value="">Select department</option>
+                                <option value="CSE">Computer Science</option>
+                                <option value="ECE">Electronics</option>
+                                <option value="EEE">Electrical</option>
+                                <option value="MECH">Mechanical</option>
+                                <option value="CIVIL">Civil</option>
+                                <option value="PLACEMENT CELL">Placement Cell</option>
+                            </select>
+                        </div>
+
+                        <div class="events-form-group">
+                            <label for="eventDate">Event Date</label>
+                            <input type="date" id="eventDate" name="eventDate" required>
+                        </div>
+
+                        <div class="events-form-group">
+                            <label for="eventParticipants">Expected Participants</label>
+                            <input type="number" id="eventParticipants" name="eventParticipants"
+                                placeholder="Enter number of participants" min="1" required>
+                        </div>
+
+
+
+
+                        <div class="events-form-actions">
+                            <button type="button" class="events-btn-cancel" onclick="closeEventModal()">Cancel</button>
+                            <button type="submit" class="events-btn-submit">Propose Event</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="reportsPage" class="page">
+        <div class="header">
+            <h1><i class="fas fa-users"></i> Reports and Analytics</h1>
+            <p>Detailed Reports and Insights</p>
+        </div>
+        <!-- Reports Section -->
+
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Task Status Report -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h4 class="text-lg font-semibold text-gray-800 mb-4">Task Status Summary</h4>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Pending Tasks:</span>
+                        <span class="font-semibold text-yellow-600">12</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">In Progress:</span>
+                        <span class="font-semibold text-blue-600">5</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Completed:</span>
+                        <span class="font-semibold text-green-600">20</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Overdue:</span>
+                        <span class="font-semibold text-red-600">3</span>
+                    </div>
+                </div>
+                <button onclick="generateEventReport()" style="background: linear-gradient(90deg, rgba(237, 204, 232, 1) 9%, rgba(173, 221, 222, 1) 100%);
+           color: white; padding: 0.5rem; border-radius: 0.5rem;"
+                    class="mt-4 w-full transition-all transform hover:scale-105 shadow-lg">
+                    Generate Report
+                </button>
+
+            </div>
+
+            <!-- Deadline Summary -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h4 class="text-lg font-semibold text-gray-800 mb-4">Upcoming Deadlines (Next 7 Days)</h4>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                        <div>
+                            <p class="font-medium text-gray-900">NAAC File</p>
+                            <p class="text-sm text-gray-600">Due in 3 days</p>
+                        </div>
+                        <span class="priority-high px-2 py-1 rounded-full text-xs font-medium">High</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                        <div>
+                            <p class="font-medium text-gray-900">Syllabus Update</p>
+                            <p class="text-sm text-gray-600">Due in 5 days</p>
+                        </div>
+                        <span class="priority-medium px-2 py-1 rounded-full text-xs font-medium">Medium</span>
+                    </div>
+                </div>
+                <button onclick="generateEventReport()" style="background: linear-gradient(90deg, rgba(237, 204, 232, 1) 9%, rgba(173, 221, 222, 1) 100%);
+           color: white; padding: 0.5rem; border-radius: 0.5rem;"
+                    class="mt-4 w-full transition-all transform hover:scale-105 shadow-lg">
+                    Export Excel Report
+                </button>
+
+            </div>
+
+            <!-- Event Calendar Report -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h4 class="text-lg font-semibold text-gray-800 mb-4">Event Calendar Report</h4>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                        <div>
+                            <p class="font-medium text-gray-900">AI Workshop</p>
+                            <p class="text-sm text-gray-600">Sep 10, 2025</p>
+                        </div>
+                        <span
+                            class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Approved</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                        <div>
+                            <p class="font-medium text-gray-900">Web Dev Workshop</p>
+                            <p class="text-sm text-gray-600">Sep 15, 2025</p>
+                        </div>
+                        <span
+                            class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                    </div>
+                </div>
+                <button onclick="generateEventReport()" style="background: linear-gradient(90deg, rgba(237, 204, 232, 1) 9%, rgba(173, 221, 222, 1) 100%);
+           color: white; padding: 0.5rem; border-radius: 0.5rem;"
+                    class="mt-4 w-full transition-all transform hover:scale-105 shadow-lg">
+                    Download Calendar
+                </button>
+
+                
+
+
+                <!-- Event Details Modal -->
+
+
+
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+                <script src="assets/js/app.js"></script>
+                <script>
+                    let calendar;
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        let calendarEl = document.getElementById('calendar');
+
+                        calendar = new FullCalendar.Calendar(calendarEl, {
+                            initialView: 'dayGridMonth',
+                            height: 400,
+                            events: [] // initially empty, will be filled from backend + approvals
+                        });
+
+                        calendar.render();
+                    });
+
+                    window.addApprovedEventToCalendar = function (eventData) {
+                        calendar.addEvent({
+                            title: eventData.title,
+                            start: eventData.date,
+                            extendedProps: {
+                                department: eventData.department,
+                                status: 'Approved'
+                            }
+                        });
+                    };
+                </script>
+
+</body>
+
+</html>

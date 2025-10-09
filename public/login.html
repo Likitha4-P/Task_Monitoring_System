@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Task Monitoring System - Login</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+
+</head>
+
+<body>
+    <div class="container">
+        <!-- Animated background elements -->
+        <div class="background">
+            <div class="pulse pulse-1 cyan"></div>
+            <div class="pulse pulse-2 purple"></div>
+            <div class="pulse pulse-3 green"></div>
+            <div class="pulse pulse-1 pink"></div>
+        </div>
+
+        <div class="login-wrapper ">
+            <!-- Login Container -->
+            <div class="glass animate-fade-in-up animate-float">
+                <!-- Header -->
+                <div class="header animate-slide-in-left delay-200">
+                    <div class="icon-wrapper">
+                        <div class="icon-bg">
+                            <i data-lucide="lock"></i>
+                        </div>
+                    </div>
+                    <h1 class="gradient-text">Welcome Back</h1>
+                    <h3 id="roleHeading" class="gradient-text"></h3>
+                    <p>Sign in to access your dashboard</p>
+                    <div class="header-underline"></div>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm">
+                    <!-- Email/Username Input -->
+                    <div class="form-group animate-slide-in-left delay-300">
+                        <label><i data-lucide="user"></i> Email</label>
+                        <input type="text" id="loginEmail" class="cyber-input"
+                            placeholder="Your Email" autocomplete="off" required>
+                    </div>
+
+                    <!-- Password Input -->
+                    <div class="form-group animate-slide-in-right delay-400">
+                        <label><i data-lucide="lock"></i> Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="loginPassword" class="cyber-input" autocomplete="new-password"
+                                placeholder="Your Password" required>
+
+                        </div>
+                    </div>
+
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="form-bottom animate-slide-in-right delay-600">
+                        <label class="remember">
+                            <input type="checkbox">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#">Forgot Password?</a>
+                    </div>
+
+                    <!-- Login Button -->
+                    <button type="submit" class="cyber-button animate-slide-in-left delay-700">
+                        <span>
+                            <i data-lucide="log-in"></i> Sign In
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Footer -->
+                <div class="footer animate-slide-in-right delay-800">
+                    <p>College Task Monitoring System</p>
+                    <div class="footer-dots">
+                        <div class="dot bounce-1"></div>
+                        <div class="dot bounce-2"></div>
+                        <div class="dot bounce-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/app.js"></script>
+    <script>
+
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons(); // initialize all icons
+            var role = getParameterByName('role');
+            document.getElementById('roleHeading').innerText = role;
+            console.log(role);
+        });
+
+    </script>
+</body>
+
+</html>

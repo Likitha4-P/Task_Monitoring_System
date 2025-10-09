@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Task Monitoring System</title>
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    a {
+      text-decoration: none;
+    }
+    h3 {
+      color: white;
+      font-size: medium;
+    }
+  </style>
+</head>
+
+
+<body>
+  <div class="page-container">
+    <!-- Background orbs -->
+    <div class="orb cyan"></div>
+    <div class="orb purple"></div>
+    <div class="orb green"></div>
+
+    <div class="main-wrapper">
+      <div class="glass-container">
+        <!-- Header -->
+        <div class="header">
+          <h1>College Task Monitoring System</h1>
+          <p>Complete Workflow Management Solution</p>
+          <div class="accent-line"></div>
+        </div>
+
+        <!-- Roles -->
+        <div class="grid">
+          <!-- Admin -->
+          <a href="login.html?role=Admin" id="a">
+            <div class="role role-card cyan">
+
+              <div class="icon"><i data-lucide="settings"></i></div>
+              <h3>Admin</h3>
+              <p>Create departments, allocate tasks, monitor progress & approve events</p>
+            </div>
+          </a>
+
+
+          <!-- Department Head -->
+          <a href="login.html?role=Department-Head" id="dh">
+            <div class="role role-card purple">
+              <div class="icon"><i data-lucide="building"></i></div>
+              <h3>Department Head</h3>
+              <p>Propose events, review faculty work & provide feedback</p>
+            </div>
+          </a>
+
+          <!-- Professor Incharge -->
+           <a href="login.html?role=Professor-Incharge" id="pi">
+             <div class="role role-card green">
+               <div class="icon"><i data-lucide="user"></i></div>
+               <h3>Professor Incharge</h3>
+               <p>Review submissions, approve/reject work & monitor deadlines</p>
+             </div>
+           </a>
+
+          <!-- Faculty/File Incharge -->
+          <a href="login.html?role=Faculty-Incharge" id="f">
+            <div class="role role-card orange">
+              <div class="icon"><i data-lucide="file-text"></i></div>
+              <h3>Faculty/File Incharge</h3>
+            <p>Receive tasks, update progress & submit deliverables</p>
+          </div>
+
+          </a>
+
+          <!-- Principal/Management -->
+          <a href="login.html?role=Principal-Management" id="pm">
+            <div class="role role-card indigo">
+              <div class="icon"><i data-lucide="bar-chart-3"></i></div>
+              <h3>Principal/Management</h3>
+              <p>View comprehensive reports & analytics dashboard</p>
+          </div>
+        
+        </a>
+
+
+        
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    lucide.createIcons();
+    
+  </script>
+</body>
+
+</html>
