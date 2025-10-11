@@ -51,12 +51,12 @@ user123  → $2b$10$SrbIEJ3RwgrF0yZt2Hc7MOh8NvBYF7D1Gz8UbEdT6g3F7VJq2rGBO
 Replace plain text passwords with the generated hashes.
 ```
 -- ❌ Before
--- INSERT INTO users (email, password) VALUES ('admin@example.com', 'admin123');
+-- INSERT INTO users (.., email, password, ..) VALUES (.., 'admin@example.com', 'admin123', ..);
 
 -- ✅ After
-INSERT INTO users (email, password) VALUES 
-('admin@example.com', '$2b$10$3d.ykj0b8qPm6nHmgV3s5OtWcUpHy4CjM3EwzP8G5y8SgDa8eCma6'),
-('user@example.com', '$2b$10$SrbIEJ3RwgrF0yZt2Hc7MOh8NvBYF7D1Gz8UbEdT6g3F7VJq2rGBO');
+INSERT INTO users (.., email, password, ..) VALUES 
+(.., 'admin@example.com', '$2b$10$3d.ykj0b8qPm6nHmgV3s5OtWcUpHy4CjM3EwzP8G5y8SgDa8eCma6', ..),
+(.., 'user@example.com', '$2b$10$SrbIEJ3RwgrF0yZt2Hc7MOh8NvBYF7D1Gz8UbEdT6g3F7VJq2rGBO', ..);
 
 ```
 
