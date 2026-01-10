@@ -1,111 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>College Task Monitoring System - Login</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login</title>
 
-
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <div class="container">
-        <!-- Animated background elements -->
-        <div class="background">
-            <div class="pulse pulse-1 cyan"></div>
-            <div class="pulse pulse-2 purple"></div>
-            <div class="pulse pulse-3 green"></div>
-            <div class="pulse pulse-1 pink"></div>
-        </div>
+<body class="min-h-screen flex items-center justify-center bg-gray-200">
 
-        <div class="login-wrapper ">
-            <!-- Login Container -->
-            <div class="glass animate-fade-in-up animate-float">
-                <!-- Header -->
-                <div class="header animate-slide-in-left delay-200">
-                    <div class="icon-wrapper">
-                        <div class="icon-bg">
-                            <i data-lucide="lock"></i>
-                        </div>
-                    </div>
-                    <h1 class="gradient-text">Welcome Back</h1>
-                    <h3 id="roleHeading" class="gradient-text"></h3>
-                    <p>Sign in to access your dashboard</p>
-                    <div class="header-underline"></div>
-                </div>
+  <!-- MAIN CONTAINER -->
+  <div class="relative w-full h-[100vh] flex  overflow-hidden shadow-2xl">
 
-                <!-- Login Form -->
-                <form id="loginForm">
-                    <!-- Email/Username Input -->
-                    <div class="form-group animate-slide-in-left delay-300">
-                        <label><i data-lucide="user"></i> Email</label>
-                        <input type="text" id="loginEmail" class="cyber-input"
-                            placeholder="Your Email" autocomplete="off" required>
-                    </div>
+    <!-- LEFT 70% -->
+    <div class="w-[70%] bg-[#2F4156] flex items-center justify-center">
+      <div class="w-[720px] h-[720px] rounded-full overflow-hidden 
+            bg-gradient-to-br from-purple-500 via-blue-500 to-pink-400 
+            flex items-center justify-center">
+  <img
+    src=""
+    alt="Admin Illustration"
+    class="w-full h-full object-cover"
+    id="img"
+  />
+</div>
 
-                    <!-- Password Input -->
-                    <div class="form-group animate-slide-in-right delay-400">
-                        <label><i data-lucide="lock"></i> Password</label>
-                        <div class="password-wrapper">
-                            <input type="password" id="loginPassword" class="cyber-input" autocomplete="new-password"
-                                placeholder="Your Password" required>
-
-                        </div>
-                    </div>
-
-                    <!-- Remember Me & Forgot Password -->
-                    <div class="form-bottom animate-slide-in-right delay-600">
-                        <label class="remember">
-                            <input type="checkbox">
-                            <span>Remember me</span>
-                        </label>
-                        <a href="#">Forgot Password?</a>
-                    </div>
-
-                    <!-- Login Button -->
-                    <button type="submit" class="cyber-button animate-slide-in-left delay-700">
-                        <span>
-                            <i data-lucide="log-in"></i> Sign In
-                        </span>
-                    </button>
-                </form>
-
-                <!-- Footer -->
-                <div class="footer animate-slide-in-right delay-800">
-                    <p>College Task Monitoring System</p>
-                    <div class="footer-dots">
-                        <div class="dot bounce-1"></div>
-                        <div class="dot bounce-2"></div>
-                        <div class="dot bounce-3"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <script src="assets/js/app.js"></script>
-    <script>
+    <!-- RIGHT 30% -->
+    <div class="w-[30%] bg-white"></div>
 
-        function getParameterByName(name, url) {
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[\]]/g, '\\$&');
-            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-                results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, ' '));
-        }
-        document.addEventListener("DOMContentLoaded", () => {
-            lucide.createIcons(); // initialize all icons
-            var role = getParameterByName('role');
-            document.getElementById('roleHeading').innerText = role;
-            console.log(role);
-        });
+    <!-- LOGIN CARD (CENTERED ON PARTITION) -->
+    
+<div class="absolute top-1/2 left-[70%] -translate-x-1/2 -translate-y-1/2">
+  <div class="bg-slate-200 w-[520px] rounded-2xl p-12 shadow-2xl">
 
-    </script>
+    <!-- Icon -->
+    <div class="flex justify-center mb-8">
+      <div class="w-14 h-14 rounded-full bg-[#2F4156] flex items-center justify-center text-white text-2xl">
+        →
+      </div>
+    </div>
+
+    <!-- Heading -->
+    <h2 class="text-3xl font-bold text-center text-slate-800" id="welcomeMsg">
+      
+    </h2>
+    <p class="text-center text-slate-600 mt-2 mb-10 text-lg">
+      Sign in to access your dashboard
+    </p>
+
+    <!-- Form -->
+    <form class="space-y-6" onsubmit="handleLogin(event)">
+
+      <!-- Email -->
+      <div class="relative">
+        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 text-lg">
+          👤
+        </span>
+        <input
+          id="loginEmail"
+          type="email"
+          placeholder="Email"
+          class="w-full py-4 pl-14 pr-4 rounded-full outline-none text-lg focus:ring-2 focus:ring-[#2F4156]"
+        />
+      </div>
+
+      <!-- Password -->
+      <div class="relative">
+        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 text-lg">
+          🔒
+        </span>
+        <input
+            id="loginPassword"
+          type="password"
+          placeholder="Password"
+          class="w-full py-4 pl-14 pr-4 rounded-full outline-none text-lg focus:ring-2 focus:ring-[#2F4156]"
+        />
+      </div>
+
+      <!-- Button -->
+      <button
+        type="submit"
+        class="w-full bg-[#2F4156] text-white py-4 rounded-full font-semibold text-lg hover:bg-[#263445] transition"
+      >
+        Login
+      </button>
+
+    </form>
+  </div>
+</div>
+
+
+  </div>
+  <script>
+  function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+    var results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+
+    // Get role from URL
+    let role = getParameterByName('role');
+
+    // ✅ Fallback if role is missing
+    if (!role) {
+      role = "Admin"; // default role
+    }
+
+    // Update UI
+    document.getElementById('welcomeMsg').innerText = "Welcome " + role;
+
+    // Safe image assignment
+    const img = document.getElementById('img');
+    img.src = "./assets/images/" + role.toLowerCase().replace(/\s+/g, '-') + ".png";
+
+  });
+</script>
+<script src="./assets/js/app.js"></script>
+
+
 </body>
-
 </html>

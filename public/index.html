@@ -2,101 +2,109 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>College Task Monitoring System</title>
-  <link rel="stylesheet" href="/assets/css/main.css">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <style>
-    a {
-      text-decoration: none;
-    }
-    h3 {
-      color: white;
-      font-size: medium;
-    }
-  </style>
 </head>
 
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white min-h-screen flex items-center justify-center">
 
-<body>
-  <div class="page-container">
-    <!-- Background orbs -->
-    <div class="orb cyan"></div>
-    <div class="orb purple"></div>
-    <div class="orb green"></div>
+  <div class="max-w-5xl w-full px-6 py-12">
 
-    <div class="main-wrapper">
-      <div class="glass-container">
-        <!-- Header -->
-        <div class="header">
-          <h1>College Task Monitoring System</h1>
-          <p>Complete Workflow Management Solution</p>
-          <div class="accent-line"></div>
+    <!-- Header -->
+    <header class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold">College Task Monitoring System</h1>
+      <p class="text-gray-400 mt-2 text-lg">Complete Workflow Management Solution</p>
+      <div class="w-24 h-1 bg-cyan-400 mx-auto mt-4 rounded"></div>
+    </header>
+
+    <!-- Roles Grid -->
+    <div class="grid gap-6 sm:grid-cols-2 items-stretch">
+
+      <!-- Admin -->
+      <a href="login.html?role=Admin" class="group h-full">
+        <div class="h-full flex flex-col justify-center text-center p-8
+                    bg-cyan-600/20 border border-cyan-500 rounded-xl
+                    hover:scale-105 hover:shadow-lg transition">
+
+          <div class="flex justify-center mb-4">
+            <i data-lucide="settings" class="w-10 h-10 text-cyan-400 group-hover:text-cyan-300"></i>
+          </div>
+
+          <h3 class="text-xl font-semibold mb-2">Admin</h3>
+          <p class="text-gray-300">
+            Create departments, allocate tasks, monitor progress & approve events
+          </p>
+
         </div>
+      </a>
 
-        <!-- Roles -->
-        <div class="grid">
-          <!-- Admin -->
-          <a href="login.html?role=Admin" id="a">
-            <div class="role role-card cyan">
+      <!-- Department Head -->
+      <a href="login.html?role=Department-Head" class="group h-full">
+        <div class="h-full flex flex-col justify-center text-center p-8
+                    bg-purple-600/20 border border-purple-500 rounded-xl
+                    hover:scale-105 hover:shadow-lg transition">
 
-              <div class="icon"><i data-lucide="settings"></i></div>
-              <h3>Admin</h3>
-              <p>Create departments, allocate tasks, monitor progress & approve events</p>
-            </div>
-          </a>
-
-
-          <!-- Department Head -->
-          <a href="login.html?role=Department-Head" id="dh">
-            <div class="role role-card purple">
-              <div class="icon"><i data-lucide="building"></i></div>
-              <h3>Department Head</h3>
-              <p>Propose events, review faculty work & provide feedback</p>
-            </div>
-          </a>
-
-          <!-- Professor Incharge -->
-           <a href="login.html?role=Professor-Incharge" id="pi">
-             <div class="role role-card green">
-               <div class="icon"><i data-lucide="user"></i></div>
-               <h3>Professor Incharge</h3>
-               <p>Review submissions, approve/reject work & monitor deadlines</p>
-             </div>
-           </a>
-
-          <!-- Faculty/File Incharge -->
-          <a href="login.html?role=Faculty-Incharge" id="f">
-            <div class="role role-card orange">
-              <div class="icon"><i data-lucide="file-text"></i></div>
-              <h3>Faculty/File Incharge</h3>
-            <p>Receive tasks, update progress & submit deliverables</p>
+          <div class="flex justify-center mb-4">
+            <i data-lucide="building" class="w-10 h-10 text-purple-400 group-hover:text-purple-300"></i>
           </div>
 
-          </a>
+          <h3 class="text-xl font-semibold mb-2">Department Head</h3>
+          <p class="text-gray-300">
+            Propose events, review faculty work & provide feedback
+          </p>
 
-          <!-- Principal/Management -->
-          <a href="login.html?role=Principal-Management" id="pm">
-            <div class="role role-card indigo">
-              <div class="icon"><i data-lucide="bar-chart-3"></i></div>
-              <h3>Principal/Management</h3>
-              <p>View comprehensive reports & analytics dashboard</p>
+        </div>
+      </a>
+
+      <!-- Professor Incharge -->
+      <a href="login.html?role=Professor-Incharge" class="group h-full">
+        <div class="h-full flex flex-col justify-center text-center p-8
+                    bg-green-600/20 border border-green-500 rounded-xl
+                    hover:scale-105 hover:shadow-lg transition">
+
+          <div class="flex justify-center mb-4">
+            <i data-lucide="user" class="w-10 h-10 text-green-400 group-hover:text-green-300"></i>
           </div>
-        
-        </a>
 
+          <h3 class="text-xl font-semibold mb-2">Professor Incharge</h3>
+          <p class="text-gray-300">
+            Review submissions, approve/reject work & monitor deadlines
+          </p>
 
-        
-      </div>
+        </div>
+      </a>
+
+      <!-- Faculty / File Incharge -->
+      <a href="login.html?role=Faculty-Incharge" class="group h-full">
+        <div class="h-full flex flex-col justify-center text-center p-8
+                    bg-orange-600/20 border border-orange-500 rounded-xl
+                    hover:scale-105 hover:shadow-lg transition">
+
+          <div class="flex justify-center mb-4">
+            <i data-lucide="file-text" class="w-10 h-10 text-orange-400 group-hover:text-orange-300"></i>
+          </div>
+
+          <h3 class="text-xl font-semibold mb-2">Faculty / File Incharge</h3>
+          <p class="text-gray-300">
+            Receive tasks, update progress & submit deliverables
+          </p>
+
+        </div>
+      </a>
+
     </div>
   </div>
 
   <script>
-
     lucide.createIcons();
-    
   </script>
-</body>
 
+</body>
 </html>
