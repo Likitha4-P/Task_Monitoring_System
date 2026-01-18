@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-gray-100 h-screen w-screen overflow-hidden">
+
+
+  <div class="border-blue-400  m-8 rounded-xl grid grid-cols-12 bg-white shadow-lg h-[90vh] mx-3">
+
+    <!-- Sidebar -->
+    <aside class="col-span-3 bg-[#2B3D50] p-6 rounded-l-xl flex flex-col gap-4 text-white h-full">
+
+      <h2 class="font-semibold text-xl mb-2">Welcome UserName !</h2>
+
+      <button class="sideBtn active">Overview</button>
+      <button class="sideBtn">Departments</button>
+      <button class="sideBtn">Assign Task</button>
+      <button class="sideBtn">Event Proposals</button>
+      <button class="sideBtn">Analyze Reports</button>
+
+    </aside>
+
+    <!-- Main Section -->
+    <main class="col-span-9 p-6 h-full overflow-y-auto">
+
+      <!-- Top Bar -->
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="font-semibold text-lg flex gap-2 items-center">
+          Admin Dashboard <span>👤</span>
+        </h1>
+        <div class="flex gap-4 text-xl">
+          <span>🔔</span>
+          <span>↩</span>
+        </div>
+      </div>
+
+      <!-- Task Cards -->
+      <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="statCard">
+          <p class="font-medium">Total Tasks</p>
+          <h2 class="text-3xl font-semibold text-purple-600">138</h2>
+        </div>
+        <div class="statCard">
+          <p class="font-medium">Pending</p>
+          <h2 class="text-3xl font-semibold text-pink-600">30</h2>
+        </div>
+        <div class="statCard">
+          <p class="font-medium">In-Progress</p>
+          <h2 class="text-3xl font-semibold text-indigo-600">64</h2>
+        </div>
+        <div class="statCard">
+          <p class="font-medium">Completed</p>
+          <h2 class="text-3xl font-semibold text-green-600">44</h2>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-12 gap-4">
+
+        <!-- Charts -->
+        <div class="col-span-7 bg-white p-6 rounded-xl shadow-md">
+          <canvas id="donutChart" height="180"></canvas>
+          <canvas id="barChart" height="200" class="mt-6"></canvas>
+        </div>
+
+        <!-- Calendar -->
+        <div class="col-span-5 flex flex-col gap-4">
+          <h2 class="text-lg font-semibold text-center">Upcoming Events</h2>
+          <div id="calendar" class="bg-[#D7E2EB] rounded-xl p-4 h-[300px]"></div>
+          <p class="text-center text-gray-500 text-sm">Click an Event date to preview!</p>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>

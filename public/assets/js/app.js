@@ -1102,7 +1102,7 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("App initialized");
   // Default section
   toggleVisibility("mainpage");
-  loadSystemAlerts();
+
 
   // Hide create button if not admin
   if (currentUser?.role !== "Admin") {
