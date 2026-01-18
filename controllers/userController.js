@@ -13,12 +13,12 @@ export async function listUsers(req, res) {
 
 export async function createUser(req, res) {
   try {
-    const { name, email, password, role, department, status = "Active" } = req.body;
+    const { name, email, password, role, departmentId, status = "Active" } = req.body;
     assertFields(req.body, ["name", "email", "password", "role"]);
     const hashed = await bcrypt.hash(password, 10);
     const [result] = await pool.query(
-      "INSERT INTO users (name, email, password, role, department, status) VALUES (?, ?, ?, ?, ?, ?)",
-      [name, email, hashed, role, department || null, status]
+      "INSERT INTO users (name, email, password_hash, role, department_id, status) VALUES (?, ?, ?, ?, ?, ?)",
+      [name, email, hashed, role, departmentId || null, status]
     );
     res.status(201).json({ id: result.insertId });
   } catch (e) {

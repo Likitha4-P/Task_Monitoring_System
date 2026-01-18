@@ -1,0 +1,27 @@
+.sideBtn {
+  background: rgba(255,255,255,0.4);
+  padding: 10px 18px;
+  border-radius: 999px;
+  text-align: left;
+  transition: 0.3s;
+  font-weight: 500;
+}
+.sideBtn:hover {
+  background: rgba(255,255,255,0.7);
+}
+
+.sideBtn.active {
+  background: white;
+  color: black;
+}
+
+.statCard {
+  background: white;
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: 0.3s ease;
+}
+.statCard:hover {
+  transform: translateY(-4px);
+}
