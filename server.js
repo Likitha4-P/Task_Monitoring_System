@@ -20,6 +20,7 @@ import taskRoutes from "./routes/tasks.js";
 import eventRoutes from "./routes/events.js";
 import alertRoutes from "./routes/alertRoutes.js";
 import reportRoutes from "./routes/reports.js";
+import departmentRoutes from "./routes/departmentRoutes.js";
 
 // --- API routes ---
 app.use("/api/auth", authRoutes);
@@ -28,6 +29,7 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/alerts", alertRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/departments", departmentRoutes);
 
 // --- Serve Frontend (index.html + assets) ---
 const __filename = fileURLToPath(import.meta.url);

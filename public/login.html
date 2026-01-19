@@ -53,7 +53,7 @@
     </p>
 
     <!-- Form -->
-    <form class="space-y-6" onsubmit="handleLogin(event)">
+    <form class="space-y-6" id="loginform" onsubmit="handleLogin(event)">
 
       <!-- Email -->
       <div class="relative">
@@ -107,8 +107,10 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-
+   
     // Get role from URL
+    document.getElementById('loginEmail').value = "";
+    document.getElementById('loginPassword').value = "";
     let role = getParameterByName('role');
 
     // ✅ Fallback if role is missing

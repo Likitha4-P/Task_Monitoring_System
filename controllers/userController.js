@@ -2,24 +2,46 @@ import pool from "../config/db.js";
 import bcrypt from "bcryptjs";
 import assertFields from "../utils/validate.js";
 
+// ---------------- LIST USERS ----------------
 export async function listUsers(req, res) {
   try {
-    const [rows] = await pool.query("SELECT id, name, email, role, department, status, created_at FROM users ORDER BY id DESC");
+    const [rows] = await pool.query(
+      `SELECT 
+         u.id, 
+         u.name, 
+         u.email, 
+         u.role, 
+         u.department_id, 
+         d.name AS department_name, 
+         u.status, 
+         u.created_at,
+         u.Contact AS contact
+       FROM users u
+       LEFT JOIN departments d ON u.department_id = d.id
+       ORDER BY u.id DESC`
+    );
+    console.log("USERS FROM DB:", users);
+
     res.json(rows);
   } catch (e) {
     res.status(500).json({ message: "Failed to list users" });
   }
 }
 
+// ---------------- CREATE USER ----------------
 export async function createUser(req, res) {
   try {
-    const { name, email, password, role, departmentId, status = "Active" } = req.body;
+    const { name, email, password, role, department_id, contact = null, status = "Active" } = req.body;
     assertFields(req.body, ["name", "email", "password", "role"]);
+
     const hashed = await bcrypt.hash(password, 10);
+
     const [result] = await pool.query(
-      "INSERT INTO users (name, email, password_hash, role, department_id, status) VALUES (?, ?, ?, ?, ?, ?)",
-      [name, email, hashed, role, departmentId || null, status]
+      `INSERT INTO users (name, email, password_hash, role, department_id, status, Contact) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [name, email, hashed, role, department_id || null, status, contact]
     );
+
     res.status(201).json({ id: result.insertId });
   } catch (e) {
     console.error(e);
@@ -27,27 +49,39 @@ export async function createUser(req, res) {
   }
 }
 
+
+// ---------------- UPDATE USER ----------------
 export async function updateUser(req, res) {
-  const { id } = req.params;
-  const { name, email, password, role, department, status } = req.body;
   try {
-    let q = "UPDATE users SET name = COALESCE(?, name), email = COALESCE(?, email), role = COALESCE(?, role), department = COALESCE(?, department), status = COALESCE(?, status)";
-    const params = [name, email, role, department, status];
-    if (password) {
-      const hashed = await bcrypt.hash(password, 10);
-      q += ", password = ?";
-      params.push(hashed);
+    const { id } = req.params;
+    const { name, email, role, status } = req.body;
+
+    const [result] = await pool.query(
+      `
+      UPDATE users
+      SET name = ?, email = ?, role = ?, status = ?
+      WHERE id = ?
+      `,
+      [name, email, role, status || "Active", id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
     }
-    q += " WHERE id = ?";
-    params.push(id);
-    await pool.query(q, params);
-    res.json({ ok: true });
-  } catch (e) {
-    console.error(e);
+
+    res.json({ message: "User updated successfully" });
+  } catch (err) {
+    // Duplicate email handling
+    if (err.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({ message: "Email already exists" });
+    }
+
+    console.error(err);
     res.status(500).json({ message: "Failed to update user" });
   }
 }
 
+// ---------------- DELETE USER ----------------
 export async function deleteUser(req, res) {
   const { id } = req.params;
   try {
@@ -57,10 +91,25 @@ export async function deleteUser(req, res) {
     res.status(500).json({ message: "Failed to delete user" });
   }
 }
+
+// ---------------- GET USER BY ID ----------------
 export async function getUserById(req, res) {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query("SELECT id, name, email, role, department, status FROM users WHERE id = ?", [id]);
+    const [rows] = await pool.query(
+      `SELECT 
+         u.id, 
+         u.name, 
+         u.email, 
+         u.role, 
+         u.department_id, 
+         d.department_name AS department_name, 
+         u.status
+       FROM users u
+       LEFT JOIN departments d ON u.department_id = d.id
+       WHERE u.id = ?`,
+      [id]
+    );
 
     if (rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -72,4 +121,3 @@ export async function getUserById(req, res) {
     res.status(500).json({ message: "Server error" });
   }
 }
-

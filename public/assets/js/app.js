@@ -74,10 +74,32 @@ function toggleVisibility(showId) {
     console.warn(`❌ Element with ID "${showId}" not found`);
   }
 }
+// ---- Dark Mode Toggle ----
+function initDarkModeToggle() {
+  // Select ALL dark toggle buttons and add click listeners
+  document.querySelectorAll('.darkToggle').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log("Dark mode toggled");
+      document.documentElement.classList.toggle('dark');
+      // Save preference to localStorage
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('darkMode', isDark ? 'true' : 'false');
+    });
+  });
+}
 
+// Load dark mode preference on page load
+function loadDarkModePreference() {
+  const isDark = localStorage.getItem('darkMode') === 'true';
+  if (isDark) {
+    document.documentElement.classList.add('dark');
+  }
+}
 
 // ---- Tasks ----
 
+// ---- Tasks ----
 async function loadTasks() {
   const res = await fetch(`${API_BASE}/tasks`, {
     headers: getHeaders(),
@@ -96,7 +118,7 @@ async function loadTasks() {
     filteredTasks = tasks.filter(task => task.assigned_to === currentUser.id);
   } else if (currentUser?.role === "Department Head" || currentUser?.role === "Professor Incharge") {
     // Department Head sees tasks in their department
-    filteredTasks = tasks.filter(task => task.department === currentUser.department);
+    filteredTasks = tasks.filter(task => task.department_id === currentUser.department_id);
   }
   // Admin sees all tasks, no filtering needed
 
@@ -104,41 +126,40 @@ async function loadTasks() {
   if (!container) return;
   container.innerHTML = "";
   const tableHead = document.getElementById("taskTableHeader");
-  console.log(filteredTasks)
 
   // ✅ Update the table header dynamically
-  tableHead.innerHTML = `
-  <th>Title</th>
-  <th>Description</th>
-  ${currentUser?.role === "Faculty/File Incharge" ? "" : "<th>Assigned To</th>"}
-  <th>Department</th>
-  <th>Priority</th>
-  <th>Due Date</th>
-  <th>Status</th>
-  <th>Actions</th>
-
+ tableHead.innerHTML = `
+  <tr>
+    <th>Title</th>
+    <th>Description</th>
+    ${currentUser?.role === "Faculty/File Incharge" ? "" : "<th>Assigned To</th>"}
+    <th>Department</th>
+    <th>Priority</th>
+    <th>Due Date</th>
+    <th>Status</th>
+    <th>Actions</th>
+  </tr>
 `;
-
   const tableBody = document.getElementById("taskrows");
   tableBody.innerHTML = ""; // Reset table before rendering
 
   for (const task of filteredTasks) {
     const row = document.createElement("tr");
-    const assignedTo = await getUserById(task.assigned_to);
+
     // ✅ Status dropdown for Professor Incharge only
     let statusDropdown = "";
     if (currentUser?.role === "Professor Incharge") {
       statusDropdown = `
-      <select 
-        onchange="updateTaskStatus(${task.id}, this.value)"
-        style="padding:3px;border-radius:5px;cursor:pointer;">
-        <option value="Pending" ${task.status === "Pending" ? "selected" : ""}>Pending</option>
-        <option value="In Progress" ${task.status === "In Progress" ? "selected" : ""}>In Progress</option>
-        <option value="Submitted" ${task.status === "Submitted" ? "selected" : ""}>Submitted</option>
-        <option value="Verified" ${task.status === "Verified" ? "selected" : ""}>Verified</option>
-        <option value="Closed" ${task.status === "Closed" ? "selected" : ""}>Closed</option>
-      </select>
-    `;
+        <select 
+          onchange="updateTaskStatus(${task.id}, this.value)"
+          style="padding:3px;border-radius:5px;cursor:pointer;">
+          <option value="Pending" ${task.status === "Pending" ? "selected" : ""}>Pending</option>
+          <option value="In Progress" ${task.status === "In Progress" ? "selected" : ""}>In Progress</option>
+          <option value="Submitted" ${task.status === "Submitted" ? "selected" : ""}>Submitted</option>
+          <option value="Verified" ${task.status === "Verified" ? "selected" : ""}>Verified</option>
+          <option value="Closed" ${task.status === "Closed" ? "selected" : ""}>Closed</option>
+        </select>
+      `;
     } else {
       statusDropdown = `<span style="font-weight:bold;">${task.status}</span>`;
     }
@@ -147,22 +168,22 @@ async function loadTasks() {
     let progressSection = "";
     if (currentUser?.id === task.assigned_to) {
       progressSection = `
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input 
-          type="range" 
-          min="0" 
-          max="100" 
-          step="5"
-          value="${task.progress}"
-          oninput="document.getElementById('progressLabel-${task.id}').innerText = this.value + '%'"
-          onchange="updateTaskProgress(${task.id}, this.value)"
-          style="cursor:pointer;width:120px;"
-        >
-        <span id="progressLabel-${task.id}" style="font-weight:bold;">
-          ${task.progress}
-        </span>
-      </div>
-    `;
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            step="5"
+            value="${task.progress}"
+            oninput="document.getElementById('progressLabel-${task.id}').innerText = this.value + '%'"
+            onchange="updateTaskProgress(${task.id}, this.value)"
+            style="cursor:pointer;width:120px;"
+          >
+          <span id="progressLabel-${task.id}" style="font-weight:bold;">
+            ${task.progress}%
+          </span>
+        </div>
+      `;
     } else {
       progressSection = `${task.progress}%`;
     }
@@ -171,55 +192,54 @@ async function loadTasks() {
     let actions = "";
     if (currentUser?.role === "Admin") {
       actions = `
-      <div style="display:flex;align-items:center;gap:8px;flex-direction:column">
-        <span style="color:green;">${progressSection} completed</span>
-        <div class="tasks-action-buttons">
-        <button class="tasks-btn-edit" onclick="editTask('${task.id}')">
-        <i class="fas fa-edit"></i> Edit
-        </button>
-        <button class="tasks-btn-delete" onclick="deleteTask('${task.id}')">
-        <i class="fas fa-trash"></i> Delete
-        </button>
-        
+        <div style="display:flex;align-items:center;gap:8px;flex-direction:column">
+          <span style="color:green;">${progressSection} completed</span>
+          <div class="tasks-action-buttons">
+            <button class="tasks-btn-edit" onclick="editTask('${task.id}')">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="tasks-btn-delete" onclick="deleteTask('${task.id}')">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
         </div>
-        </div>
-    `;
+      `;
     } else if (currentUser?.role === "Professor Incharge") {
       actions = `
-      <div class="tasks-action-buttons">
-        ${statusDropdown}
-        ${progressSection}
-      </div>
-    `;
+        <div class="tasks-action-buttons">
+          ${statusDropdown}
+          ${progressSection}
+        </div>
+      `;
     } else if (currentUser?.role === "Faculty/File Incharge") {
       actions = `
-      <div class="tasks-action-buttons">
-        ${progressSection}
-      </div>
-    `;
+        <div class="tasks-action-buttons">
+          ${progressSection}
+        </div>
+      `;
     } else {
       actions = `
-      <div class="tasks-action-buttons" style="color:gray;">
-        View Only
-      </div>
-    `;
+        <div class="tasks-action-buttons" style="color:gray;">
+          View Only
+        </div>
+      `;
     }
 
-    // ✅ Build the row
-    row.innerHTML = `
-    <td>${task.title}</td>
-    <td>${task.description}</td>
-    ${currentUser?.role === "Faculty/File Incharge" ? "" : `<td>${assignedTo.name || "Unassigned"}</td>`}
-    <td>${task.department}</td>
-    <td>${task.priority}</td>
-    <td>${formatDate(task.deadline)}</td>
-    <td>${task.status}</td>
-    <td>${actions}</td>
-  `;
+    // ✅ Build the row using new schema fields
+      row.innerHTML = `
+      <td class="text-slate-700 p-3 dark:text-slate-200">${task.title}</td>
+      <td class="text-slate-700 p-3 dark:text-slate-200">${task.description || ""}</td>
+      ${currentUser?.role === "Faculty/File Incharge" ? "" : `<td class="text-slate-700 p-3 dark:text-slate-200">${task.assignee_name || "Unassigned"}</td>`}
+      <td class="text-slate-700 p-3 dark:text-slate-200">${task.department_name || "N/A"}</td>
+      <td class="text-slate-700 p-3 dark:text-slate-200">${task.priority}</td>
+      <td class="text-slate-700 p-3 dark:text-slate-200">${formatDate(task.deadline)}</td>
+      <td class="text-slate-700 p-3 dark:text-slate-200">${statusDropdown}</td>
+      <td class="text-slate-700 p-3 dark:text-slate-200">${actions}</td>
+    `;
+        row.className = "border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700";
 
     tableBody.appendChild(row);
-  };
-
+  }
 }
 
 
@@ -913,9 +933,70 @@ async function loadUsers() {
   return users; // ✅ return array so openTaskModal() can use it
 }
 
+async function loadDepartmentsForUserForm() {
+  const select = document.getElementById("userDepartment");
+  select.innerHTML = `<option value="">Select department</option>`;
+
+  const res = await fetch(`${API_BASE}/departments`);
+  const departments = await res.json();
+
+  departments
+    .filter(d => d.is_active === "Yes")
+    .forEach(d => {
+      const option = document.createElement("option");
+      option.value = d.id; // ✅ department_id
+      option.textContent = `${d.department_code} - ${d.department_name}`;
+      select.appendChild(option);
+    });
+}
+
+async function openEditUserModal(userId) {
+  try {
+    const res = await fetch(`${API_BASE}/users/${userId}`, {
+      headers: getHeaders()
+    });
+
+    if (!res.ok) {
+      alert("Failed to fetch user details");
+      return;
+    }
+
+    const user = await res.json();
+
+    const form = document.getElementById("createUserForm");
+
+    // Switch to edit mode
+    form.dataset.mode = "edit";
+    form.dataset.userId = user.id;
+
+    // Auto-fill fields
+    document.getElementById("userName").value = user.name;
+    document.getElementById("userEmail").value = user.email;
+    document.getElementById("userRole").value = user.role;
+
+    // Password stays empty
+    document.getElementById("userPass").value = "";
+
+    // Change submit text
+    document.querySelector("#createUserForm .btn-submit").textContent =
+      "Update User";
+
+    openModal();
+  } catch (err) {
+    console.error(err);
+    alert("Error loading user");
+  }
+}
+
 
 // Open/close modal
 function openModal() {
+
+     if (currentDepartment) {
+    document.getElementById("userDepartmentDisplay").value =
+      `${currentDepartment.department_code} - ${currentDepartment.department_name}`;
+  }
+
   document.getElementById('userEmail').value = "";
   document.getElementById('userPass').value = "";
   document.getElementById('createUserModal').style.display = 'block';
@@ -924,33 +1005,61 @@ function openModal() {
 function closeModal() {
   const form = document.getElementById("createUserForm");
   form.reset();
+
   delete form.dataset.mode;
   delete form.dataset.userId;
-  document.querySelector("#createUserForm .btn-submit").textContent = "Create User";
-  document.getElementById('createUserModal').style.display = 'none';
-  document.body.style.overflow = 'auto';
-  // Removed duplicate reset
+
+  document.querySelector("#createUserForm .btn-submit").textContent =
+    "Create User";
+
+  document.getElementById("createUserModal").style.display = "none";
+  document.body.style.overflow = "auto";
 }
+
 
 // Create user
 async function createUser() {
-  const name = document.getElementById("userName").value;
-  const email = document.getElementById("userEmail").value;
+  if (!currentDepartment) {
+    alert("No department selected");
+    return;
+  }
+
+  const name = document.getElementById("userName").value.trim();
+  const email = document.getElementById("userEmail").value.trim();
   const password = document.getElementById("userPass").value;
   const role = document.getElementById("userRole").value;
-  const department = document.getElementById("userDepartment").value;
+  const contact = document.getElementById("userContact").value.trim();
+  if (!/^\d+$/.test(contact)) {
+    alert("Contact must contain only numbers");
+    return;
+  }
+  
 
   const res = await fetch(`${API_BASE}/users`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify({ name, email, password, role, department })
+    body: JSON.stringify({
+      name,
+      email,
+      password,
+      role,
+      department_id: currentDepartment.id, // ✅ AUTO-FILLED
+      contact,
+      status: "Active"
+    })
   });
 
-  if (!res.ok) return alert("Failed to create user");
-  alert("User created!");
+  if (!res.ok) {
+    const err = await res.json();
+    alert(err.message || "Failed to create user");
+    return;
+  }
+
+  alert("User created successfully!");
   closeModal();
-  loadUsers();
+  loadDepartmentUsers(currentDepartment.id); // refresh table
 }
+
 
 // Delete user
 async function deleteUser(id) {
@@ -1024,75 +1133,225 @@ async function getUserById(userId) {
     return null;
   }
 }
-// Edit user
-async function editUser(id) {
-  const user = await getUserById(id);
-  if (!user) return alert("User not found");
-
-  // Fill form
-  document.getElementById("userName").value = user.name;
-  document.getElementById("userEmail").value = user.email;
-  document.getElementById("userRole").value = user.role;
-  document.getElementById("userDepartment").value = user.department;
-
-  // Mark form as edit mode
-  const form = document.getElementById("createUserForm");
-  form.dataset.mode = "edit";
-  form.dataset.userId = id;
-  document.querySelector("#createUserForm .btn-submit").textContent = "Update User";
-
-
-  openModal();
-}
 
 // Update user
-async function updateUser(id) {
-  const name = document.getElementById("userName").value;
-  const email = document.getElementById("userEmail").value;
+async function updateUser(userId) {
+  const name = document.getElementById("userName").value.trim();
+  const email = document.getElementById("userEmail").value.trim();
   const role = document.getElementById("userRole").value;
-  const department = document.getElementById("userDepartment").value;
 
-  const res = await fetch(`${API_BASE}/users/${id}`, {
+  const res = await fetch(`${API_BASE}/users/${userId}`, {
     method: "PUT",
     headers: getHeaders(),
-    body: JSON.stringify({ name, email, role, department })
+    body: JSON.stringify({
+      name,
+      email, // ✅ INCLUDED
+      role,
+      status: "Active"
+    })
   });
 
-  if (!res.ok) return alert("Failed to update user");
-  alert("User updated!");
-  closeModal();
-  loadUsers();
-}
-const alertsContainer = document.getElementById("alerts-container");
+  if (!res.ok) {
+    const err = await res.json();
+    alert(err.message || "Failed to update user");
+    return;
+  }
 
-async function loadSystemAlerts() {
+  alert("User updated successfully!");
+  closeModal();
+  loadDepartmentUsers(currentDepartment.id);
+}
+// ================= DEPARTMENTS =================
+const departmentGrid = document.getElementById("departmentGrid");
+document.addEventListener("click", (e) => {
+  const card = e.target.closest("[data-department-id]");
+  if (!card) return;
+
+  const depId = card.dataset.departmentId;
+  console.log("Delegated click:", depId);
+
+  // Find department object
+  const dep = window._departments.find(d => d.id == depId);
+  if (dep) openDepartment(dep);
+});
+
+async function renderDepartments() {
   try {
-    const res = await fetch(`${API_BASE}/alerts`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
+    const response = await fetch("http://localhost:5000/api/departments");
+    const departments = await response.json();
+window._departments = departments;
+    // ✅ SAFETY CHECK
+    if (!Array.isArray(departments)) {
+      console.error("Expected array, got:", departments);
+      return;
+    }
+
+    departmentGrid.innerHTML = "";
+
+
+    departments
+      .filter(dep => dep.is_active === "Yes")
+      .slice(1) // skip first department
+      .forEach(dep => {
+        const card = document.createElement("div");
+        card.className = `
+          bg-white dark:bg-slate-800 rounded-xl p-5 shadow
+          hover:shadow-md hover:-translate-y-1 transition cursor-pointer
+        `;
+
+        card.innerHTML = `
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-semibold">${dep.department_code}</h3>
+            <i class="bx bx-right-arrow-alt text-xl"></i>
+          </div>
+          <p class="text-sm">${dep.department_name}</p>
+        `;
+        card.dataset.departmentId = dep.id;
+
+
+        // ✅ CLICK → OPEN DEPARTMENT DASHBOARD
+        card.onclick = () => {
+          console.log("Opening department:", dep);
+          openDepartment(dep);
+        }
+          
+
+        departmentGrid.appendChild(card);
+      });
+
+    // ✅ Add Department Card (always last)
+    departmentGrid.innerHTML += `
+      <div id="addBtn"
+           class="bg-white dark:bg-slate-800 rounded-xl p-5 shadow
+           flex flex-col items-center justify-center gap-2
+           hover:shadow-md hover:-translate-y-1 transition cursor-pointer">
+
+        <button onclick="openDepartmentModal()"
+                class="flex flex-col items-center justify-center w-full">
+          <div class="w-10 h-10 flex items-center justify-center
+                      rounded-full bg-blue-700">
+            <i class="fa-solid fa-plus text-white"></i>
+          </div>
+          <span class="text-sm font-bold mt-2">Add Department</span>
+        </button>
+
+      </div>
+    `;
+
+  } catch (error) {
+    console.error("Error loading departments:", error);
+  }
+}
+let currentDepartment = null;
+
+function openDepartment(dep) {
+  currentDepartment = dep;
+
+  // Set department title
+  document.getElementById("departmentTitle").textContent =
+    dep.department_code;
+
+  // Switch page (your existing system)
+  toggleVisibility("departmentDashboard");
+  console.log("Opened department:", dep);
+
+  // Load department-specific data
+  loadDepartmentStats(dep.id);
+  loadDepartmentUsers(dep.id);
+}
+
+async function loadDepartmentStats(departmentId) {
+  try {
+    const res = await fetch(`${API_BASE}/departments/${departmentId}/stats`);
+    const stats = await res.json();
+
+    document.getElementById("depttotalTasks").textContent = stats.total || 0;
+    document.getElementById("deptpendingTasks").textContent = stats.pending || 0;
+    document.getElementById("deptinProgressTasks").textContent = stats.inProgress || 0;
+    document.getElementById("deptcompletedTasks").textContent = stats.completed || 0;
+  } catch (err) {
+    console.error("Failed to load stats", err);
+  }
+}
+async function loadDepartmentUsers(departmentId) {
+  try {
+    const res = await fetch(`${API_BASE}/departments/${departmentId}/users`);
+    const users = await res.json();
+
+    const tbody = document.getElementById("departmentUsersTable");
+    tbody.innerHTML = "";
+
+    if (users.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center py-4 text-gray-500">
+            No users Yet.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    users.forEach(user => {
+      console.log("user : ",user)
+      tbody.innerHTML += `
+        <tr class="border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700">
+          <td class="px-4 py-2">${user.name}</td>
+          <td class="px-4 py-2">${user.role}</td>
+          <td class="px-4 py-2">${user.email}</td>
+          <td class="px-4 py-2">${user.contact}</td>
+          <td class="px-4 py-2">${user.status}</td>
+          <td class="px-4 py-2">
+            <button class="edit-btn" onclick="openEditUserModal('${user.id}')">
+                        <i class='bx bx-edit-alt cursor-pointer hover:text-blue-600'></i>
+                        
+                    </button>
+                            
+          </td>
+        </tr>
+      `;
     });
 
-    const data = await res.json();
-    const alertsContainer = document.getElementById("system-alerts");
-    alertsContainer.innerHTML = "";
-
-    if (data.success && data.alerts.length > 0) {
-      data.alerts.forEach((alert) => {
-        const li = document.createElement("li");
-        li.innerHTML = `<b>${alert.type === "task" ? "📝 Task" : "📌 Event"}:</b> ${alert.message}`;
-        alertsContainer.appendChild(li);
-      });
-    } else {
-      alertsContainer.innerHTML = `<li>No new alerts 🎉</li>`;
-    }
-  } catch (error) {
-    console.error("Error loading alerts:", error);
+  } catch (err) {
+    console.error("Failed to load users", err);
   }
 }
 
+async function createDepartment() {
+  const department_code =
+    document.getElementById("departmentCode").value.trim();
+  const department_name =
+    document.getElementById("departmentName").value.trim();
 
+  const res = await fetch(`${API_BASE}/departments`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ department_code, department_name })
+  });
+
+  if (!res.ok) {
+    alert("Failed to add department");
+    return;
+  }
+
+  alert("Department added!");
+  closeDepartmentModal();
+  renderDepartments();
+}
+
+
+function openDepartmentModal() {
+  document.getElementById("createDepartmentModal").style.display = "block";
+  document.body.style.overflow = "hidden";
+}
+
+function closeDepartmentModal() {
+  const form = document.getElementById("createDepartmentForm");
+  form.reset();
+
+  document.getElementById("createDepartmentModal").style.display = "none";
+  document.body.style.overflow = "auto";
+}
 
 
 
@@ -1101,6 +1360,8 @@ async function loadSystemAlerts() {
 document.addEventListener("DOMContentLoaded", () => {
   console.log("App initialized");
   // Default section
+    loadDarkModePreference();
+  initDarkModeToggle();
   toggleVisibility("mainpage");
 
 
@@ -1125,6 +1386,11 @@ document.addEventListener("DOMContentLoaded", () => {
     loadEvents();
   }
 
+   document.getElementById("showdepartments")?.addEventListener("click", () => {
+    console.log("Loading departments...");
+    renderDepartments();
+    toggleVisibility('allDepartments');
+  });
   // Sidebar buttons
   document.getElementById("showtasks")?.addEventListener("click", () => {
     console.log("Loading tasks...");
@@ -1172,6 +1438,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  //department form
+  
+const createDepartmentForm = document.getElementById("createDepartmentForm");
+
+if (createDepartmentForm) {
+  createDepartmentForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    await createDepartment();
+    
+  });
+}
+
+// Event form
   const eventUserForm = document.getElementById("proposeEventForm");
   if (eventUserForm) {
     eventUserForm.addEventListener("submit", async (event) => {
