@@ -1,5 +1,5 @@
 /* Container */
-body, html {
+/* body, html {
     margin: 0;
     padding: 0;
     height: 100%;
@@ -7,7 +7,7 @@ body, html {
     background: linear-gradient(to bottom right, #111, #000, #222);
     color: #fff;
     overflow-x: hidden;
-}
+} */
 
 #mainpage, #taskList {
   transition: display 0.3s ease;

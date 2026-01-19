@@ -9,6 +9,22 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        sidebar: '#2f4156'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <!-- FullCalendar CSS & JS -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
@@ -19,10 +35,10 @@
 
 
 <body>
-    <div class="dashboard-container bg-gray-100 h-screen w-screen overflow-hidden">
+    <div class="dashboard-container bg-gray-100 dark:bg-slate-900 h-screen w-screen overflow-hidden overflow-x-hidden">
 
         <!-- Sidebar -->
-        <aside class="col-span-3 bg-[#2B3D50] p-6 w-[20vw] flex flex-col gap-4 h-full">
+        <aside class="col-span-3 bg-[#2B3D50] dark:bg-[#1a2332] p-6 w-[20vw] flex flex-col gap-4 h-full">
 
             <h2 id="sidebarTitle" class="font-semibold text-xl text-white mb-2">Welcome UserName!</h2>
 
@@ -36,53 +52,62 @@
 
 
         <!-- Main Content -->
-        <main class="main-content px-3 page py-2 overflow-y-auto" id="mainpage">
-            <div class="border-blue-400 bg-white shadow-lg h-[100vh]">
+        <main class="main-content  page  overflow-y-auto dark:bg-slate-900" id="mainpage">
+            <div class="border-blue-400 bg-white dark:bg-slate-800 shadow-lg p-2">
                 <!-- Main Section -->
-                <main class="col-span-9 h-full ">
+                <main class="col-span-9">
 
-                    <!-- Top Bar -->
-                    <div class="flex justify-between items-center mb-6">
-                        <h1 class="font-semibold text-lg text-black flex gap-2 items-center">
-                            Admin Dashboard <span>👤</span>
-                        </h1>
-                        <div class="flex gap-4 text-xl">
-                            <span>🔔</span>
-                            <span>↩</span>
-                        </div>
+                     <!-- Top Bar -->
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100"></h2>
+
+                    <div class="flex items-center gap-4">
+                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
+                            <i class="fa-regular fa-bell"></i>
+                        </button>
+
+                        <button
+                            class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
+                            <i class='bx bx-moon'></i>
+                        </button>
+
+                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-red-400">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </button>
                     </div>
+                </div>
 
                     <!-- Task Cards -->
                     <div class="grid grid-cols-4 gap-4 mb-6">
-                        <div class="statCard">
-                            <p class="font-medium">Total Tasks</p>
-                            <h2 class="text-3xl font-semibold text-purple-600" id="totaltasks">138</h2>
+                        <div class="statCard dark:bg-slate-700">
+                            <p class="font-medium text-gray-700 dark:text-slate-200">Total Tasks</p>
+                            <h2 class="text-3xl font-semibold !text-purple-600 dark:text-purple-400" id="totaltasks">138</h2>
                         </div>
-                        <div class="statCard">
-                            <p class="font-medium">Pending</p>
-                            <h2 class="text-3xl font-semibold text-pink-600" id="pendingtasks">30</h2>
+                        <div class="statCard dark:bg-slate-700">
+                            <p class="font-medium text-gray-700 dark:text-slate-200">Pending</p>
+                            <h2 class="text-3xl font-semibold !text-pink-600 dark:text-pink-400" id="pendingtasks">30</h2>
                         </div>
-                        <div class="statCard">
-                            <p class="font-medium">In-Progress</p>
-                            <h2 class="text-3xl font-semibold text-indigo-600" id="inprogresstasks">64</h2>
+                        <div class="statCard dark:bg-slate-700">
+                            <p class="font-medium text-gray-700 dark:text-slate-200">In-Progress</p>
+                            <h2 class="text-3xl font-semibold !text-indigo-600 dark:text-indigo-400" id="inprogresstasks">64</h2>
                         </div>
-                        <div class="statCard">
-                            <p class="font-medium">Completed</p>
-                            <h2 class="text-3xl font-semibold text-green-600" id="completedtasks">44</h2>
+                        <div class="statCard dark:bg-slate-700">
+                            <p class="font-medium text-gray-700 dark:text-slate-200">Completed</p>
+                            <h2 class="text-3xl font-semibold !text-green-600 dark:text-green-400" id="completedtasks">44</h2>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-12 gap-4">
+                    <div class="grid grid-cols-12 gap-4 ">
 
                         <!-- Charts -->
-                        <div class="col-span-6 bg-white p-6 rounded-xl shadow-md px-3">
+                        <div class="col-span-6 bg-white dark:bg-slate-700 p-6 rounded-xl shadow-md px-3">
                             <canvas id="donutChart" width="200" height="200"></canvas>
-<canvas id="barChart" width="300" height="200" class="mt-6"></canvas>
+                            <canvas id="barChart" width="300" height="200" class="mt-6"></canvas>
                         </div>
 
-                        <div class=" col-span-6 glass animate-fade-in-up delay-200">
-                            <h2>Event Calendar View</h2>
-                            <div id="calendar" style="height: 500px;"></div>
+                        <div class=" col-span-6 glass animate-fade-in-up delay-200 bg-white dark:bg-slate-700 p-6 rounded-xl shadow-md">
+                            <h2 class="text-gray-900 dark:text-slate-100 font-semibold mb-4">Event Calendar View</h2>
+                            <div id="calendar" style="height: 500px;" class="dark:text-slate-200"></div>
                         </div>
 
                     </div>
@@ -91,196 +116,285 @@
 
             </div>
         </main>
-        <div id="taskManagement" class="page">
-            <div class="tasks-container">
-                <!-- Header Section -->
-                <div class="tasks-header">
-                    <h1><i class="fas fa-tasks"></i> Task Management</h1>
-                    <p>Organize and track project tasks and assignments</p>
+        <div class="h-[100vh] w-full page bg-gray-50 dark:bg-slate-900
+             text-slate-700 dark:text-slate-200" id="allDepartments">
+
+
+
+            <!-- Main Content -->
+            <main class="flex-1 p-8">
+
+                <!-- Top Bar -->
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">All Departments</h2>
+
+                    <div class="flex items-center gap-4">
+                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
+                            <i class="fa-regular fa-bell"></i>
+                        </button>
+
+                        <button
+                            class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
+                            <i class='bx bx-moon'></i>
+                        </button>
+
+                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-red-400">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </button>
+                    </div>
                 </div>
-                <div id="createTaskModal" class="tasks-modal">
-                    <div class="tasks-modal-content">
-                        <div class="tasks-modal-header">
-                            <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
-                            <button class="tasks-close-btn" onclick="closeTaskModal()">&times;</button>
+
+                <!-- Departments Grid -->
+                <div id="departmentGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+
+
+
+
+                </div>
+                <!-- Create Department Modal -->
+                <div id="createDepartmentModal" class="modal h-[100vh]">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2><i class="fas fa-building"></i> Add Department</h2>
+                            <button class="close-btn" onclick="closeDepartmentModal()">&times;</button>
                         </div>
-                        <div class="tasks-modal-body">
-                            <form id="createTaskForm">
 
+                        <div class="modal-body">
+                            <form id="createDepartmentForm">
 
-                                <div class="tasks-form-group">
-                                    <label for="taskTitle">Task Title</label>
-                                    <input type="text" id="taskTitle" name="taskTitle" placeholder="Enter task title"
-                                        required>
+                                <div class="form-group">
+                                    <label for="departmentCode">Department Code</label>
+                                    <input type="text" id="departmentCode" placeholder="CSE" required>
                                 </div>
 
-                                <div class="tasks-form-group">
-                                    <label for="taskDescription">Description</label>
-                                    <textarea id="taskDescription" name="taskDescription"
-                                        placeholder="Enter task description" required></textarea>
+                                <div class="form-group">
+                                    <label for="departmentName">Department Name</label>
+                                    <input type="text" id="departmentName"
+                                        placeholder="Computer Science and Engineering" required>
                                 </div>
 
-                                <div class="tasks-form-group">
-                                    <label for="taskAssignedTo" id="taskAssignedToLabel">Assigned To</label>
-                                    <select id="taskAssignedTo" name="taskAssignedTo" required>
-
-                                    </select>
+                                <div class="form-actions">
+                                    <button type="button" class="btn-cancel"
+                                        onclick="closeDepartmentModal()">Cancel</button>
+                                    <button type="submit" class="btn-submit">
+                                        Add Department
+                                    </button>
                                 </div>
 
-                                <input type="hidden" id="hiddenAssignedTo" name="hiddenAssignedTo" />
-                                <div class="tasks-form-group">
-                                    <label for="taskPriority">Priority</label>
-                                    <select id="taskPriority" name="taskPriority" required>
-                                        <option value="Low">Low</option>
-                                        <option value="Medium">Medium</option>
-                                        <option value="High">High</option>
-                                    </select>
-                                </div>
-
-                                <div class="tasks-form-group">
-                                    <label for="taskStatus">Status</label>
-                                    <select id="taskStatus" name="taskStatus" required>
-                                        <option value="Pending">Pending</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Submitted">Submitted</option>
-                                        <option value="Verified">Verified</option>
-
-                                    </select>
-                                </div>
-
-                                <div class="tasks-form-group">
-                                    <label for="taskDueDate">Due Date</label>
-                                    <input type="date" id="taskDueDate" name="taskDueDate" required>
-                                </div>
-
-
-                                <div class="tasks-form-actions">
-                                    <button type="button" class="tasks-btn-cancel"
-                                        onclick="closeTaskModal()">Cancel</button>
-                                    <button type="submit" class="tasks-btn-submit">Create Task</button>
-                                </div>
                             </form>
                         </div>
                     </div>
                 </div>
 
+            </main>
+        </div>
 
-                <!-- Table Section -->
-                <div class="tasks-table-section">
-                    <div class="tasks-table-header">
-                        <h2 class="tasks-table-title">All Tasks</h2>
-                        <button class="tasks-create-btn" onclick="openTaskModal()">
-                            <i class="fas fa-plus"></i>
-                            Create Task
-                        </button>
+        <div id="departmentDashboard"
+            class="page bg-gray-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 transition-all duration-300 w-full h-[100vh] overflow-y-auto">
+            <main class="flex-1 p-8">
+                <!-- Top Bar -->
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-2 text-lg font-semibold">
+                        <i class='bx bx-chevron-left text-xl cursor-pointer'
+                            onclick="toggleVisibility('allDepartments')"></i>
+                        <span id="departmentTitle"></span>
                     </div>
 
-                    <div class="scrollable-table-container">
-                        <table id="tasksTable" class="tasks-table">
-                            <thead id="taskTableHeader">
 
+                    <div class="flex items-center gap-4">
+                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                            <i class="fa-regular fa-bell"></i>
+                        </button>
+
+                        <button id="darkToggle"
+                            class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                            <i class='bx bx-moon'></i>
+                        </button>
+                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 shadow hover:shadow-md transition">
+                        <p class="text-sm">Total Tasks</p>
+                        <h2 class="text-2xl font-bold text-purple-700 dark:text-purple-400" id="depttotalTasks">0</h2>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 shadow hover:shadow-md transition">
+                        <p class="text-sm">Pending</p>
+                        <h2 class="text-2xl font-bold text-purple-700 dark:text-purple-400" id="deptpendingTasks">0</h2>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 shadow hover:shadow-md transition">
+                        <p class="text-sm">In-Progress</p>
+                        <h2 class="text-2xl font-bold text-purple-700 dark:text-purple-400" id="deptinProgressTasks">0
+                        </h2>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 shadow hover:shadow-md transition">
+                        <p class="text-sm">Completed</p>
+                        <h2 class="text-2xl font-bold text-purple-700 dark:text-purple-400" id="deptcompletedTasks">0
+                        </h2>
+                    </div>
+                </div>
+<div id="createUserModal" class="modal h-[100vh]">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><i class="fas fa-user-plus"></i> Create New User</h2>
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <form id="createUserForm">
+
+        <div class="form-group">
+          <label for="userName">Full Name</label>
+          <input type="text" id="userName" required>
+        </div>
+
+        <div class="form-group">
+          <label for="userEmail">Email Address</label>
+          <input type="email" id="userEmail" required>
+        </div>
+
+        <div class="form-group">
+          <label for="userPass">User Password</label>
+          <input type="password" id="userPass" required>
+        </div>
+ <div class="form-group">
+          <label for="userContact">Contact</label>
+          <input type="text" id="userContact" required>
+        </div>
+        <div class="form-group">
+          <label for="userRole">Role</label>
+          <select id="userRole" required>
+            <option value="">Select role</option>
+            <option value="Admin">Admin</option>
+            <option value="Department Head">Department Head</option>
+            <option value="Professor Incharge">Professor Incharge</option>
+            <option value="Faculty/File Incharge">Faculty/File Incharge</option>
+            <option value="View Only">View Only</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+  <label>Department</label>
+  <input type="text" id="userDepartmentDisplay" disabled>
+</div>
+
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn-submit">Create User</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+                <!-- Table Card -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+
+                    <!-- Search -->
+                    <div class="flex justify-between items-center mb-4">
+                        <input type="text" placeholder="Search ..." class="w-60 px-4 py-2 border rounded-xl outline-none
+                 focus:ring-2 focus:ring-slate-300
+                 dark:bg-slate-700 dark:border-slate-600">
+
+                        <div class="flex justify-center items-center gap-3 text-xl">
+                            <i class='bx bx-filter cursor-pointer text-3xl hover:text-blue-500 transition'></i>
+                            <button class="create-btn" onclick="openModal()">
+                        <i class="bx bx-user-plus cursor-pointer hover:text-green-500 transition"></i>
+                        
+                    </button>
+                            
+                            
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-100 dark:bg-slate-700">
+                                <tr>
+                                    <th class="text-left px-4 py-2">Name</th>
+                                    <th class="text-left px-4 py-2">Role</th>
+                                    <th class="text-left px-4 py-2">Email</th>
+                                    <th class="text-left px-4 py-2">Contact</th>
+                                    <th class="text-left px-4 py-2">Active</th>
+                                    <th class="px-4 py-2"></th>
+                                </tr>
                             </thead>
-                            <tbody id="taskrows"></tbody>
+
+                            <tbody id="departmentUsersTable">
+
+                            </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
 
-        <div id="userManagement" class="page">
-            <!-- Header Section -->
-            <div class="header">
-                <h1><i class="fas fa-users"></i> User Management</h1>
-                <p>Manage your team members and their access levels</p>
-            </div>
+        
+        <div id="taskManagement" class="page bg-gray-50 dark:bg-slate-900
+             text-slate-700 dark:text-slate-200
+             transition-colors duration-300 w-full h-[100vh] overflow-y-auto">
+            <!-- Main -->
+                      <main class="flex-1 p-8 bg-gray-50 dark:bg-slate-900 h-[100vh]">
 
-            <!-- Create User Modal -->
-            <div id="createUserModal" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2><i class="fas fa-user-plus"></i> Create New User</h2>
-                        <button class="close-btn" onclick="closeModal()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="createUserForm">
+                <!-- Top Bar -->
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold">All Tasks</h2>
 
+                    <div class="flex items-center gap-4">
+                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                            <i class="fa-regular fa-bell"></i>
+                        </button>
 
-                            <div class="form-group">
-                                <label for="userName">Full Name</label>
-                                <input type="text" id="userName" name="userName" placeholder="Enter full name" required>
-                            </div>
+                        <!-- Dark mode toggle -->
+                                <button class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                                    <i class='bx bx-moon'></i>
+                                </button>
 
-                            <div class="form-group">
-                                <label for="userEmail">Email Address</label>
-                                <input type="email" id="userEmail" name="userEmail" placeholder="Enter email address"
-                                    required>
-                            </div>
-                            <div class="form-group">
-                                <label for="userPass">User Password</label>
-                                <input type="password" id="userPass" name="userPass" placeholder="Enter user Password"
-                                    required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="userRole">Role</label>
-                                <select id="userRole" name="userRole" required>
-                                    <option value="">Select a role</option>
-                                    <option value="Department Head">Department Head</option>
-                                    <option value="Professor Incharge">Professor Incharge</option>
-                                    <option value="Faculty/File Incharge">Faculty/File Incharge</option>
-                                    <option value="Principal/Management">Principal/Management</option>
-                                    <option value="Admin">Admin</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="userDepartment">Department</label>
-                                <select id="userDepartment" name="userDepartment" required>
-                                    <option value="">Select department</option>
-                                    <option value="CSE">Computer Science</option>
-                                    <option value="ECE">Electronics</option>
-                                    <option value="EEE">Electrical</option>
-                                    <option value="MECH">Mechanical</option>
-                                    <option value="CIVIL">Civil</option>
-                                    <option value="PLACEMENT CELL">Placement Cell</option>
-                                </select>
-                            </div>
-
-                            <div class="form-actions">
-                                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-                                <button type="submit" class="btn-submit">CreateUser</button>
-                            </div>
-                        </form>
+                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </button>
                     </div>
                 </div>
-            </div>
-            <!-- Table Section -->
-            <div class="table-section">
-                <div class="table-header">
-                    <h2 class="table-title">All Users</h2>
-                    <button class="create-btn" onclick="openModal()">
-                        <i class="fas fa-plus"></i>
-                        Create User
-                    </button>
+
+                <!-- Search -->
+                <div class="flex justify-between items-center mb-4">
+                    <input id="search" type="text" placeholder="Search ..." class="w-90 px-4 py-2 border rounded-xl outline-none
+               bg-white dark:bg-slate-800
+               border-gray-500 dark:border-slate-600
+               focus:ring-2 focus:ring-slate-300">
+
+                    <div class="flex gap-4 text-xl">
+                        <i class='bx bx-filter cursor-pointer hover:text-blue-500 transition'></i>
+                        <i class='bx bx-file cursor-pointer hover:text-green-500 transition'></i>
+                    </div>
                 </div>
 
-                <div class="scrollable-table-container">
-                    <table id="usersTable">
-                        <thead>
-                            <tr>
-
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Department</th>
-                                <th>Modify</th>
-                            </tr>
+                <!-- Table -->
+                                <div class="bg-white dark:bg-slate-800 rounded-xl shadow overflow-x-auto">
+                    <table class="w-full text-sm p-3 bg-white dark:bg-slate-800 ">
+                        <thead class="bg-gray-700 p-3 h-[40px] dark:bg-slate-700 text-white" id="taskTableHeader">
+                           
                         </thead>
-                        <tbody id="tableRows"></tbody>
+
+                        <tbody id="taskrows" >
+                            
+
+                        </tbody>
                     </table>
                 </div>
-            </div>
+            </main>
+
         </div>
+
+        
         <div id="eventManagement" class="page">
             <div class="events-container">
                 <!-- Header Section -->
@@ -506,6 +620,7 @@
         };
     </script>
     <script src="assets/js/script.js"></script>
+    
 
 </body>
 

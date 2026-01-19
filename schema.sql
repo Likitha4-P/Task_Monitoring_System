@@ -32,6 +32,7 @@ CREATE TABLE users (
     'View Only'
   ) NOT NULL,
   department_id INT,
+  Contact VARCHAR(50),
   status ENUM('Active','Inactive') DEFAULT 'Active',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL

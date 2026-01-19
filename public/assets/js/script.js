@@ -102,6 +102,8 @@ async function loadTaskCounters() {
 ------------------------------*/
 
 document.addEventListener("DOMContentLoaded", () => {
+  
+
   loadTaskCounters();
   loadDonutChart();
   loadBarChart();
@@ -113,3 +115,58 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 120000); // refresh every 120 seconds
 });
 
+/* PAGE LOAD ANIMATION */
+window.addEventListener("load", () => {
+  document.querySelectorAll("aside, main").forEach((el, i) => {
+    el.style.opacity = "0";
+    el.style.transform = "translateY(20px)";
+    el.style.transition = "all 0.6s ease";
+
+    setTimeout(() => {
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0)";
+    }, i * 150);
+  });
+});
+
+/* SEARCH FILTER */
+const search = document.getElementById("search");
+const rows = document.querySelectorAll("#taskTable tr");
+
+search.addEventListener("input", () => {
+  const value = search.value.toLowerCase();
+  rows.forEach(row => {
+    row.style.display = row.innerText.toLowerCase().includes(value)
+      ? ""
+      : "none";
+  });
+});
+
+/* PROGRESS BAR ANIMATION */
+document.querySelectorAll(".progress-bar").forEach(bar => {
+  const targetWidth = bar.classList.contains("w-full") ? "100%" : "25%";
+  bar.style.width = "0%";
+
+  setTimeout(() => {
+    bar.style.transition = "width 0.8s ease";
+    bar.style.width = targetWidth;
+  }, 300);
+});
+
+/* ROW FOCUS EFFECT */
+rows.forEach(row => {
+  row.addEventListener("mouseenter", () => {
+    rows.forEach(r => r !== row && (r.style.opacity = "0.4"));
+  });
+  row.addEventListener("mouseleave", () => {
+    rows.forEach(r => (r.style.opacity = "1"));
+  });
+});
+
+/* ICON CLICK FEEDBACK */
+document.querySelectorAll("i").forEach(icon => {
+  icon.addEventListener("click", () => {
+    icon.style.transform = "scale(1.3)";
+    setTimeout(() => (icon.style.transform = "scale(1)"), 150);
+  });
+});
