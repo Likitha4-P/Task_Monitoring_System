@@ -35,21 +35,30 @@ if (userRows.length) {
     res.status(e.status || 500).json({ message: e.message || "Failed to create event" });
   }
 }
-
+// GET ALL EVENTS
 export async function listEvents(req, res) {
   try {
-    const [rows] = await pool.query(
-      `SELECT e.*, u.name as creator_name
-       FROM events e LEFT JOIN users u ON e.created_by = u.id
-       ORDER BY e.id DESC`
-    );
+    const [rows] = await pool.query(`
+      SELECT 
+        e.id,
+        e.title,
+        e.event_date,
+        e.participants,
+        e.venue,
+        e.status,
+        e.created_by,
+        d.department_code
+      FROM events e
+      LEFT JOIN departments d ON e.department_id = d.id
+      ORDER BY e.created_at DESC
+    `);
+
     res.json(rows);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "Failed to list events" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to load events" });
   }
 }
-
 // export async function approveEvent(req, res) {
 //   try {
 //     const { id } = req.params;

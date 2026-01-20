@@ -97,7 +97,6 @@ function loadDarkModePreference() {
   }
 }
 
-// ---- Tasks ----
 
 // ---- Tasks ----
 async function loadTasks() {
@@ -271,7 +270,7 @@ async function editTask(taskId) {
   document.getElementById("taskDescription").value = task.description;
   document.getElementById("taskDueDate").value = task.deadline.split("T")[0];
   document.getElementById("taskPriority").value = task.priority;
-  document.getElementById("taskStatus").value = task.status;
+  document.getElementById("taskDeliverables").value = task.deliverables;
   document.getElementById("taskAssignedTo").value = task.assigned_to;
   document.getElementById("hiddenAssignedTo").value = task.assigned_to;
   const assignedToSelect = document.getElementById("taskAssignedTo");
@@ -303,12 +302,13 @@ async function updateTask(taskId) {
   const description = document.getElementById("taskDescription").value;
   const deadline = document.getElementById("taskDueDate").value;
   const priority = document.getElementById("taskPriority").value;
-  const status = document.getElementById("taskStatus").value;
+  const deliverables = document.getElementById("taskDeliverables").value;
+  const status = document.getElementById("taskStatus")?.value || null;
   const assigned_to = document.getElementById("hiddenAssignedTo").value;
   const res = await fetch(`${API_BASE}/tasks/${taskId}`, {
     method: "PUT",
     headers: getHeaders(),
-    body: JSON.stringify({ title, description, deadline, priority, status, assigned_to })
+    body: JSON.stringify({ title, description, deadline, priority, deliverables, status,assigned_to })
   });
 
   if (!res.ok) return alert("Failed to update task");
@@ -445,7 +445,7 @@ function populateFacultyDropdown(facultyMembers) {
   facultyMembers.forEach(faculty => {
     const option = document.createElement('option');
     option.value = faculty.id; // better to store id, not just name
-    option.textContent = `${faculty.name} (${faculty.department})`;
+    option.textContent = `${faculty.name} (${faculty.department_code})`;
     option.setAttribute('id', faculty.id); // set id for easy access later
     select.appendChild(option);
   });
@@ -458,19 +458,21 @@ async function createTask(event) {
 
 
   const faculty = await getUserById(document.getElementById("taskAssignedTo").value);
-  console.log(faculty.department);
+  
   const title = document.getElementById("taskTitle").value;
   const description = document.getElementById("taskDescription").value;
   const deadline = document.getElementById("taskDueDate").value;
   const priority = document.getElementById("taskPriority").value;
-  const status = document.getElementById("taskStatus").value;
+  const deliverables = document.getElementById("taskDeliverables").value;
   const assigned_to = document.getElementById("taskAssignedTo").value;
-  const department = faculty.department;
+  const assigned_by = currentUserid;
+  const department = faculty.department_id;
+  
 
   const res = await fetch(`${API_BASE}/tasks`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify({ title, description, deadline, priority, status, assigned_to, department })
+    body: JSON.stringify({ title, description, deadline, priority, deliverables, assigned_to, assigned_by, department_id:department})
   });
 
   if (!res.ok) return alert("Failed to create task");
@@ -491,78 +493,69 @@ function formatDate(isoString) {
 async function loadEvents() {
   const res = await fetch(`${API_BASE}/events`, { headers: getHeaders() });
   if (!res.ok) return alert("Failed to load events");
+
   const events = await res.json();
 
-  const container = document.getElementById("eventRows");
-  if (!container) return;
-  container.innerHTML = "";
-  for (const ev of events) {
-    const tr = document.createElement("tr");
-
-    const createdby = await getUserById(ev.created_by);
-    console.log(createdby)
-
-    tr.className = "calendar-event " + ev.status.toLowerCase();
-    tr.innerHTML = `
-      <td>${ev.title}</td>
-      <td>${ev.department}</td>
-      <td>${formatDate(ev.created_at)}</td>
-      <td>${formatDate(ev.date)}</td>
-      <td>${ev.participants}</td>
-      <td><span class="events-status-badge events-status-${ev.status.toLowerCase()}">${ev.status}</span></td>
-      <td>${createdby.name}</td>
-      <td>
-      ${currentUser?.role === "Admin"
-        ? ev.status === 'Approved'
-          ? `<div class="events-action-buttons">
-          <button class="events-btn-edit" disabled style="opacity:0.5;cursor:not-allowed">
-            <i class="fas fa-edit"></i> Approve
-          </button>
-          <button class="events-btn-delete" disabled style="opacity:0.5;cursor:not-allowed">
-            <i class="fas fa-trash"></i> Reject
-          </button>
-          </div>`
-          : `<div class="events-action-buttons">
-          <button class="events-btn-edit" onclick="approveEvent('${ev.id}')">
-            <i class="fas fa-edit"></i> Approve
-          </button>
-          <button class="events-btn-delete" onclick="rejectEvent('${ev.id}')">
-            <i class="fas fa-trash"></i> Reject
-          </button>
-          </div>`
-        : `<span style="color:gray;">View Only</span>`
-      }
-      </td>
-    `;
-    container.appendChild(tr);
-
-    if (ev.status === "Approved") {
-      addApprovedEventToCalendar({
-        title: ev.title,
-        date: formatForCalendar(ev.date), // ensure proper format
-        department: ev.department,
-        participants: ev.participants,
-        createdBy: createdby?.name || "-"
-      });
-    }
-
-  }
-  //   for (const ev of events) {
-  //   if (ev.status === "Approved") {
-  //     const createdby = await getUserById(ev.created_by);
-
-  //     // Push into FullCalendar
-  //     addApprovedEventToCalendar({
-  //       title: ev.title,
-  //       date: ev.date,  // must be YYYY-MM-DD
-  //       department: ev.department,
-  //       participants: ev.participants,
-  //       createdBy: createdby?.name || "-"
-  //     });
-  //   }
-  // }
-
+  renderApprovalCards(events);
+  renderEventsTable(events);
 }
+function renderApprovalCards(events) {
+  const container = document.getElementById("eventApprovalCards");
+  container.innerHTML = "";
+
+  events
+    .filter(ev => ev.status === "Pending")
+    .slice(0, 6) // show latest 6
+    .forEach(ev => {
+      container.innerHTML += `
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow">
+          <h4 class="font-semibold text-sm mb-2">
+            ${ev.title} proposed by ${ev.department_code || "-"}
+          </h4>
+          <p class="text-xs">Venue – ${ev.venue || "-"}</p>
+          <p class="text-xs mb-3">Participants – ${ev.participants}</p>
+          <div class="flex gap-2">
+            <button onclick="approveEvent(${ev.id})"
+              class="px-3 py-1 rounded-full text-xs bg-green-500 text-white">
+              Approve
+            </button>
+            <button onclick="rejectEvent(${ev.id})"
+              class="px-3 py-1 rounded-full text-xs bg-red-500 text-white">
+              Reject
+            </button>
+          </div>
+        </div>
+      `;
+    });
+}
+function renderEventsTable(events) {
+  const tbody = document.getElementById("eventTableBody");
+  tbody.innerHTML = "";
+
+  events.forEach(ev => {
+    const badge =
+      ev.status === "Approved"
+        ? "bg-green-100 text-green-700"
+        : ev.status === "Rejected"
+        ? "bg-red-100 text-red-700"
+        : "bg-yellow-100 text-yellow-700";
+
+    tbody.innerHTML += `
+      <tr class="border-b dark:border-slate-700">
+        <td class="px-4 py-2">${ev.title}</td>
+        <td class="px-4 py-2">${ev.department_code || "-"}</td>
+        <td class="px-4 py-2">${formatDate(ev.event_date)}</td>
+        <td class="px-4 py-2">${ev.venue || "-"}</td>
+        <td class="px-4 py-2">
+          <span class="px-3 py-1 text-xs rounded-full ${badge}">
+            ${ev.status}
+          </span>
+        </td>
+      </tr>
+    `;
+  });
+}
+
 
 // helper to ensure FullCalendar accepts the date
 function formatForCalendar(dateStr) {
@@ -903,32 +896,7 @@ async function loadUsers() {
 
   const users = await res.json();
 
-  const container = document.getElementById("tableRows");
-  if (!container) return users;
-  container.innerHTML = "";
 
-  users.forEach(u => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${u.name}</td>
-      <td>${u.email}</td>
-      <td>${u.role}</td>
-      <td>${u.department}</td>
-      <td>
-        ${currentUser?.role === "Admin"
-        ? `<div class="action-buttons">
-                <button class="btn-edit" onclick="editUser('${u.id}')">
-                  <i class="fas fa-edit"></i> Edit
-                </button>
-                <button class="btn-delete" onclick="deleteUser('${u.id}')">
-                  <i class="fas fa-trash"></i> Delete
-                </button>
-             </div>`
-        : `<span style="color:gray;">View Only</span>`}
-      </td>
-    `;
-    container.appendChild(tr);
-  });
 
   return users; // ✅ return array so openTaskModal() can use it
 }
@@ -1117,7 +1085,7 @@ async function deleteUser(id) {
     }
   }
   if (!res.ok) return alert("Failed to delete user");
-  loadUsers();
+  loadDepartmentUsers(currentDepartment.id);
 }
 
 // Get user by ID
@@ -1302,9 +1270,12 @@ async function loadDepartmentUsers(departmentId) {
           <td class="px-4 py-2">${user.contact}</td>
           <td class="px-4 py-2">${user.status}</td>
           <td class="px-4 py-2">
-            <button class="edit-btn" onclick="openEditUserModal('${user.id}')">
+            <button class="edit-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" onclick="openEditUserModal('${user.id}')">
                         <i class='bx bx-edit-alt cursor-pointer hover:text-blue-600'></i>
                         
+                    </button>
+                    <button class="del-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded" onclick="deleteUser('${user.id}')">
+                        <i class='bx bx-trash cursor-pointer hover:text-red-600'></i>
                     </button>
                             
           </td>
@@ -1416,12 +1387,13 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleVisibility('reportsPage');
   });
 
-  document.getElementById("logoutBtn")?.addEventListener("click", () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  const buttons = document.getElementsByClassName("logoutBtn");
+for (const btn of buttons) {
+  btn.addEventListener("click", () => {
+    localStorage.clear();
     window.location.href = "/index.html";
   });
-
+}
   // Login form
   const loginForm = document.getElementById("loginForm");
   if (loginForm) loginForm.addEventListener("submit", handleLogin);

@@ -499,13 +499,6 @@
             box-sizing: border-box;
         } */
 
-        #eventManagement {
-            width:100vw;
-            
-            background: white;
-          
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
         
         .events-header {
 background: linear-gradient(180deg,rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233, 1) 100%);
