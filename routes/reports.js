@@ -1,6 +1,8 @@
 import express from 'express';
 import pool from '../config/db.js';
 import { authRequired, requireRole } from '../middleware/auth.js';
+import { getUpcomingEvents, getPendingEventApprovals } from '../controllers/reportController.js';
+import { getDeadlineSummary, exportReportData} from '../controllers/reportController.js';
 
 const router = express.Router();
 
@@ -52,5 +54,12 @@ router.get(
     res.json(rows);
   }
 );
+
+router.get("/events/upcoming", getUpcomingEvents);
+router.get("/events/pending", getPendingEventApprovals);
+router.get("/tasks/deadlines", getDeadlineSummary);
+router.get("/export", exportReportData);
+
+
 
 export default router;

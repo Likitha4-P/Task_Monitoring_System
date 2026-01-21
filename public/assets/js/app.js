@@ -63,7 +63,10 @@ async function handleLogin(event) {
 function toggleVisibility(showId) {
 
   document.querySelectorAll(".page").forEach(el => {
-    el.style.display = "none"; // hide all pages
+    if (el.id !== showId) {
+      el.style.display = "none";
+    }
+    
   });
 
   const showEl = document.getElementById(showId);
@@ -555,12 +558,101 @@ function renderEventsTable(events) {
     `;
   });
 }
+let calendar;
 
 
-// helper to ensure FullCalendar accepts the date
-function formatForCalendar(dateStr) {
-  return new Date(dateStr).toISOString().split("T")[0];// YYYY-MM-DD
+async function initCalendar() {
+  const calendarEl = document.getElementById("calendar");
+if (calendar) return;
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: "dayGridMonth",
+    height: "auto",
+    headerToolbar: {
+      left: "prev ,today",
+      center: "title",
+      right:"next"
+      
+    },
+    events: fetchCalendarEvents,
+   eventContent: renderEventSquare,
+    eventClick: handleEventClick,
+    dateClick: () => {
+  document.getElementById("eventDetailsWrapper").classList.add("hidden");
 }
+
+  });
+
+  calendar.render();
+}
+
+async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) {
+   console.log("🔥 fetchCalendarEvents CALLED");
+  try {
+    const res = await fetch(`${API_BASE}/events/approved`, {
+      headers: getHeaders()
+    });
+
+    const events = await res.json();
+
+    const calendarEvents = events.map(ev => ({
+      id: ev.id,
+      title: ev.title,
+      start: ev.event_date, // YYYY-MM-DD
+      extendedProps: {
+        department: ev.department_code,
+        venue: ev.venue,
+        participants: ev.participants
+      }
+    }));
+
+    successCallback(calendarEvents);
+  } catch (err) {
+    console.error(err);
+    failureCallback(err);
+  }
+}
+function handleEventClick(info) {
+  const ev = info.event;
+
+  // Fill data
+  document.getElementById("eventTitle").textContent = ev.title;
+  document.getElementById("eventVenue").textContent =
+    ev.extendedProps.venue || "-";
+  document.getElementById("eventDepartment").textContent =
+    ev.extendedProps.department || "-";
+  document.getElementById("eventParticipants").textContent =
+    ev.extendedProps.participants ?? "-";
+  document.getElementById("eventDate").textContent =
+    ev.start.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+  
+  // Show the card
+  document.getElementById("eventDetailsWrapper").classList.remove("hidden");
+  const wrapper = document.getElementById("eventDetailsWrapper");
+wrapper.classList.remove("hidden");
+
+setTimeout(() => {
+  wrapper.scrollIntoView({ behavior: "smooth", block: "start" });
+}, 0);
+}
+
+
+function renderEventSquare(arg) {
+  const dept = arg.event.title || "-";
+
+  const square = document.createElement("div");
+  square.className =
+    "dept-square flex items-center justify-center text-xs text-wrap text-center font-bold";
+
+  square.textContent = dept;
+
+  return { domNodes: [square] };
+}
+
+
 async function approveEvent(id, title, date, department, participants, createdBy) {
   try {
     const res = await fetch(`${API_BASE}/events/${id}/approve`, {
@@ -572,17 +664,9 @@ async function approveEvent(id, title, date, department, participants, createdBy
     // ✅ Update table status badge
     const row = document.querySelector(`#eventRows tr td span.events-status-badge`);
     if (row) row.innerText = "Approved";
+      calendar.refetchEvents(); // Refresh calendar events
 
-    // ✅ Add to calendar
-    addApprovedEventToCalendar({
-      title: title,
-      date: formatForCalendar(date),
-      department: department,
-      participants: participants,
-      createdBy: createdBy
-    });
-
-    alert("✅ Event Approved and added to calendar!");
+   
   } catch (err) {
     console.error(err);
     alert("Error approving event");
@@ -653,238 +737,6 @@ async function rejectEvent(id) {
 }
 
 
-function generateTaskReport() {
-  // Create PDF content
-  const pdfContent = `
-COLLEGE TASK MONITORING SYSTEM
-Task Status Report
-Generated on: ${new Date().toLocaleDateString()}
-
-=== TASK SUMMARY ===
-Total Tasks: 40
-Pending: 12 (30%)
-In Progress: 5 (12.5%)
-Completed: 20 (50%)
-Overdue: 3 (7.5%)
-
-=== DEPARTMENT BREAKDOWN ===
-Computer Science:
-- Total Tasks: 15
-- Completed: 8
-- In Progress: 3
-- Pending: 3
-- Overdue: 1
-
-Information Technology:
-- Total Tasks: 12
-- Completed: 7
-- In Progress: 2
-- Pending: 2
-- Overdue: 1
-
-Mathematics:
-- Total Tasks: 8
-- Completed: 3
-- In Progress: 0
-- Pending: 4
-- Overdue: 1
-
-Physics:
-- Total Tasks: 5
-- Completed: 2
-- In Progress: 0
-- Pending: 3
-- Overdue: 0
-
-=== FACULTY WORKLOAD ANALYSIS ===
-Faculty X: 5 tasks (3 completed, 1 in progress, 1 pending)
-Dr. John Smith: 4 tasks (2 completed, 1 in progress, 1 pending)
-Prof. Sarah Johnson: 3 tasks (3 completed, 0 in progress, 0 pending)
-Dr. Mike Wilson: 6 tasks (4 completed, 1 in progress, 1 overdue)
-
-=== DEADLINE COMPLIANCE ===
-On-time completion rate: 85%
-Average completion time: 12 days
-Tasks completed before deadline: 17/20
-
-=== PRIORITY ANALYSIS ===
-High Priority: 8 tasks (6 completed, 1 in progress, 1 overdue)
-Medium Priority: 20 tasks (12 completed, 3 in progress, 5 pending)
-Low Priority: 12 tasks (2 completed, 1 in progress, 6 pending, 3 overdue)
-
-=== RECOMMENDATIONS ===
-1. Focus on overdue high-priority tasks
-2. Redistribute workload for Faculty with 6+ tasks
-3. Implement early warning system for approaching deadlines
-4. Provide additional support for Mathematics department
-
-Report generated by College Task Monitoring System
-Contact: admin@college.edu for queries
-            `;
-
-  // Create and download PDF-like text file
-  const blob = new Blob([pdfContent], { type: 'text/plain' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Task_Status_Report_${new Date().toISOString().split('T')[0]}.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
-
-  alert('📊 Task Status Report downloaded successfully!\n\nFile: Task_Status_Report_' + new Date().toISOString().split('T')[0] + '.txt\n\nThe report includes comprehensive task analytics, department breakdowns, and faculty workload analysis.');
-}
-
-function generateDeadlineReport() {
-  // Create Excel-like CSV content
-  const csvContent = `Task ID,Task Name,Assigned To,Department,Deadline,Days Remaining,Priority,Status,Progress
-TSK001,NAAC Accreditation File,Faculty X,Computer Science,2025-09-10,3,High,In Progress,50%
-TSK002,Syllabus File Update,Prof. Johnson,Mathematics,2025-09-15,8,Medium,Verified,100%
-TSK003,Student Attendance Report,Dr. Smith,Computer Science,2025-09-20,13,Low,Submitted,100%
-TSK004,Lab Equipment Inventory,Dr. Wilson,Physics,2025-09-08,1,High,Pending,0%
-TSK005,Course Outcome Analysis,Faculty Y,Information Technology,2025-09-12,5,Medium,In Progress,75%
-TSK006,Research Paper Review,Prof. Davis,Mathematics,2025-09-18,11,Low,Pending,0%
-TSK007,Student Feedback Analysis,Faculty Z,Computer Science,2025-09-14,7,Medium,In Progress,25%
-TSK008,Library Book Audit,Librarian,Administration,2025-09-16,9,Low,Pending,0%
-TSK009,Exam Schedule Preparation,Dr. Brown,Administration,2025-09-11,4,High,In Progress,80%
-TSK010,Faculty Performance Review,Principal,Management,2025-09-25,18,Medium,Pending,0%
-TSK011,Infrastructure Maintenance,Maintenance Head,Administration,2025-09-09,2,High,Overdue,0%
-TSK012,Student Placement Report,Placement Officer,Administration,2025-09-22,15,Medium,Pending,0%
-TSK013,Budget Allocation Review,Finance Head,Administration,2025-09-13,6,High,In Progress,60%
-TSK014,Academic Calendar Update,Academic Head,Administration,2025-09-17,10,Medium,Pending,0%
-TSK015,Quality Assurance Audit,QA Team,Administration,2025-09-19,12,High,Pending,0%
-
-SUMMARY STATISTICS:
-Total Tasks Due in Next 30 Days: 15
-Overdue Tasks: 1
-High Priority Tasks: 6
-Medium Priority Tasks: 6
-Low Priority Tasks: 3
-Average Days to Deadline: 8.2
-Tasks at Risk (Due in 3 days): 3
-
-DEPARTMENT WISE BREAKDOWN:
-Computer Science: 3 tasks
-Mathematics: 2 tasks
-Information Technology: 1 task
-Physics: 1 task
-Administration: 8 tasks
-
-PRIORITY ANALYSIS:
-High Priority Overdue: 1
-Medium Priority Due Soon: 2
-Low Priority Delayed: 1`;
-
-  // Create and download CSV file
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Deadline_Summary_Report_${new Date().toISOString().split('T')[0]}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
-
-  alert('📈 Deadline Summary Report downloaded successfully!\n\nFile: Deadline_Summary_Report_' + new Date().toISOString().split('T')[0] + '.csv\n\nOpen with Excel or Google Sheets for detailed analysis. Includes task deadlines, priority breakdown, and department-wise statistics.');
-}
-
-function generateEventReport() {
-  // Create iCal format calendar content
-  const calendarContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//College Task Monitoring System//Event Calendar//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-
-BEGIN:VEVENT
-UID:evt001@college.edu
-DTSTART:20250910T090000Z
-DTEND:20250910T170000Z
-SUMMARY:Workshop on Artificial Intelligence
-DESCRIPTION:Comprehensive workshop on AI technologies and applications. Resource persons: Industry Expert, Prof. Smith. Expected participants: 75.
-LOCATION:Tech Lab, Main Building
-STATUS:CONFIRMED
-CATEGORIES:WORKSHOP,COMPUTER SCIENCE
-PRIORITY:5
-END:VEVENT
-
-BEGIN:VEVENT
-UID:evt002@college.edu
-DTSTART:20250912T100000Z
-DTEND:20250912T160000Z
-SUMMARY:Guest Lecture on Cloud Computing
-DESCRIPTION:Expert lecture on cloud technologies and future trends. Resource person: Cloud Computing Expert. Expected participants: 60.
-LOCATION:Conference Hall, IT Block
-STATUS:CONFIRMED
-CATEGORIES:LECTURE,INFORMATION TECHNOLOGY
-PRIORITY:5
-END:VEVENT
-
-BEGIN:VEVENT
-UID:evt003@college.edu
-DTSTART:20250915T090000Z
-DTEND:20250915T170000Z
-SUMMARY:Web Development Workshop
-DESCRIPTION:Hands-on workshop on modern web development technologies. Resource persons: Industry Expert, Faculty Team. Expected participants: 50.
-LOCATION:Main Auditorium
-STATUS:TENTATIVE
-CATEGORIES:WORKSHOP,COMPUTER SCIENCE
-PRIORITY:3
-END:VEVENT
-
-BEGIN:VEVENT
-UID:evt004@college.edu
-DTSTART:20250918T140000Z
-DTEND:20250918T170000Z
-SUMMARY:Mathematics Symposium
-DESCRIPTION:Annual mathematics symposium with research presentations. Resource persons: Mathematics Faculty. Expected participants: 40.
-LOCATION:Mathematics Department
-STATUS:CONFIRMED
-CATEGORIES:SYMPOSIUM,MATHEMATICS
-PRIORITY:4
-END:VEVENT
-
-BEGIN:VEVENT
-UID:evt005@college.edu
-DTSTART:20250920T100000Z
-DTEND:20250920T150000Z
-SUMMARY:Physics Lab Demonstration
-DESCRIPTION:Advanced physics experiments demonstration for students. Resource persons: Physics Faculty. Expected participants: 30.
-LOCATION:Physics Laboratory
-STATUS:CONFIRMED
-CATEGORIES:DEMONSTRATION,PHYSICS
-PRIORITY:4
-END:VEVENT
-
-BEGIN:VEVENT
-UID:evt006@college.edu
-DTSTART:20250922T090000Z
-DTEND:20250922T120000Z
-SUMMARY:Career Guidance Session
-DESCRIPTION:Career counseling and placement guidance for final year students. Resource persons: Placement Team. Expected participants: 100.
-LOCATION:Main Auditorium
-STATUS:CONFIRMED
-CATEGORIES:GUIDANCE,PLACEMENT
-PRIORITY:5
-END:VEVENT
-
-END:VCALENDAR`;
-
-  // Create and download iCal file
-  const blob = new Blob([calendarContent], { type: 'text/calendar' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `College_Event_Calendar_${new Date().toISOString().split('T')[0]}.ics`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
-
-  alert('📅 Event Calendar downloaded successfully!\n\nFile: College_Event_Calendar_' + new Date().toISOString().split('T')[0] + '.ics\n\nImport this file into Google Calendar, Outlook, or any calendar application to view all college events. Includes approved events, pending proposals, and detailed event information.');
-}
 // ================= USERS =================
 // Load all users 
 async function loadUsers() {
@@ -1326,14 +1178,38 @@ function closeDepartmentModal() {
 
 
 
+function initDarkModeToggle() {
+  // Select ALL dark toggle buttons and add click listeners
+  document.querySelectorAll('.darkToggle').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log("Dark mode toggled");
+      document.documentElement.classList.toggle('dark');
+      // Save preference to localStorage
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('darkMode', isDark ? 'true' : 'false');
+    });
+  });
+}
+
+// Load dark mode preference on page load
+function loadDarkModePreference() {
+  const isDark = localStorage.getItem('darkMode') === 'true';
+  if (isDark) {
+    document.documentElement.classList.add('dark');
+  }
+}
 
 // Attach handlers
 document.addEventListener("DOMContentLoaded", () => {
   console.log("App initialized");
+  
   // Default section
-    loadDarkModePreference();
+  
+  loadDarkModePreference();
   initDarkModeToggle();
   toggleVisibility("mainpage");
+  initCalendar();
 
 
   // Hide create button if not admin
@@ -1381,10 +1257,22 @@ document.addEventListener("DOMContentLoaded", () => {
     //  loadEvents();
     toggleVisibility('eventManagement');
   });
-  document.getElementById("showreports")?.addEventListener("click", () => {
+  document.getElementById("showreports")?.addEventListener("click", async () => {
     console.log("Loading reports...");
-    // loadReports();
+
+    await populateDepartmentFilter();
+  await populateFacultyFilter();
+    applyFilters(); 
     toggleVisibility('reportsPage');
+    const darkModeToggle = document.getElementById('darkToggle');
+            
+            darkModeToggle.addEventListener('click', () => {
+              console.log("Dark mode toggled from reports page");
+                document.documentElement.classList.toggle('dark');
+                const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+                localStorage.setItem('theme', theme);
+            });
+    
   });
 
   const buttons = document.getElementsByClassName("logoutBtn");

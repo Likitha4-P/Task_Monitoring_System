@@ -125,10 +125,7 @@
   width:90vw;
   background: white;
 }
-#reportsPage {
-    width:90vw;
-    background: white;
-}
+
 
 #mainpage h2 {
   font-size: 1.5rem;
@@ -1085,46 +1082,55 @@ background: linear-gradient(180deg,rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233
         .hidden {
             display: none;
         }
-    #reportsPage {
-        height:100vh;
-    }
-
-
-    .fc-daygrid-day.fc-has-event .fc-daygrid-day-frame {
-  background: #edcce8 !important;
-  background: linear-gradient(
-    90deg,
-    rgba(237, 204, 232, 1) 9%,
-    rgba(173, 221, 222, 1) 100%
-  ) !important;
-  border-radius: 8px;
-  color: #222 !important;
-  transition: transform 0.2s ease;
-}
-
-.fc-daygrid-day.fc-has-event:hover .fc-daygrid-day-frame {
-  transform: scale(1.05);
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-.fc-h-event .fc-event-title {
-    display: inline-block;
-    vertical-align: top;
-    left: 0;
-    color: black;
-    background: linear-gradient(90deg, rgba(237, 204, 232, 1) 9%, rgba(173, 221, 222, 1) 100%);
-    right: 0;
-    max-width: 100%;
-    overflow: hidden;
-    text-wrap: wrap;
-    
-}
+ 
 
 html {
   overflow-y: scroll;   /* always show vertical scrollbar */
   overflow-x: hidden;   /* prevent horizontal scroll unless needed */
 }
-#calendar {
-    color:black;
-    height: 550px;
+
+.dept-square {
+  width: 112px;
+  height: 72px;
+  margin:10px;
+  border-radius: 4px;
+  background-color: #6366f1; /* default indigo */
+  color: white;
+  margin: 2px 0;
+}
+
+/* Optional: department-wise colors
+.dept-square[data-dept="CSE"] { background-color: #6366f1; }
+.dept-square[data-dept="ECE"] { background-color: #22c55e; }
+.dept-square[data-dept="MECH"] { background-color: #f97316; }
+.dept-square[data-dept="CIVIL"] { background-color: #0ea5e9; }
+ */
+/* Entire calendar background */
+.dark .fc {
+  background-color: #333b4d; /* slate-900 */
+}
+
+/* Day cell background */
+.dark .fc-daygrid-day {
+  background-color: #334155; /* slate-950 */
+}
+
+/* Day header (Sun–Sat row) */
+.dark .fc .fc-col-header-cell {
+  background-color: #334155; /* slate-950 */
+}
+
+/* Today highlight */
+.dark .fc .fc-day-today {
+  background-color: rgba(99, 102, 241, 0.18) !important;
+}
+
+/* Hover effect */
+.dark .fc .fc-daygrid-day:hover {
+  background-color: #020617;
+}
+
+/* Day number */
+.dark .fc .fc-daygrid-day-number {
+  color: #ffffff !important;
 }

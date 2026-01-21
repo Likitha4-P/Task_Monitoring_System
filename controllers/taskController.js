@@ -40,7 +40,7 @@ export async function createTask(req, res) {
     const [userRows] = await pool.query("SELECT email FROM users WHERE id = ?", [assigned_to]);
     if (userRows.length) {
       const assigneeEmail = userRows[0].email;
-      // sendTaskEmail(assigneeEmail, { title, description, deadline, priority }).catch(console.error);
+      sendTaskEmail(assigneeEmail, { title, description, deadline, priority, deliverables }).catch(console.error);
     }
 
     res.status(201).json({ id: result.insertId });
@@ -160,7 +160,7 @@ export async function updateTask(req, res) {
       const [userRows] = await pool.query("SELECT email FROM users WHERE id = ?", [assigned_to]);
       if (userRows.length) {
         const assigneeEmail = userRows[0].email;
-        // sendTaskUpdateEmail(assigneeEmail, { title, description, deadline, priority }).catch(console.error);
+        sendTaskUpdateEmail(assigneeEmail, { title, description, deadline, priority, deliverables }).catch(console.error);
       }
     }
 

@@ -43,10 +43,9 @@ app.use(cors());
 
 
 console.log("Serving static files from:", path.join(__dirname, "public"));
-console.log(process.env.EMAIL_USER); // Remove after testing!
-console.log(process.env.EMAIL_PASS); // Remove after testing!
-// Run every day at 11:35 AM
-cron.schedule("35 11 * * *", async () => {
+
+// Run every day at 11:40 AM
+cron.schedule("40 11 * * *", async () => {
   console.log("⏳ Checking deadlines...");
   await sendDeadlineReminders();
 });

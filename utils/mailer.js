@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 
 /* ------------------ TASK ASSIGNMENT EMAIL ------------------ */
 export async function sendTaskEmail(to, taskDetails) {
-  const { title, description, deadline, priority } = taskDetails;
+  const { title, description, deadline, priority , deliverables } = taskDetails;
 
   const html = `
     <div style="font-family: Arial, sans-serif; color: #333;">
@@ -40,6 +40,10 @@ export async function sendTaskEmail(to, taskDetails) {
           <td style="padding: 8px; border: 1px solid #ddd;"><strong>Priority</strong></td>
           <td style="padding: 8px; border: 1px solid #ddd;">${priority}</td>
         </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;"><strong>Deliverables</strong></td>
+          <td style="padding: 8px; border: 1px solid #ddd;">${deliverables || "No deliverables provided"}</td>
+        </tr>
       </table>
 
       <p style="margin-top:15px;">Please ensure to complete the task before the deadline.</p>
@@ -57,7 +61,7 @@ export async function sendTaskEmail(to, taskDetails) {
 
 /* ------------------ TASK UPDATE EMAIL ------------------ */
 export async function sendTaskUpdateEmail(to, taskDetails) {
-  const { title, description, deadline, priority } = taskDetails;
+  const { title, description, deadline, priority, deliverables } = taskDetails;
 
   const html = `
     <div style="font-family: Arial, sans-serif; color: #333;">
@@ -82,6 +86,11 @@ export async function sendTaskUpdateEmail(to, taskDetails) {
           <td style="padding: 8px; border: 1px solid #ddd;"><strong>Priority</strong></td>
           <td style="padding: 8px; border: 1px solid #ddd;">${priority}</td>
         </tr>
+    
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;"><strong>Deliverables</strong></td>
+          <td style="padding: 8px; border: 1px solid #ddd;">${deliverables || "No deliverables provided"}</td>
+        </tr>
       </table>
 
       <p style="margin-top:15px;">Kindly take note of the updated details.</p>
@@ -99,7 +108,7 @@ export async function sendTaskUpdateEmail(to, taskDetails) {
 
 /* ------------------ EVENT CREATION EMAIL ------------------ */
 export async function sendEventEmail(to, eventDetails) {
-  const { title, department, date, participants } = eventDetails;
+  const { title, department_name, event_date, participants } = eventDetails;
 
   const html = `
     <div style="font-family: Arial, sans-serif; color: #333;">
@@ -114,11 +123,11 @@ export async function sendEventEmail(to, eventDetails) {
         </tr>
         <tr>
           <td style="padding: 8px; border: 1px solid #ddd;"><strong>Department</strong></td>
-          <td style="padding: 8px; border: 1px solid #ddd;">${department || "General"}</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">${department_name || "General"}</td>
         </tr>
         <tr>
           <td style="padding: 8px; border: 1px solid #ddd;"><strong>Date</strong></td>
-          <td style="padding: 8px; border: 1px solid #ddd;">${date}</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">${event_date}</td>
         </tr>
         <tr>
           <td style="padding: 8px; border: 1px solid #ddd;"><strong>Participants</strong></td>
@@ -141,7 +150,7 @@ export async function sendEventEmail(to, eventDetails) {
 
 /* ------------------ EVENT STATUS UPDATE EMAIL ------------------ */
 export async function sendEventStatusEmail(to, eventDetails, status) {
-  const { title, department, date, participants } = eventDetails;
+  const { title, department_name, event_date, participants, venue } = eventDetails;
 
   const html = `
     <div style="font-family: Arial, sans-serif; color: #333;">
@@ -156,15 +165,19 @@ export async function sendEventStatusEmail(to, eventDetails, status) {
         </tr>
         <tr>
           <td style="padding: 8px; border: 1px solid #ddd;"><strong>Department</strong></td>
-          <td style="padding: 8px; border: 1px solid #ddd;">${department || "General"}</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">${department_name || "General"}</td>
         </tr>
         <tr>
           <td style="padding: 8px; border: 1px solid #ddd;"><strong>Date</strong></td>
-          <td style="padding: 8px; border: 1px solid #ddd;">${date}</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">${event_date}</td>
         </tr>
         <tr>
           <td style="padding: 8px; border: 1px solid #ddd;"><strong>Participants</strong></td>
           <td style="padding: 8px; border: 1px solid #ddd;">${participants}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;"><strong>Venue</strong></td>
+          <td style="padding: 8px; border: 1px solid #ddd;">${venue || "Not specified"}</td>
         </tr>
         <tr>
           <td style="padding: 8px; border: 1px solid #ddd;"><strong>Status</strong></td>
