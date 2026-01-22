@@ -2,6 +2,7 @@ import pool from "../config/db.js";
 import assertFields from "../utils/validate.js";
 import { sendEventEmail } from "../utils/mailer.js";
 export async function createEvent(req, res) {
+ 
   try {
     const {
       title,
@@ -102,20 +103,32 @@ export async function createEvent(req, res) {
 // GET ALL EVENTS
 export async function listEvents(req, res) {
   try {
-    const [rows] = await pool.query(`
+    const { role, department_id } = req.user;
+
+    let where = "1=1";
+    const params = [];
+
+    if (role !== "Admin") {
+      where += " AND e.department_id = ?";
+      params.push(department_id);
+    }
+
+    const [rows] = await pool.query(
+      `
       SELECT 
         e.id,
         e.title,
         e.event_date,
-        e.participants,
         e.venue,
         e.status,
-        e.created_by,
         d.department_code
       FROM events e
       LEFT JOIN departments d ON e.department_id = d.id
-      ORDER BY e.created_at DESC
-    `);
+      WHERE ${where}
+      ORDER BY e.event_date DESC
+      `,
+      params
+    );
 
     res.json(rows);
   } catch (err) {
@@ -123,27 +136,8 @@ export async function listEvents(req, res) {
     res.status(500).json({ message: "Failed to load events" });
   }
 }
-// export async function approveEvent(req, res) {
-//   try {
-//     const { id } = req.params;
-//     await pool.query("UPDATE events SET status = 'Approved' WHERE id = ?", [id]);
-//     res.json({ ok: true });
-//   } catch (e) {
-//     console.error(e);
-//     res.status(500).json({ message: "Failed to approve event" });
-//   }
-// }
 
-// export async function rejectEvent(req, res) {
-//   try {
-//     const { id } = req.params;
-//     await pool.query("UPDATE events SET status = 'Rejected' WHERE id = ?", [id]);
-//     res.json({ ok: true });
-//   } catch (e) {
-//     console.error(e);
-//     res.status(500).json({ message: "Failed to reject event" });
-//   }
-// }
+
 import { sendEventStatusEmail } from "../utils/mailer.js";
 
 export async function approveEvent(req, res) {
@@ -240,5 +234,41 @@ export async function getApprovedEvents(req, res) {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to load approved events" });
+  }
+}
+export async function getEventSummary(req, res) {
+  try {
+    const { role, department_id } = req.user;
+
+    let where = "1=1";
+    const params = [];
+
+    // 🔐 Role-based filtering
+    if (role !== "Admin") {
+      where += " AND department_id = ?";
+      params.push(department_id);
+    }
+
+    const [[row]] = await pool.query(
+      `
+      SELECT
+        SUM(status = 'Pending')   AS pending,
+        SUM(status = 'Approved')  AS approved,
+        SUM(status = 'Rejected')  AS rejected
+      FROM events
+      WHERE ${where}
+      `,
+      params
+    );
+
+    res.json({
+      pending: row.pending || 0,
+      approved: row.approved || 0,
+      rejected: row.rejected || 0
+    });
+
+  } catch (err) {
+    console.error("Event summary error:", err);
+    res.status(500).json({ message: "Failed to load event summary" });
   }
 }

@@ -54,7 +54,7 @@ async function loadBarChart() {
   }
 
   const rows = await res.json();
-
+  
   const labels = rows.map(r => r.department);
   const counts = rows.map(r => r.count);
 

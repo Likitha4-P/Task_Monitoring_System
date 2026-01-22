@@ -108,7 +108,7 @@ export async function sendTaskUpdateEmail(to, taskDetails) {
 
 /* ------------------ EVENT CREATION EMAIL ------------------ */
 export async function sendEventEmail(to, eventDetails) {
-  const { title, department_name, event_date, participants } = eventDetails;
+  const { title, department_name, event_date, participants, venue } = eventDetails;
 
   const html = `
     <div style="font-family: Arial, sans-serif; color: #333;">
@@ -126,12 +126,16 @@ export async function sendEventEmail(to, eventDetails) {
           <td style="padding: 8px; border: 1px solid #ddd;">${department_name || "General"}</td>
         </tr>
         <tr>
-          <td style="padding: 8px; border: 1px solid #ddd;"><strong>Date</strong></td>
+          <td style="padding: 8px; border: 1px solid #ddd;"><strong>📅Date</strong></td>
           <td style="padding: 8px; border: 1px solid #ddd;">${event_date}</td>
         </tr>
         <tr>
-          <td style="padding: 8px; border: 1px solid #ddd;"><strong>Participants</strong></td>
+          <td style="padding: 8px; border: 1px solid #ddd;"><strong>Participants👥</strong></td>
           <td style="padding: 8px; border: 1px solid #ddd;">${participants}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;"><strong>Venue📍</strong></td>
+          <td style="padding: 8px; border: 1px solid #ddd;">${venue || "Not specified"}</td>
         </tr>
       </table>
 
@@ -193,7 +197,7 @@ export async function sendEventStatusEmail(to, eventDetails, status) {
   `;
 
   return transporter.sendMail({
-    from: process.env.EMAIL_USER,
+    from: "CTMS Notifications <" + process.env.EMAIL_USER + ">",
     to,
     subject: `Event ${status}: ${title}`,
     html

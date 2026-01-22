@@ -1,4 +1,92 @@
 import pool from "../config/db.js";
+export async function getTaskSummary(req, res) {
+   
+  try {
+    const { role, department_id, id: userId } = req.user;
+
+    let where = "WHERE 1=1";
+    const params = [];
+console.log(req.user);
+    if (["Department Head", "Professor Incharge"].includes(role)) {
+      if (!department_id) {
+        return res.json({ pending: 0, completed: 0, in_progress: 0, overdue: 0, total: 0 });
+      }
+      where += " AND department_id = ?";
+      params.push(department_id);
+    }
+
+    if (role === "Faculty/File Incharge") {
+      where += " AND assigned_to = ?";
+      params.push(userId);
+    }
+
+    const [rows] = await pool.query(
+      `
+      SELECT
+        COALESCE(SUM(status = 'Pending'), 0) AS pending,
+        COALESCE(SUM(status IN ('Completed','Closed')), 0) AS completed,
+        COALESCE(SUM(status = 'In Progress'), 0) AS in_progress,
+        COALESCE(SUM(deadline < CURDATE() AND status NOT IN ('Completed','Closed')), 0) AS overdue,
+        COUNT(*) AS total
+      FROM tasks
+      ${where}
+      `,
+      params
+    );
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to load task summary" });
+  }
+
+
+  }
+export async function getTasksByDepartment(req, res) {
+ 
+  try {
+    const { role, department_id, id: userId } = req.user;
+
+    let joinCondition = "ON t.department_id = d.id";
+    const params = [];
+
+    if (["Department Head", "Professor Incharge"].includes(role)) {
+      joinCondition += " AND d.id = ?";
+      params.push(department_id);
+    }
+
+    if (role === "Faculty/File Incharge") {
+      joinCondition += " AND t.assigned_to = ?";
+      params.push(userId);
+    }
+
+    const [rows] = await pool.query(
+      `
+      SELECT
+        d.department_code AS department,
+        COUNT(t.id) AS count
+      FROM departments d
+      LEFT JOIN tasks t
+        ${joinCondition}
+      GROUP BY d.id
+      ORDER BY count DESC
+      `,
+      params
+    );
+    const filtered = rows.filter(
+  row => row.department?.toLowerCase() !== "admin"
+);
+
+res.json(filtered);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to load tasks by department" });
+  }
+
+
+  }
+
 export async function getUpcomingEvents(req, res) {
   try {
     const { department_id, from_date, to_date } = req.query;

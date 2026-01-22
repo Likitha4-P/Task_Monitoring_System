@@ -66,7 +66,7 @@ function toggleVisibility(showId) {
     if (el.id !== showId) {
       el.style.display = "none";
     }
-    
+
   });
 
   const showEl = document.getElementById(showId);
@@ -130,10 +130,10 @@ async function loadTasks() {
   const tableHead = document.getElementById("taskTableHeader");
 
   // ✅ Update the table header dynamically
- tableHead.innerHTML = `
+  tableHead.innerHTML = `
   <tr>
     <th>Title</th>
-    <th>Description</th>
+    <th>Documents</th>
     ${currentUser?.role === "Faculty/File Incharge" ? "" : "<th>Assigned To</th>"}
     <th>Department</th>
     <th>Priority</th>
@@ -195,7 +195,7 @@ async function loadTasks() {
     if (currentUser?.role === "Admin") {
       actions = `
         <div style="display:flex;align-items:center;gap:8px;flex-direction:column">
-          <span style="color:green;">${progressSection} completed</span>
+          <span class="bg-green-200 border text-green-800 px-2 py-1 rounded-full">${progressSection} completed</span>
           <div class="tasks-action-buttons">
             <button class="tasks-btn-edit" onclick="editTask('${task.id}')">
               <i class="fas fa-edit"></i> Edit
@@ -209,7 +209,7 @@ async function loadTasks() {
     } else if (currentUser?.role === "Professor Incharge") {
       actions = `
         <div class="tasks-action-buttons">
-          ${statusDropdown}
+         
           ${progressSection}
         </div>
       `;
@@ -228,9 +228,9 @@ async function loadTasks() {
     }
 
     // ✅ Build the row using new schema fields
-      row.innerHTML = `
+    row.innerHTML = `
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.title}</td>
-      <td class="text-slate-700 p-3 dark:text-slate-200">${task.description || ""}</td>
+      <td class="text-slate-700 p-3 flex items-center justify-center"><i class='bx bx-show p-3 text-red-500 text-2xl cursor-pointer  dark:text-slate-200 hover:text-green-500 transition'></i></td>
       ${currentUser?.role === "Faculty/File Incharge" ? "" : `<td class="text-slate-700 p-3 dark:text-slate-200">${task.assignee_name || "Unassigned"}</td>`}
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.department_name || "N/A"}</td>
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.priority}</td>
@@ -238,7 +238,7 @@ async function loadTasks() {
       <td class="text-slate-700 p-3 dark:text-slate-200">${statusDropdown}</td>
       <td class="text-slate-700 p-3 dark:text-slate-200">${actions}</td>
     `;
-        row.className = "border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700";
+    row.className = "border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700";
 
     tableBody.appendChild(row);
   }
@@ -311,7 +311,7 @@ async function updateTask(taskId) {
   const res = await fetch(`${API_BASE}/tasks/${taskId}`, {
     method: "PUT",
     headers: getHeaders(),
-    body: JSON.stringify({ title, description, deadline, priority, deliverables, status,assigned_to })
+    body: JSON.stringify({ title, description, deadline, priority, deliverables, status, assigned_to })
   });
 
   if (!res.ok) return alert("Failed to update task");
@@ -461,7 +461,7 @@ async function createTask(event) {
 
 
   const faculty = await getUserById(document.getElementById("taskAssignedTo").value);
-  
+
   const title = document.getElementById("taskTitle").value;
   const description = document.getElementById("taskDescription").value;
   const deadline = document.getElementById("taskDueDate").value;
@@ -470,12 +470,12 @@ async function createTask(event) {
   const assigned_to = document.getElementById("taskAssignedTo").value;
   const assigned_by = currentUserid;
   const department = faculty.department_id;
-  
+
 
   const res = await fetch(`${API_BASE}/tasks`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify({ title, description, deadline, priority, deliverables, assigned_to, assigned_by, department_id:department})
+    body: JSON.stringify({ title, description, deadline, priority, deliverables, assigned_to, assigned_by, department_id: department })
   });
 
   if (!res.ok) return alert("Failed to create task");
@@ -505,8 +505,47 @@ async function loadEvents() {
 function renderApprovalCards(events) {
   const container = document.getElementById("eventApprovalCards");
   container.innerHTML = "";
+  if (currentUser.role === "Department Head" || currentUser.role === "Professor Incharge") {
+    container.innerHTML = `
+  <!-- Propose New Event -->
+  <div onclick="openEventModal()" class="bg-green-100 h-[15vh] dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
+    <div>
+      <h2 class="text-lg font-semibold">Propose New Event</h2>
+      <p class="text-sm text-green-600 dark:text-green-300">Create a new event proposal</p>
+    </div>
+    <i class='bx bx-user-plus text-4xl p-3'></i>
+  </div>
 
-  events
+  <!-- Pending Approval -->
+  <div class="bg-yellow-100 h-[15vh] dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
+    <div>
+      <h2 class="text-lg font-semibold">Pending Approval</h2>
+      <p id="pendingEvents" class="text-2xl font-bold">4</p>
+    </div>
+    <i class='bx bx-hourglass text-4xl p-3'></i>
+  </div>
+
+  <!-- Events Approved -->
+  <div class="bg-blue-100 h-[15vh] dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
+    <div>
+      <h2 class="text-lg font-semibold">Events Approved</h2>
+      <p id="approvedEvents" class="text-2xl font-bold">15</p>
+    </div>
+    <i class='bx bx-check-circle text-4xl p-3'></i>
+  </div>
+
+  <!-- Events Rejected -->
+  <div class="bg-red-100 h-[15vh] dark:bg-red-900 text-red-800 dark:text-red-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
+    <div>
+      <h2 class="text-lg font-semibold">Events Rejected</h2>
+      <p id="rejectedEvents" class="text-2xl font-bold">3</p>
+    </div>
+    <i class='bx bx-x-circle text-4xl p-3'></i>
+  </div>
+`;
+  }
+  else {
+    events
     .filter(ev => ev.status === "Pending")
     .slice(0, 6) // show latest 6
     .forEach(ev => {
@@ -530,6 +569,8 @@ function renderApprovalCards(events) {
         </div>
       `;
     });
+  }
+  
 }
 function renderEventsTable(events) {
   const tbody = document.getElementById("eventTableBody");
@@ -540,8 +581,8 @@ function renderEventsTable(events) {
       ev.status === "Approved"
         ? "bg-green-100 text-green-700"
         : ev.status === "Rejected"
-        ? "bg-red-100 text-red-700"
-        : "bg-yellow-100 text-yellow-700";
+          ? "bg-red-100 text-red-700"
+          : "bg-yellow-100 text-yellow-700";
 
     tbody.innerHTML += `
       <tr class="border-b dark:border-slate-700">
@@ -563,22 +604,22 @@ let calendar;
 
 async function initCalendar() {
   const calendarEl = document.getElementById("calendar");
-if (calendar) return;
+  if (calendar) return;
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
     height: "auto",
     headerToolbar: {
       left: "prev ,today",
       center: "title",
-      right:"next"
-      
+      right: "next"
+
     },
     events: fetchCalendarEvents,
-   eventContent: renderEventSquare,
+    eventContent: renderEventSquare,
     eventClick: handleEventClick,
     dateClick: () => {
-  document.getElementById("eventDetailsWrapper").classList.add("hidden");
-}
+      document.getElementById("eventDetailsWrapper").classList.add("hidden");
+    }
 
   });
 
@@ -586,7 +627,7 @@ if (calendar) return;
 }
 
 async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) {
-   console.log("🔥 fetchCalendarEvents CALLED");
+  console.log("🔥 fetchCalendarEvents CALLED");
   try {
     const res = await fetch(`${API_BASE}/events/approved`, {
       headers: getHeaders()
@@ -628,15 +669,15 @@ function handleEventClick(info) {
       month: "short",
       year: "numeric"
     });
-  
+
   // Show the card
   document.getElementById("eventDetailsWrapper").classList.remove("hidden");
   const wrapper = document.getElementById("eventDetailsWrapper");
-wrapper.classList.remove("hidden");
+  wrapper.classList.remove("hidden");
 
-setTimeout(() => {
-  wrapper.scrollIntoView({ behavior: "smooth", block: "start" });
-}, 0);
+  setTimeout(() => {
+    wrapper.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 0);
 }
 
 
@@ -653,45 +694,6 @@ function renderEventSquare(arg) {
 }
 
 
-async function approveEvent(id, title, date, department, participants, createdBy) {
-  try {
-    const res = await fetch(`${API_BASE}/events/${id}/approve`, {
-      method: "PUT",
-      headers: getHeaders()
-    });
-    if (!res.ok) return alert("Failed to approve event");
-
-    // ✅ Update table status badge
-    const row = document.querySelector(`#eventRows tr td span.events-status-badge`);
-    if (row) row.innerText = "Approved";
-      calendar.refetchEvents(); // Refresh calendar events
-
-   
-  } catch (err) {
-    console.error(err);
-    alert("Error approving event");
-  }
-}
-
-async function rejectEvent(id) {
-  try {
-    const res = await fetch(`${API_BASE}/events/${id}/reject`, {
-      method: "PUT",
-      headers: getHeaders()
-    });
-    if (!res.ok) return alert("Failed to reject event");
-
-    // ✅ Update table status badge
-    const row = document.querySelector(`#eventRows tr td span.events-status-badge`);
-    if (row) row.innerText = "Rejected";
-
-    alert("❌ Event Rejected!");
-  } catch (err) {
-    console.error(err);
-    alert("Error rejecting event");
-  }
-}
-
 function openEventModal() {
   document.getElementById('proposeEventModal').style.display = 'block';
   document.body.style.overflow = 'hidden';
@@ -707,32 +709,59 @@ function closeEventModal() {
   document.querySelector('.events-modal-header h2').innerHTML = '<i class="fas fa-calendar-plus"></i> Propose New Event';
   document.querySelector('.events-btn-submit').textContent = 'Propose Event';
 }
+async function createEvent(form) {
+  const title = form.eventTitle?.value;
+  const event_date = form.eventDate?.value;
+  const participants = Number(form.eventParticipants?.value || 0);
+  const venue = form.eventVenue?.value || null;
+  const department_id = currentUser?.department_id;
 
-async function createEvent() {
-  const title = document.getElementById("eventTitle").value;
-  const department = document.getElementById("eventDepartment").value;
-  const date = document.getElementById("eventDate").value;
-  const participants = document.getElementById("eventParticipants").value;
+  console.log("Frontend values:", {
+    title,
+    event_date,
+    participants,
+    venue,
+    department_id
+  });
+
+  if (!title || !event_date || !department_id) {
+    alert("Missing required fields");
+    return;
+  }
 
   const res = await fetch(`${API_BASE}/events`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify({ title, department, date, participants })
+    body: JSON.stringify({
+      title,
+      department_id,
+      event_date,
+      participants,
+      venue
+    })
   });
 
-  if (!res.ok) return alert("Failed to create event");
+  if (!res.ok) {
+    const err = await res.json();
+    alert(err.message || "Failed to create event");
+    return;
+  }
+
   alert("Event created!");
   closeEventModal();
   loadEvents();
 }
 
 
+
 async function approveEvent(id) {
   await fetch(`${API_BASE}/events/${id}/approve`, { method: "POST", headers: getHeaders() });
+  alert("Event approved!");
   loadEvents();
 }
 async function rejectEvent(id) {
   await fetch(`${API_BASE}/events/${id}/reject`, { method: "POST", headers: getHeaders() });
+  alert("Event rejected!");
   loadEvents();
 }
 
@@ -812,7 +841,7 @@ async function openEditUserModal(userId) {
 // Open/close modal
 function openModal() {
 
-     if (currentDepartment) {
+  if (currentDepartment) {
     document.getElementById("userDepartmentDisplay").value =
       `${currentDepartment.department_code} - ${currentDepartment.department_name}`;
   }
@@ -853,7 +882,7 @@ async function createUser() {
     alert("Contact must contain only numbers");
     return;
   }
-  
+
 
   const res = await fetch(`${API_BASE}/users`, {
     method: "POST",
@@ -999,7 +1028,7 @@ async function renderDepartments() {
   try {
     const response = await fetch("http://localhost:5000/api/departments");
     const departments = await response.json();
-window._departments = departments;
+    window._departments = departments;
     // ✅ SAFETY CHECK
     if (!Array.isArray(departments)) {
       console.error("Expected array, got:", departments);
@@ -1034,13 +1063,13 @@ window._departments = departments;
           console.log("Opening department:", dep);
           openDepartment(dep);
         }
-          
+
 
         departmentGrid.appendChild(card);
       });
-
-    // ✅ Add Department Card (always last)
-    departmentGrid.innerHTML += `
+    if (currentUser?.role === "Admin") {
+      // ✅ Add Department Card (always last)
+      departmentGrid.innerHTML += `
       <div id="addBtn"
            class="bg-white dark:bg-slate-800 rounded-xl p-5 shadow
            flex flex-col items-center justify-center gap-2
@@ -1057,6 +1086,8 @@ window._departments = departments;
 
       </div>
     `;
+    }
+
 
   } catch (error) {
     console.error("Error loading departments:", error);
@@ -1113,7 +1144,7 @@ async function loadDepartmentUsers(departmentId) {
     }
 
     users.forEach(user => {
-      console.log("user : ",user)
+      console.log("user : ", user)
       tbody.innerHTML += `
         <tr class="border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700">
           <td class="px-4 py-2">${user.name}</td>
@@ -1121,6 +1152,7 @@ async function loadDepartmentUsers(departmentId) {
           <td class="px-4 py-2">${user.email}</td>
           <td class="px-4 py-2">${user.contact}</td>
           <td class="px-4 py-2">${user.status}</td>
+          ${currentUser?.role === "Admin" ? `
           <td class="px-4 py-2">
             <button class="edit-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" onclick="openEditUserModal('${user.id}')">
                         <i class='bx bx-edit-alt cursor-pointer hover:text-blue-600'></i>
@@ -1131,7 +1163,7 @@ async function loadDepartmentUsers(departmentId) {
                     </button>
                             
           </td>
-        </tr>
+        </tr>`: ``}
       `;
     });
 
@@ -1199,16 +1231,35 @@ function loadDarkModePreference() {
     document.documentElement.classList.add('dark');
   }
 }
+async function loadEventSummaryCards() {
+  const res = await fetch(`${API_BASE}/events/event-summary`, {
+    headers: getHeaders()
+  });
+
+  if (!res.ok) {
+    console.error("Failed to load event summary");
+    return;
+  }
+
+  const data = await res.json();
+
+  console.log("Event summary:", data);
+
+  document.getElementById("pendingEvents").textContent = data.pending;
+  document.getElementById("approvedEvents").textContent = data.approved;
+  document.getElementById("rejectedEvents").textContent = data.rejected;
+}
 
 // Attach handlers
 document.addEventListener("DOMContentLoaded", () => {
   console.log("App initialized");
-  
+
   // Default section
-  
+
   loadDarkModePreference();
   initDarkModeToggle();
   toggleVisibility("mainpage");
+
   initCalendar();
 
 
@@ -1230,58 +1281,98 @@ document.addEventListener("DOMContentLoaded", () => {
   const sidebarTitle = document.getElementById("sidebarTitle");
   if (sidebarTitle) {
     sidebarTitle.innerHTML = `Welcome ${currentUser?.name || "Guest"}`;
-    loadEvents();
+    
   }
-
-   document.getElementById("showdepartments")?.addEventListener("click", () => {
+  const sidebartasks = document.getElementById("showtasks");
+  if (sidebartasks && currentUser?.role === "Department Head") {
+    sidebartasks.innerHTML = "View Tasks";
+  }
+  const sidebardepartments = document.getElementById("showdepartments");
+  if (sidebardepartments && currentUser?.role === "Department Head") {
+    sidebardepartments.innerHTML = "View Faculty";
+  }
+  const sidebarevents = document.getElementById("showevents");
+  if (sidebarevents && currentUser?.role === "Department Head") {
+    sidebarevents.innerHTML = "Propose Events";
+  }
+  const eventApprovalText = document.getElementById("eventApprovalText");
+  if (eventApprovalText && currentUser?.role === "Department Head") {
+    eventApprovalText.innerHTML = "";
+  }
+  document.getElementById("overview")?.addEventListener("click", () => {
+    console.log("Loading overview...");
+    renderDepartments();
+    toggleVisibility('mainpage');
+    document.querySelectorAll(".sideBtn").forEach(el => {
+    el.classList.remove("active");
+  });
+    
+    document.getElementById("overview").classList.add("active");
+    
+  });
+  document.getElementById("showdepartments")?.addEventListener("click", () => {
     console.log("Loading departments...");
     renderDepartments();
     toggleVisibility('allDepartments');
+    document.querySelectorAll(".sideBtn").forEach(el => {
+    el.classList.remove("active");
+  });
+    
+    document.getElementById("showdepartments").classList.add("active");
+    
   });
   // Sidebar buttons
   document.getElementById("showtasks")?.addEventListener("click", () => {
     console.log("Loading tasks...");
     loadTasks();
     toggleVisibility('taskManagement');
+    document.querySelectorAll(".sideBtn").forEach(el => {
+    el.classList.remove("active");
+  });
+    document.getElementById("showtasks").classList.add("active");
   });
 
-  document.getElementById("showusers")?.addEventListener("click", () => {
-    console.log("Loading users...");
-    loadUsers();
-    // loadFacultyMembers();
-    toggleVisibility('userManagement');
-  });
+  
   document.getElementById("showevents")?.addEventListener("click", () => {
     console.log("Loading events...");
-
-    //  loadEvents();
+     
+    loadEvents();
+    loadEventSummaryCards();
     toggleVisibility('eventManagement');
+    document.querySelectorAll(".sideBtn").forEach(el => {
+    el.classList.remove("active");
+  });
+    document.getElementById("showevents").classList.add("active");
   });
   document.getElementById("showreports")?.addEventListener("click", async () => {
     console.log("Loading reports...");
 
     await populateDepartmentFilter();
-  await populateFacultyFilter();
-    applyFilters(); 
+    await populateFacultyFilter();
+    applyFilters();
     toggleVisibility('reportsPage');
+    document.querySelectorAll(".sideBtn").forEach(el => {
+    el.classList.remove("active");
+  });
+    document.getElementById("showreports").classList.add("active"); 
     const darkModeToggle = document.getElementById('darkToggle');
-            
-            darkModeToggle.addEventListener('click', () => {
-              console.log("Dark mode toggled from reports page");
-                document.documentElement.classList.toggle('dark');
-                const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-                localStorage.setItem('theme', theme);
-            });
-    
+
+    darkModeToggle.addEventListener('click', () => {
+      console.log("Dark mode toggled from reports page");
+      document.documentElement.classList.toggle('dark');
+      const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      localStorage.setItem('theme', theme);
+    });
+
   });
 
   const buttons = document.getElementsByClassName("logoutBtn");
-for (const btn of buttons) {
-  btn.addEventListener("click", () => {
-    localStorage.clear();
-    window.location.href = "/index.html";
-  });
-}
+  for (const btn of buttons) {
+    btn.addEventListener("click", () => {
+      localStorage.clear();
+      window.location.href = "/index.html";
+    });
+  }
   // Login form
   const loginForm = document.getElementById("loginForm");
   if (loginForm) loginForm.addEventListener("submit", handleLogin);
@@ -1300,19 +1391,19 @@ for (const btn of buttons) {
   }
 
   //department form
-  
-const createDepartmentForm = document.getElementById("createDepartmentForm");
 
-if (createDepartmentForm) {
-  createDepartmentForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  const createDepartmentForm = document.getElementById("createDepartmentForm");
 
-    await createDepartment();
-    
-  });
-}
+  if (createDepartmentForm) {
+    createDepartmentForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-// Event form
+      await createDepartment();
+
+    });
+  }
+
+  // Event form
   const eventUserForm = document.getElementById("proposeEventForm");
   if (eventUserForm) {
     eventUserForm.addEventListener("submit", async (event) => {
@@ -1320,7 +1411,7 @@ if (createDepartmentForm) {
       if (eventUserForm.dataset.mode === "edit") {
         await updateEvent(eventUserForm.dataset.eventId);
       } else {
-        await createEvent();
+        await createEvent(event.target);
       }
     });
   }

@@ -30,7 +30,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-   
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 
@@ -45,7 +45,7 @@
 
             <h2 id="sidebarTitle" class="font-semibold text-xl text-white mb-2">Welcome UserName!</h2>
 
-            <button class="sideBtn active" onclick="toggleVisibility('mainpage')">Overview</button>
+            <button class="sideBtn active" id="overview">Overview</button>
             <button class="sideBtn" id="showdepartments">Departments</button>
             <button class="sideBtn" id="showtasks">Assign Task</button>
             <button class="sideBtn" id="showevents">Event Proposals</button>
@@ -394,18 +394,18 @@
             <main class="flex-1 bg-gray-50 dark:bg-slate-900 h-[100vh]">
 
                 <!-- Top Bar -->
-               <header
-                class="bg-white flex justify-between items-center dark:bg-gray-800 border-b-2 border-[#2b3b50] dark:border-gray-700 shadow-sm transition-colors duration-300">
-                <div class="p-6">
-                    <h1 class="text-3xl mb-4 font-bold text-[#2b3b50] dark:text-white">All Tasks</h1>
-                   
-                </div>
-                <div class="flex items-center gap-4 p-6">
+                <header
+                    class="bg-white flex justify-between items-center dark:bg-gray-800 border-b-2 border-[#2b3b50] dark:border-gray-700 shadow-sm transition-colors duration-300">
+                    <div class="p-6">
+                        <h1 class="text-3xl mb-4 font-bold text-[#2b3b50] dark:text-white">All Tasks</h1>
+
+                    </div>
+                    <div class="flex items-center gap-4 p-6">
                         <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
                             <i class="fa-regular fa-bell"></i>
                         </button>
 
-                        <button 
+                        <button
                             class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
                             <i class="bx bx-moon"></i>
                         </button>
@@ -415,7 +415,7 @@
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         </button>
                     </div>
-            </header>
+                </header>
                 <div id="createTaskModal" class="tasks-modal">
                     <div class="tasks-modal-content">
                         <div class="tasks-modal-header">
@@ -486,8 +486,8 @@
 
                     <div class="flex gap-4 text-xl px-3">
                         <i class='bx bx-filter text-4xl cursor-pointer hover:text-blue-500 transition'></i>
-                        <button onClick="openTaskModal()">
-                            <i class='bx bxs-file-plus text-4xl cursor-pointer hover:text-green-500 transition'></i>
+                        <button class="tasks-create-btn" onClick="openTaskModal()">
+                            <i class='bx bxs-file-plus text-2xl p-3 hover:text-green-500 transition'></i>
                         </button>
                     </div>
                 </div>
@@ -499,7 +499,7 @@
 
                         </thead>
 
-                        <tbody id="taskrows">
+                        <tbody id="taskrows" class="text-center">
 
 
                         </tbody>
@@ -516,17 +516,17 @@
 
                 <!-- Top Bar -->
                 <header
-                class="bg-white flex justify-between items-center dark:bg-gray-800 border-b-2 border-[#2b3b50] dark:border-gray-700 shadow-sm transition-colors duration-300">
-                <div class="p-8">
-                    <h1 class="text-3xl font-bold text-[#2b3b50] dark:text-white">Manage College Events</h1>
-                    
-                </div>
-                <div class="flex items-center gap-4 p-6">
+                    class="bg-white flex justify-between items-center dark:bg-gray-800 border-b-2 border-[#2b3b50] dark:border-gray-700 shadow-sm transition-colors duration-300">
+                    <div class="p-8">
+                        <h1 class="text-3xl font-bold text-[#2b3b50] dark:text-white">Manage College Events</h1>
+
+                    </div>
+                    <div class="flex items-center gap-4 p-6">
                         <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
                             <i class="fa-regular fa-bell"></i>
                         </button>
 
-                        <button 
+                        <button
                             class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
                             <i class="bx bx-moon"></i>
                         </button>
@@ -536,11 +536,12 @@
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         </button>
                     </div>
-            </header>
-                <p class="text-green-800 text-2xl px-8 dark:text-gray-400 mt-1" style="font-weight: 700;">Events awaiting approval</p>
+                </header>
+                <p id="eventApprovalText" class="text-green-800 text-2xl px-8 dark:text-gray-400 mt-1"
+                    style="font-weight: 700;">Events awaiting approval</p>
                 <!-- Approval Cards -->
                 <div id="eventApprovalCards"
-                    class="flex gap-4 bg-slate-200 dark:bg-slate-700 rounded-2xl m-6 dark:bg-slate-700 rounded-2xl p-4 mb-6">
+                    class="flex justify-center gap-5 bg-slate-100 dark:bg-slate-700 rounded-2xl m-6 dark:bg-slate-700 rounded-2xl p-4 mb-6">
 
                 </div>
 
@@ -550,6 +551,58 @@
                dark:bg-slate-700 dark:border-slate-600">
 
                     <i class="bx bx-filter text-xl cursor-pointer hover:text-blue-500"></i>
+                </div>
+                <!-- Modal for Propose Event -->
+                <div id="proposeEventModal" class="events-modal">
+                    <div class="events-modal-content">
+                        <div class="events-modal-header">
+                            <h2><i class="fas fa-calendar-plus"></i> Propose New Event</h2>
+                            <button class="events-close-btn" onclick="closeEventModal()">&times;</button>
+                        </div>
+                        <div class="events-modal-body">
+                            <form id="proposeEventForm">
+
+                                <!-- Event Title -->
+                                <div class="events-form-group">
+                                    <label for="eventTitle">Event Title</label>
+                                    <input type="text" id="eventTitle" name="eventTitle" placeholder="Enter event title"
+                                        required />
+                                </div>
+
+                               
+                                <!-- Event Date -->
+                                <div class="events-form-group">
+                                    <label for="eventDate">Event Date</label>
+                                    <input type="date" id="eventDate" name="eventDate" required />
+                                </div>
+
+                                <!-- Participants -->
+                                <div class="events-form-group">
+                                    <label for="eventParticipants">Expected Participants</label>
+                                    <input type="number" id="eventParticipants" name="eventParticipants" min="1"
+                                        placeholder="Enter number of participants" required />
+                                </div>
+                                <!-- Venue -->
+                                <div class="events-form-group">
+                                    <label for="eventVenue">Venue</label>
+                                    <input type="text" id="eventVenue" name="eventVenue" placeholder="Enter venue"
+                                        required />
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="events-form-actions">
+                                    <button type="button" class="events-btn-cancel" onclick="closeEventModal()">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="events-btn-submit">
+                                        Propose Event
+                                    </button>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Table -->
@@ -566,28 +619,7 @@
                         </thead>
 
                         <tbody id="eventTableBody">
-                            <tr class="border-b dark:border-slate-700">
-                                <td class="px-4 py-2">AI Workshop</td>
-                                <td class="px-4 py-2">CSE</td>
-                                <td class="px-4 py-2">12 Feb 2025</td>
-                                <td class="px-4 py-2">Seminar Hall 1</td>
-                                <td class="px-4 py-2">
-                                    <span
-                                        class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">Pending</span>
-                                </td>
-                            </tr>
 
-
-
-                            <tr class="border-b dark:border-slate-700">
-                                <td class="px-4 py-2">FDP on Machine Learning</td>
-                                <td class="px-4 py-2">CSE</td>
-                                <td class="px-4 py-2">10 Apr 2025</td>
-                                <td class="px-4 py-2">Dr. Leela</td>
-                                <td class="px-4 py-2">
-                                    <span class="px-3 py-1 text-xs rounded-full bg-red-100 text-red-700">Rejected</span>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -656,20 +688,19 @@
                     <p class="text-gray-600 dark:text-gray-400 mt-1">Insights on tasks, events, and deadlines</p>
                 </div>
                 <div class="flex items-center gap-4 p-6">
-                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
-                            <i class="fa-regular fa-bell"></i>
-                        </button>
+                    <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
 
-                        <button id="darkToggle"
-                            class=" p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
-                            <i class="bx bx-moon"></i>
-                        </button>
+                    <button id="darkToggle"
+                        class=" p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                        <i class="bx bx-moon"></i>
+                    </button>
 
-                        <button
-                            class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        </button>
-                    </div>
+                    <button class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </div>
             </header>
             <main class="w-full h-full px-6 py-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
                 <!-- Global Filters Section -->
@@ -853,18 +884,18 @@
 
         </div>
     </div>
-   
+
 
 
     <script src="assets/js/app.js"></script>
 
     <script src="assets/js/script.js"></script>
     <!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<!-- jsPDF AutoTable (required for tables) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    
+    <!-- jsPDF AutoTable (required for tables) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
     <script src="assets/js/reports.js"></script>
 
 </body>
