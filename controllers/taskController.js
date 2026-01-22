@@ -9,7 +9,9 @@ export async function createTask(req, res) {
       title, 
       description, 
       assigned_to, 
+      assigned_by,
       department_id, 
+      deliverables,
       deadline, 
       priority = "Medium", 
       status = "Pending" 
@@ -19,24 +21,26 @@ export async function createTask(req, res) {
 
     const [result] = await pool.query(
       `INSERT INTO tasks 
-        (title, description, assigned_to, assigned_by, department_id, deadline, priority, status, progress) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)`,
+        (title, description, assigned_to, assigned_by, department_id, deliverables, deadline, priority, status, progress) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         title, 
         description || null, 
         assigned_to, 
-        req.user.id, 
+        assigned_by, 
         department_id || null, 
+        deliverables || null,
         deadline, 
         priority, 
-        status
+        status,
+        0
       ]
     );
 
     const [userRows] = await pool.query("SELECT email FROM users WHERE id = ?", [assigned_to]);
     if (userRows.length) {
       const assigneeEmail = userRows[0].email;
-      // sendTaskEmail(assigneeEmail, { title, description, deadline, priority }).catch(console.error);
+      sendTaskEmail(assigneeEmail, { title, description, deadline, priority, deliverables }).catch(console.error);
     }
 
     res.status(201).json({ id: result.insertId });
@@ -85,7 +89,7 @@ export async function getTask(req, res) {
          t.*, 
          u.name AS assignee_name, 
          ab.name AS assigner_name, 
-         d.name AS department_name
+         d.department_name AS department_name
        FROM tasks t
        LEFT JOIN users u ON t.assigned_to = u.id
        LEFT JOIN users ab ON t.assigned_by = ab.id
@@ -108,11 +112,11 @@ export async function updateTask(req, res) {
       title, 
       description, 
       assigned_to, 
-      department_id, 
       deadline, 
       priority, 
-      status, 
-      progress 
+      status,
+      deliverables
+      
     } = req.body;
 
     const userRole = req.user.role;
@@ -124,12 +128,12 @@ export async function updateTask(req, res) {
           title = COALESCE(?, title),
           description = COALESCE(?, description),
           assigned_to = COALESCE(?, assigned_to),
-          department_id = COALESCE(?, department_id),
+          deliverables = COALESCE(?, deliverables),
           deadline = COALESCE(?, deadline),
-          priority = COALESCE(?, priority),
-          status = COALESCE(?, status)
+          priority = COALESCE(?, priority)
+         
          WHERE id = ?`,
-        [title, description, assigned_to, department_id, deadline, priority, status, id]
+        [title, description, assigned_to, deliverables, deadline, priority, id]
       );
     } 
     else if (userRole === "Professor Incharge") {
@@ -156,7 +160,7 @@ export async function updateTask(req, res) {
       const [userRows] = await pool.query("SELECT email FROM users WHERE id = ?", [assigned_to]);
       if (userRows.length) {
         const assigneeEmail = userRows[0].email;
-        // sendTaskUpdateEmail(assigneeEmail, { title, description, deadline, priority }).catch(console.error);
+        sendTaskUpdateEmail(assigneeEmail, { title, description, deadline, priority, deliverables }).catch(console.error);
       }
     }
 

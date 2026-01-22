@@ -26,23 +26,26 @@
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <!-- FullCalendar CSS & JS -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 
 </head>
 
 
 <body>
-    <div class="dashboard-container bg-gray-100 dark:bg-slate-900 h-screen w-screen overflow-hidden overflow-x-hidden">
+    <div class="dashboard-container bg-gray-100 dark:bg-slate-900  overflow-hidden">
 
         <!-- Sidebar -->
         <aside class="col-span-3 bg-[#2B3D50] dark:bg-[#1a2332] p-6 w-[20vw] flex flex-col gap-4 h-full">
 
             <h2 id="sidebarTitle" class="font-semibold text-xl text-white mb-2">Welcome UserName!</h2>
 
-            <button class="sideBtn active" onclick="toggleVisibility('mainpage')">Overview</button>
+            <button class="sideBtn active" id="overview">Overview</button>
             <button class="sideBtn" id="showdepartments">Departments</button>
             <button class="sideBtn" id="showtasks">Assign Task</button>
             <button class="sideBtn" id="showevents">Event Proposals</button>
@@ -57,43 +60,49 @@
                 <!-- Main Section -->
                 <main class="col-span-9">
 
-                     <!-- Top Bar -->
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100"></h2>
+                    <!-- Top Bar -->
+                    <div class="flex justify-between items-center mb-8 p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100"></h2>
 
-                    <div class="flex items-center gap-4">
-                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
-                            <i class="fa-regular fa-bell"></i>
-                        </button>
+                        <div class="flex items-center gap-4">
+                            <button
+                                class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
+                                <i class="fa-regular fa-bell"></i>
+                            </button>
 
-                        <button
-                            class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
-                            <i class='bx bx-moon'></i>
-                        </button>
+                            <button
+                                class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
+                                <i class='bx bx-moon'></i>
+                            </button>
 
-                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-red-400">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        </button>
+                            <button
+                                class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-red-400">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
 
                     <!-- Task Cards -->
                     <div class="grid grid-cols-4 gap-4 mb-6">
                         <div class="statCard dark:bg-slate-700">
                             <p class="font-medium text-gray-700 dark:text-slate-200">Total Tasks</p>
-                            <h2 class="text-3xl font-semibold !text-purple-600 dark:text-purple-400" id="totaltasks">138</h2>
+                            <h2 class="text-3xl font-semibold !text-purple-600 dark:text-purple-400" id="totaltasks">138
+                            </h2>
                         </div>
                         <div class="statCard dark:bg-slate-700">
                             <p class="font-medium text-gray-700 dark:text-slate-200">Pending</p>
-                            <h2 class="text-3xl font-semibold !text-pink-600 dark:text-pink-400" id="pendingtasks">30</h2>
+                            <h2 class="text-3xl font-semibold !text-pink-600 dark:text-pink-400" id="pendingtasks">30
+                            </h2>
                         </div>
                         <div class="statCard dark:bg-slate-700">
                             <p class="font-medium text-gray-700 dark:text-slate-200">In-Progress</p>
-                            <h2 class="text-3xl font-semibold !text-indigo-600 dark:text-indigo-400" id="inprogresstasks">64</h2>
+                            <h2 class="text-3xl font-semibold !text-indigo-600 dark:text-indigo-400"
+                                id="inprogresstasks">64</h2>
                         </div>
                         <div class="statCard dark:bg-slate-700">
                             <p class="font-medium text-gray-700 dark:text-slate-200">Completed</p>
-                            <h2 class="text-3xl font-semibold !text-green-600 dark:text-green-400" id="completedtasks">44</h2>
+                            <h2 class="text-3xl font-semibold !text-green-600 dark:text-green-400" id="completedtasks">
+                                44</h2>
                         </div>
                     </div>
 
@@ -105,12 +114,49 @@
                             <canvas id="barChart" width="300" height="200" class="mt-6"></canvas>
                         </div>
 
-                        <div class=" col-span-6 glass animate-fade-in-up delay-200 bg-white dark:bg-slate-700 p-6 rounded-xl shadow-md">
-                            <h2 class="text-gray-900 dark:text-slate-100 font-semibold mb-4">Event Calendar View</h2>
-                            <div id="calendar" style="height: 500px;" class="dark:text-slate-200"></div>
+                        <!-- Calendar -->
+                        <div class="col-span-6">
+                            <div class="bg-white dark:bg-slate-700 p-6 rounded-xl shadow-md">
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-slate-200 mb-4">Event Calendar
+                                </h3>
+                                <div id="calendar" style="min-height: 400px;"></div>
+                            </div>
+                            <!-- Event Details Container -->
+                            <div id="eventDetailsWrapper" class="w-full h-[40vh] border border-gray-200 shadow-2xs rounded-xl p-4 mt-4
+            flex items-center justify-center hidden">
+
+                                <div class="flex flex-col w-[100vw]  bg-green-100 border border-gray-200 shadow-2xs
+           rounded-xl p-4 md:p-5 max-w-md dark:bg-slate-700 dark:border-slate-600">
+
+                                    <h3 id="eventTitle" class="text-2xl font-bold text-gray-800 dark:text-slate-200">
+                                        Event title
+                                    </h3>
+
+                                    <p id="eventVenue"
+                                        class="mt-1 text-xl font-medium uppercase text-red-800 dark:text-gray-400">
+                                        Venue
+                                    </p>
+
+                                    <!-- Structured details -->
+                                    <div class="mt-4 space-y-2 text-sm text-gray-700 dark:text-slate-300">
+                                        <p><span class="font-semibold text-xl">Department: </span> <span
+                                                id="eventDepartment" class="text-xl font-awesome"></span>
+                                        </p>
+                                        <p><span class="font-semibold text-xl">Date: </span> <span id="eventDate"
+                                                class="text-xl font-awesome"></span></p>
+                                        <p><span class="font-semibold text-xl">Participants: </span> <span
+                                                id="eventParticipants" class="text-xl font-awesome"></span>
+                                        </p>
+                                    </div>
+
+                                </div>
+                            </div>
+
                         </div>
 
+
                     </div>
+
 
                 </main>
 
@@ -129,7 +175,8 @@
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">All Departments</h2>
 
                     <div class="flex items-center gap-4">
-                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
+                        <button
+                            class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
                             <i class="fa-regular fa-bell"></i>
                         </button>
 
@@ -138,7 +185,8 @@
                             <i class='bx bx-moon'></i>
                         </button>
 
-                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-red-400">
+                        <button
+                            class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-red-400">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         </button>
                     </div>
@@ -207,11 +255,12 @@
                             <i class="fa-regular fa-bell"></i>
                         </button>
 
-                        <button id="darkToggle"
+                        <button
                             class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
                             <i class='bx bx-moon'></i>
                         </button>
-                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                        <button
+                            class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         </button>
                     </div>
@@ -238,61 +287,61 @@
                         </h2>
                     </div>
                 </div>
-<div id="createUserModal" class="modal h-[100vh]">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2><i class="fas fa-user-plus"></i> Create New User</h2>
-      <button class="close-btn" onclick="closeModal()">&times;</button>
-    </div>
+                <div id="createUserModal" class="modal h-[100vh]">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2><i class="fas fa-user-plus"></i> Create New User</h2>
+                            <button class="close-btn" onclick="closeModal()">&times;</button>
+                        </div>
 
-    <div class="modal-body">
-      <form id="createUserForm">
+                        <div class="modal-body">
+                            <form id="createUserForm">
 
-        <div class="form-group">
-          <label for="userName">Full Name</label>
-          <input type="text" id="userName" required>
-        </div>
+                                <div class="form-group">
+                                    <label for="userName">Full Name</label>
+                                    <input type="text" id="userName" required>
+                                </div>
 
-        <div class="form-group">
-          <label for="userEmail">Email Address</label>
-          <input type="email" id="userEmail" required>
-        </div>
+                                <div class="form-group">
+                                    <label for="userEmail">Email Address</label>
+                                    <input type="email" id="userEmail" required>
+                                </div>
 
-        <div class="form-group">
-          <label for="userPass">User Password</label>
-          <input type="password" id="userPass" required>
-        </div>
- <div class="form-group">
-          <label for="userContact">Contact</label>
-          <input type="text" id="userContact" required>
-        </div>
-        <div class="form-group">
-          <label for="userRole">Role</label>
-          <select id="userRole" required>
-            <option value="">Select role</option>
-            <option value="Admin">Admin</option>
-            <option value="Department Head">Department Head</option>
-            <option value="Professor Incharge">Professor Incharge</option>
-            <option value="Faculty/File Incharge">Faculty/File Incharge</option>
-            <option value="View Only">View Only</option>
-          </select>
-        </div>
+                                <div class="form-group">
+                                    <label for="userPass">User Password</label>
+                                    <input type="password" id="userPass" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="userContact">Contact</label>
+                                    <input type="text" id="userContact" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="userRole">Role</label>
+                                    <select id="userRole" required>
+                                        <option value="">Select role</option>
+                                        <option value="Admin">Admin</option>
+                                        <option value="Department Head">Department Head</option>
+                                        <option value="Professor Incharge">Professor Incharge</option>
+                                        <option value="Faculty/File Incharge">Faculty/File Incharge</option>
+                                        <option value="View Only">View Only</option>
+                                    </select>
+                                </div>
 
-        <div class="form-group">
-  <label>Department</label>
-  <input type="text" id="userDepartmentDisplay" disabled>
-</div>
+                                <div class="form-group">
+                                    <label>Department</label>
+                                    <input type="text" id="userDepartmentDisplay" disabled>
+                                </div>
 
 
-        <div class="form-actions">
-          <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="btn-submit">Create User</button>
-        </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                                    <button type="submit" class="btn-submit">Create User</button>
+                                </div>
 
-      </form>
-    </div>
-  </div>
-</div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Table Card -->
                 <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
@@ -306,11 +355,11 @@
                         <div class="flex justify-center items-center gap-3 text-xl">
                             <i class='bx bx-filter cursor-pointer text-3xl hover:text-blue-500 transition'></i>
                             <button class="create-btn" onclick="openModal()">
-                        <i class="bx bx-user-plus cursor-pointer hover:text-green-500 transition"></i>
-                        
-                    </button>
-                            
-                            
+                                <i class="bx bx-user-plus cursor-pointer hover:text-green-500 transition"></i>
+
+                            </button>
+
+
                         </div>
                     </div>
 
@@ -337,55 +386,121 @@
             </main>
         </div>
 
-        
+
         <div id="taskManagement" class="page bg-gray-50 dark:bg-slate-900
              text-slate-700 dark:text-slate-200
              transition-colors duration-300 w-full h-[100vh] overflow-y-auto">
             <!-- Main -->
-                      <main class="flex-1 p-8 bg-gray-50 dark:bg-slate-900 h-[100vh]">
+            <main class="flex-1 bg-gray-50 dark:bg-slate-900 h-[100vh]">
 
                 <!-- Top Bar -->
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-semibold">All Tasks</h2>
+                <header
+                    class="bg-white flex justify-between items-center dark:bg-gray-800 border-b-2 border-[#2b3b50] dark:border-gray-700 shadow-sm transition-colors duration-300">
+                    <div class="p-6">
+                        <h1 class="text-3xl mb-4 font-bold text-[#2b3b50] dark:text-white">All Tasks</h1>
 
-                    <div class="flex items-center gap-4">
+                    </div>
+                    <div class="flex items-center gap-4 p-6">
                         <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
                             <i class="fa-regular fa-bell"></i>
                         </button>
 
-                        <!-- Dark mode toggle -->
-                                <button class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
-                                    <i class='bx bx-moon'></i>
-                                </button>
+                        <button
+                            class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                            <i class="bx bx-moon"></i>
+                        </button>
 
-                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                        <button
+                            class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         </button>
+                    </div>
+                </header>
+                <div id="createTaskModal" class="tasks-modal">
+                    <div class="tasks-modal-content">
+                        <div class="tasks-modal-header">
+                            <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
+                            <button class="tasks-close-btn" onclick="closeTaskModal()">&times;</button>
+                        </div>
+                        <div class="tasks-modal-body">
+                            <form id="createTaskForm">
+
+
+                                <div class="tasks-form-group">
+                                    <label for="taskTitle">Task Title</label>
+                                    <input type="text" id="taskTitle" name="taskTitle" placeholder="Enter task title"
+                                        required>
+                                </div>
+
+                                <div class="tasks-form-group">
+                                    <label for="taskDescription">Description</label>
+                                    <textarea id="taskDescription" name="taskDescription"
+                                        placeholder="Enter task description" required></textarea>
+                                </div>
+
+                                <div class="tasks-form-group">
+                                    <label for="taskAssignedTo" id="taskAssignedToLabel">Assigned To</label>
+                                    <select id="taskAssignedTo" name="taskAssignedTo" required>
+
+                                    </select>
+                                </div>
+
+                                <input type="hidden" id="hiddenAssignedTo" name="hiddenAssignedTo" />
+                                <div class="tasks-form-group">
+                                    <label for="taskPriority">Priority</label>
+                                    <select id="taskPriority" name="taskPriority" required>
+                                        <option value="Low">Low</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="High">High</option>
+                                    </select>
+                                </div>
+
+                                <div class="tasks-form-group">
+                                    <label for="taskDeliverables">Deliverables(if any)</label>
+                                    <input type="text" id="taskDeliverables" name="taskDeliverables" required>
+
+                                </div>
+
+                                <div class="tasks-form-group">
+                                    <label for="taskDueDate">Due Date</label>
+                                    <input type="date" id="taskDueDate" name="taskDueDate" required>
+                                </div>
+
+
+                                <div class="tasks-form-actions">
+                                    <button type="button" class="tasks-btn-cancel"
+                                        onclick="closeTaskModal()">Cancel</button>
+                                    <button type="submit" class="tasks-btn-submit">Create Task</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Search -->
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex justify-between p-6 items-center mt-4 mb-4">
                     <input id="search" type="text" placeholder="Search ..." class="w-90 px-4 py-2 border rounded-xl outline-none
                bg-white dark:bg-slate-800
                border-gray-500 dark:border-slate-600
                focus:ring-2 focus:ring-slate-300">
 
-                    <div class="flex gap-4 text-xl">
-                        <i class='bx bx-filter cursor-pointer hover:text-blue-500 transition'></i>
-                        <i class='bx bx-file cursor-pointer hover:text-green-500 transition'></i>
+                    <div class="flex gap-4 text-xl px-3">
+                        <i class='bx bx-filter text-4xl cursor-pointer hover:text-blue-500 transition'></i>
+                        <button class="tasks-create-btn" onClick="openTaskModal()">
+                            <i class='bx bxs-file-plus text-2xl p-3 hover:text-green-500 transition'></i>
+                        </button>
                     </div>
                 </div>
 
                 <!-- Table -->
-                                <div class="bg-white dark:bg-slate-800 rounded-xl shadow overflow-x-auto">
+                <div class="bg-white p-6 dark:bg-slate-800 rounded-xl shadow overflow-x-auto">
                     <table class="w-full text-sm p-3 bg-white dark:bg-slate-800 ">
                         <thead class="bg-gray-700 p-3 h-[40px] dark:bg-slate-700 text-white" id="taskTableHeader">
-                           
+
                         </thead>
 
-                        <tbody id="taskrows" >
-                            
+                        <tbody id="taskrows" class="text-center">
+
 
                         </tbody>
                     </table>
@@ -394,48 +509,122 @@
 
         </div>
 
-        
-        <div id="eventManagement" class="page">
-            <div class="events-container">
-                <!-- Header Section -->
-                <div class="events-header">
-                    <h1><i class="fas fa-calendar-alt"></i> Event Management</h1>
-                    <p>Organize and manage company events and activities</p>
-                </div>
 
-                <!-- Table Section -->
-                <div class="events-table-section">
-                    <div class="events-table-header">
-                        <h2 class="events-table-title">All Events</h2>
-                        <button class="events-propose-btn" onclick="openEventModal()">
-                            <i class="fas fa-plus"></i>
-                            Propose Event
+        <div id="eventManagement" class="page bg-gray-50 w-full dark:bg-slate-900 text-slate-700 dark:text-slate-200">
+            <main class="flex-1 ">
+
+
+                <!-- Top Bar -->
+                <header
+                    class="bg-white flex justify-between items-center dark:bg-gray-800 border-b-2 border-[#2b3b50] dark:border-gray-700 shadow-sm transition-colors duration-300">
+                    <div class="p-8">
+                        <h1 class="text-3xl font-bold text-[#2b3b50] dark:text-white">Manage College Events</h1>
+
+                    </div>
+                    <div class="flex items-center gap-4 p-6">
+                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                            <i class="fa-regular fa-bell"></i>
+                        </button>
+
+                        <button
+                            class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                            <i class="bx bx-moon"></i>
+                        </button>
+
+                        <button
+                            class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         </button>
                     </div>
+                </header>
+                <p id="eventApprovalText" class="text-green-800 text-2xl px-8 dark:text-gray-400 mt-1"
+                    style="font-weight: 700;">Events awaiting approval</p>
+                <!-- Approval Cards -->
+                <div id="eventApprovalCards"
+                    class="flex justify-center gap-5 bg-slate-100 dark:bg-slate-700 rounded-2xl m-6 dark:bg-slate-700 rounded-2xl p-4 mb-6">
 
-                    <div class="scrollable-table-container">
-                        <table id="eventsTable" class="events-table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Department</th>
-                                    <th>Proposed At</th>
-                                    <th>Event Date</th>
-                                    <th>Participants</th>
-                                    <th>Status</th>
-                                    <th>Created By</th>
+                </div>
 
-                                    <th>Approve/Reject</th>
-                                </tr>
-                            </thead>
-                            <tbody id="eventRows">
+                <!-- Search -->
+                <div class="flex justify-between items-center p-6 mb-4">
+                    <input type="text" placeholder="Search ..." class="w-72 px-4 py-2 border rounded-xl outline-none
+               dark:bg-slate-700 dark:border-slate-600">
 
-                            </tbody>
-                        </table>
+                    <i class="bx bx-filter text-xl cursor-pointer hover:text-blue-500"></i>
+                </div>
+                <!-- Modal for Propose Event -->
+                <div id="proposeEventModal" class="events-modal">
+                    <div class="events-modal-content">
+                        <div class="events-modal-header">
+                            <h2><i class="fas fa-calendar-plus"></i> Propose New Event</h2>
+                            <button class="events-close-btn" onclick="closeEventModal()">&times;</button>
+                        </div>
+                        <div class="events-modal-body">
+                            <form id="proposeEventForm">
+
+                                <!-- Event Title -->
+                                <div class="events-form-group">
+                                    <label for="eventTitle">Event Title</label>
+                                    <input type="text" id="eventTitle" name="eventTitle" placeholder="Enter event title"
+                                        required />
+                                </div>
+
+                               
+                                <!-- Event Date -->
+                                <div class="events-form-group">
+                                    <label for="eventDate">Event Date</label>
+                                    <input type="date" id="eventDate" name="eventDate" required />
+                                </div>
+
+                                <!-- Participants -->
+                                <div class="events-form-group">
+                                    <label for="eventParticipants">Expected Participants</label>
+                                    <input type="number" id="eventParticipants" name="eventParticipants" min="1"
+                                        placeholder="Enter number of participants" required />
+                                </div>
+                                <!-- Venue -->
+                                <div class="events-form-group">
+                                    <label for="eventVenue">Venue</label>
+                                    <input type="text" id="eventVenue" name="eventVenue" placeholder="Enter venue"
+                                        required />
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="events-form-actions">
+                                    <button type="button" class="events-btn-cancel" onclick="closeEventModal()">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="events-btn-submit">
+                                        Propose Event
+                                    </button>
+                                </div>
+
+                            </form>
+
+                        </div>
                     </div>
                 </div>
-            </div>
 
+                <!-- Table -->
+                <div class="bg-white p-6 dark:bg-slate-800 rounded-xl shadow overflow-x-auto">
+                    <table class="w-full text-sm px-3">
+                        <thead class="bg-gray-700 text-white dark:bg-slate-700">
+                            <tr>
+                                <th class="px-4 py-2 text-left">Event Name</th>
+                                <th class="px-4 py-2 text-left">Department</th>
+                                <th class="px-4 py-2 text-left">Proposed Date</th>
+                                <th class="px-4 py-2 text-left">Venue</th>
+                                <th class="px-4 py-2 text-left">Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="eventTableBody">
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </main>
             <!-- Modal for Propose Event -->
             <div id="proposeEventModal" class="events-modal">
                 <div class="events-modal-content">
@@ -491,136 +680,223 @@
             </div>
 
         </div>
-        <div id="reportsPage" class="page">
-            <div class="header">
-                <h1><i class="fas fa-users"></i> Reports and Analytics</h1>
-                <p>Detailed Reports and Insights</p>
-            </div>
-            <!-- Reports Section -->
-
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <!-- Task Status Report -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Task Status Summary</h4>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Pending Tasks:</span>
-                            <span class="font-semibold text-yellow-600">12</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">In Progress:</span>
-                            <span class="font-semibold text-blue-600">5</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Completed:</span>
-                            <span class="font-semibold text-green-600">20</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Overdue:</span>
-                            <span class="font-semibold text-red-600">3</span>
-                        </div>
-                    </div>
-                    <button onclick="generateEventReport()" style="background: linear-gradient(90deg, rgba(237, 204, 232, 1) 9%, rgba(173, 221, 222, 1) 100%);
-           color: white; padding: 0.5rem; border-radius: 0.5rem;"
-                        class="mt-4 w-full transition-all transform hover:scale-105 shadow-lg">
-                        Generate Report
+        <div id="reportsPage" class="page bg-gray-50 dark:bg-gray-900 overflow-y-scroll duration-300">
+            <header
+                class="bg-white flex justify-between items-center dark:bg-gray-800 border-b-2 border-[#2b3b50] dark:border-gray-700 shadow-sm transition-colors duration-300">
+                <div class="p-6">
+                    <h1 class="text-3xl font-bold text-[#2b3b50] dark:text-white">Reporting & Analytics</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-1">Insights on tasks, events, and deadlines</p>
+                </div>
+                <div class="flex items-center gap-4 p-6">
+                    <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                        <i class="fa-regular fa-bell"></i>
                     </button>
 
-                </div>
-
-                <!-- Deadline Summary -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Upcoming Deadlines (Next 7 Days)</h4>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
-                            <div>
-                                <p class="font-medium text-gray-900">NAAC File</p>
-                                <p class="text-sm text-gray-600">Due in 3 days</p>
-                            </div>
-                            <span class="priority-high px-2 py-1 rounded-full text-xs font-medium">High</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-                            <div>
-                                <p class="font-medium text-gray-900">Syllabus Update</p>
-                                <p class="text-sm text-gray-600">Due in 5 days</p>
-                            </div>
-                            <span class="priority-medium px-2 py-1 rounded-full text-xs font-medium">Medium</span>
-                        </div>
-                    </div>
-                    <button onclick="generateEventReport()" style="background: linear-gradient(90deg, rgba(237, 204, 232, 1) 9%, rgba(173, 221, 222, 1) 100%);
-           color: white; padding: 0.5rem; border-radius: 0.5rem;"
-                        class="mt-4 w-full transition-all transform hover:scale-105 shadow-lg">
-                        Export Excel Report
+                    <button id="darkToggle"
+                        class=" p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                        <i class="bx bx-moon"></i>
                     </button>
 
+                    <button class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
                 </div>
-
-                <!-- Event Calendar Report -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Event Calendar Report</h4>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                            <div>
-                                <p class="font-medium text-gray-900">AI Workshop</p>
-                                <p class="text-sm text-gray-600">Sep 10, 2025</p>
-                            </div>
-                            <span
-                                class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Approved</span>
+            </header>
+            <main class="w-full h-full px-6 py-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                <!-- Global Filters Section -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-8 transition-colors duration-300">
+                    <h2 class="text-lg font-semibold text-[#2b3b50] dark:text-white mb-4">Filters</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-[#2b3b50] dark:text-gray-300 mb-2">Department</label>
+                            <select id="deptFilter"
+                                class="w-full px-4 py-2 border-2 border-[#2b3b50] dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2b3b50] dark:focus:ring-blue-500">
+                                <option>All Departments</option>
+                                <option>Computer Science & Engineering</option>
+                                <option>Electronics & Communication</option>
+                                <option>Mechanical Engineering</option>
+                                <option>Civil Engineering</option>
+                            </select>
                         </div>
-                        <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-                            <div>
-                                <p class="font-medium text-gray-900">Web Dev Workshop</p>
-                                <p class="text-sm text-gray-600">Sep 15, 2025</p>
-                            </div>
-                            <span
-                                class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-[#2b3b50] dark:text-gray-300 mb-2">Faculty</label>
+                            <select id="facultyFilter"
+                                class="w-full px-4 py-2 border-2 border-[#2b3b50] dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2b3b50] dark:focus:ring-blue-500">
+                                <option>All Faculty</option>
+                                <option>Dr. Smith Johnson</option>
+                                <option>Prof. Maria Garcia</option>
+                                <option>Dr. Rajesh Kumar</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-[#2b3b50] dark:text-gray-300 mb-2">Date
+                                From</label>
+                            <input type="date" id="dateFrom"
+                                class="w-full px-4 py-2 border-2 border-[#2b3b50] dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2b3b50] dark:focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-[#2b3b50] dark:text-gray-300 mb-2">Date
+                                To</label>
+                            <input type="date" id="dateTo"
+                                class="w-full px-4 py-2 border-2 border-[#2b3b50] dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2b3b50] dark:focus:ring-blue-500">
                         </div>
                     </div>
-                    <button onclick="generateEventReport()" style="background: linear-gradient(90deg, rgba(237, 204, 232, 1) 9%, rgba(173, 221, 222, 1) 100%);
-           color: white; padding: 0.5rem; border-radius: 0.5rem;"
-                        class="mt-4 w-full transition-all transform hover:scale-105 shadow-lg">
-                        Download Calendar
-                    </button>
-
+                    <div class="flex gap-3 mt-6">
+                        <button onclick="applyFilters()"
+                            class="px-6 py-2 bg-[#2b3b50] dark:bg-blue-600 text-white rounded-lg font-medium hover:bg-[#1f2b3a] dark:hover:bg-blue-700 transition-colors">
+                            Apply Filters
+                        </button>
+                        <button onclick="resetFilters()"
+                            class="px-6 py-2 bg-white dark:bg-gray-700 text-[#2b3b50] dark:text-white border-2 border-[#2b3b50] dark:border-gray-600 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                            Reset
+                        </button>
+                    </div>
                 </div>
-            </div>
+
+                <!-- Event & Deadline Summary Section -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Upcoming Events -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors duration-300">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#2b3b50] dark:text-blue-400 mr-2" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-[#2b3b50] dark:text-white">Upcoming Events</h3>
+                        </div>
+                        <div id="upcomingEventsList" class="space-y-4">
+                            <div class="border-l-4 border-[#2b3b50] dark:border-blue-500 pl-3 py-2">
+                                <p class="font-medium text-[#2b3b50] dark:text-white">Tech Symposium 2026</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Computer Science & Engineering</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">📅 Jan 25, 2026</p>
+                            </div>
+                            <div class="border-l-4 border-[#2b3b50] dark:border-blue-500 pl-3 py-2">
+                                <p class="font-medium text-[#2b3b50] dark:text-white">Annual Sports Day</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Physical Education</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">📅 Feb 2, 2026</p>
+                            </div>
+                            <div class="border-l-4 border-[#2b3b50] dark:border-blue-500 pl-3 py-2">
+                                <p class="font-medium text-[#2b3b50] dark:text-white">Research Conference</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">All Departments</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">📅 Feb 10, 2026</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Event Approvals -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors duration-300">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#2b3b50] dark:text-blue-400 mr-2" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-[#2b3b50] dark:text-white">Pending Approvals</h3>
+                        </div>
+                        <div id="pendingApprovalsList" class="space-y-4">
+                            <div class="border-l-4 border-amber-500 pl-3 py-2">
+                                <p class="font-medium text-[#2b3b50] dark:text-white">Industrial Visit</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Mechanical Engineering</p>
+                                <p class="text-sm text-amber-600 dark:text-amber-400 font-medium mt-1">⏳ Pending</p>
+                            </div>
+                            <div class="border-l-4 border-amber-500 pl-3 py-2">
+                                <p class="font-medium text-[#2b3b50] dark:text-white">Guest Lecture Series</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Electronics & Communication</p>
+                                <p class="text-sm text-amber-600 dark:text-amber-400 font-medium mt-1">⏳ Pending</p>
+                            </div>
+                            <div class="border-l-4 border-green-500 pl-3 py-2">
+                                <p class="font-medium text-[#2b3b50] dark:text-white">Workshop on AI</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Computer Science & Engineering</p>
+                                <p class="text-sm text-green-600 dark:text-green-400 font-medium mt-1">✓ Approved</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deadline Summary -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors duration-300">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#2b3b50] dark:text-blue-400 mr-2" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                </path>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-[#2b3b50] dark:text-white">Deadline Summary</h3>
+                        </div>
+                        <div id="deadlineSummaryList" class="space-y-4">
+                            <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 pl-3 py-2">
+                                <p class="font-medium text-red-700 dark:text-red-400">Assignment Submission</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Data Structures Course</p>
+                                <p class="text-sm text-red-600 dark:text-red-400 font-medium mt-1">⚠️ Overdue by 2 days
+                                </p>
+                            </div>
+                            <div class="border-l-4 border-amber-500 pl-3 py-2">
+                                <p class="font-medium text-[#2b3b50] dark:text-white">Lab Report Submission</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Physics Laboratory</p>
+                                <p class="text-sm text-amber-600 dark:text-amber-400 font-medium mt-1">⏰ Due in 2 days
+                                </p>
+                            </div>
+                            <div class="border-l-4 border-green-500 pl-3 py-2">
+                                <p class="font-medium text-[#2b3b50] dark:text-white">Project Proposal</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Final Year Project</p>
+                                <p class="text-sm text-green-600 dark:text-green-400 font-medium mt-1">✓ Submitted</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Section -->
+                <div class="bg-white mb-20 dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors duration-300">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-[#2b3b50] dark:text-white">Export Report</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Download analytics data based on
+                                applied filters</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="exportPDF()"
+                                class="px-6 py-2 bg-[#2b3b50] dark:bg-blue-600 text-white rounded-lg font-medium hover:bg-[#1f2b3a] dark:hover:bg-blue-700 transition-colors flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                                Export as PDF
+                            </button>
+                            <button onclick="exportExcel()"
+                                class="px-6 py-2 bg-white dark:bg-gray-700 text-[#2b3b50] dark:text-white border-2 border-[#2b3b50] dark:border-gray-600 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                    </path>
+                                </svg>
+                                Export as Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+
         </div>
     </div>
-    <!-- Event Details Modal -->
 
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="assets/js/app.js"></script>
-    <script>
-        let calendar;
 
-        document.addEventListener('DOMContentLoaded', function () {
-            let calendarEl = document.getElementById('calendar');
-
-            calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                height: 400,
-                events: [] // initially empty, will be filled from backend + approvals
-            });
-
-            calendar.render();
-        });
-
-        window.addApprovedEventToCalendar = function (eventData) {
-            calendar.addEvent({
-                title: eventData.title,
-                start: eventData.date,
-                extendedProps: {
-                    department: eventData.department,
-                    status: 'Approved'
-                }
-            });
-        };
-    </script>
     <script src="assets/js/script.js"></script>
-    
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- jsPDF AutoTable (required for tables) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <script src="assets/js/reports.js"></script>
 
 </body>
 

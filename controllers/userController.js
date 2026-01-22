@@ -12,7 +12,7 @@ export async function listUsers(req, res) {
          u.email, 
          u.role, 
          u.department_id, 
-         d.name AS department_name, 
+         d.department_code AS department_code, 
          u.status, 
          u.created_at,
          u.Contact AS contact
@@ -20,7 +20,7 @@ export async function listUsers(req, res) {
        LEFT JOIN departments d ON u.department_id = d.id
        ORDER BY u.id DESC`
     );
-    console.log("USERS FROM DB:", users);
+    
 
     res.json(rows);
   } catch (e) {

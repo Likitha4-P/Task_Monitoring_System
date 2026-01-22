@@ -63,7 +63,10 @@ async function handleLogin(event) {
 function toggleVisibility(showId) {
 
   document.querySelectorAll(".page").forEach(el => {
-    el.style.display = "none"; // hide all pages
+    if (el.id !== showId) {
+      el.style.display = "none";
+    }
+
   });
 
   const showEl = document.getElementById(showId);
@@ -97,7 +100,6 @@ function loadDarkModePreference() {
   }
 }
 
-// ---- Tasks ----
 
 // ---- Tasks ----
 async function loadTasks() {
@@ -128,10 +130,10 @@ async function loadTasks() {
   const tableHead = document.getElementById("taskTableHeader");
 
   // ✅ Update the table header dynamically
- tableHead.innerHTML = `
+  tableHead.innerHTML = `
   <tr>
     <th>Title</th>
-    <th>Description</th>
+    <th>Documents</th>
     ${currentUser?.role === "Faculty/File Incharge" ? "" : "<th>Assigned To</th>"}
     <th>Department</th>
     <th>Priority</th>
@@ -193,7 +195,7 @@ async function loadTasks() {
     if (currentUser?.role === "Admin") {
       actions = `
         <div style="display:flex;align-items:center;gap:8px;flex-direction:column">
-          <span style="color:green;">${progressSection} completed</span>
+          <span class="bg-green-200 border text-green-800 px-2 py-1 rounded-full">${progressSection} completed</span>
           <div class="tasks-action-buttons">
             <button class="tasks-btn-edit" onclick="editTask('${task.id}')">
               <i class="fas fa-edit"></i> Edit
@@ -207,7 +209,7 @@ async function loadTasks() {
     } else if (currentUser?.role === "Professor Incharge") {
       actions = `
         <div class="tasks-action-buttons">
-          ${statusDropdown}
+         
           ${progressSection}
         </div>
       `;
@@ -226,9 +228,9 @@ async function loadTasks() {
     }
 
     // ✅ Build the row using new schema fields
-      row.innerHTML = `
+    row.innerHTML = `
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.title}</td>
-      <td class="text-slate-700 p-3 dark:text-slate-200">${task.description || ""}</td>
+      <td class="text-slate-700 p-3 flex items-center justify-center"><i class='bx bx-show p-3 text-red-500 text-2xl cursor-pointer  dark:text-slate-200 hover:text-green-500 transition'></i></td>
       ${currentUser?.role === "Faculty/File Incharge" ? "" : `<td class="text-slate-700 p-3 dark:text-slate-200">${task.assignee_name || "Unassigned"}</td>`}
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.department_name || "N/A"}</td>
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.priority}</td>
@@ -236,7 +238,7 @@ async function loadTasks() {
       <td class="text-slate-700 p-3 dark:text-slate-200">${statusDropdown}</td>
       <td class="text-slate-700 p-3 dark:text-slate-200">${actions}</td>
     `;
-        row.className = "border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700";
+    row.className = "border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700";
 
     tableBody.appendChild(row);
   }
@@ -271,7 +273,7 @@ async function editTask(taskId) {
   document.getElementById("taskDescription").value = task.description;
   document.getElementById("taskDueDate").value = task.deadline.split("T")[0];
   document.getElementById("taskPriority").value = task.priority;
-  document.getElementById("taskStatus").value = task.status;
+  document.getElementById("taskDeliverables").value = task.deliverables;
   document.getElementById("taskAssignedTo").value = task.assigned_to;
   document.getElementById("hiddenAssignedTo").value = task.assigned_to;
   const assignedToSelect = document.getElementById("taskAssignedTo");
@@ -303,12 +305,13 @@ async function updateTask(taskId) {
   const description = document.getElementById("taskDescription").value;
   const deadline = document.getElementById("taskDueDate").value;
   const priority = document.getElementById("taskPriority").value;
-  const status = document.getElementById("taskStatus").value;
+  const deliverables = document.getElementById("taskDeliverables").value;
+  const status = document.getElementById("taskStatus")?.value || null;
   const assigned_to = document.getElementById("hiddenAssignedTo").value;
   const res = await fetch(`${API_BASE}/tasks/${taskId}`, {
     method: "PUT",
     headers: getHeaders(),
-    body: JSON.stringify({ title, description, deadline, priority, status, assigned_to })
+    body: JSON.stringify({ title, description, deadline, priority, deliverables, status, assigned_to })
   });
 
   if (!res.ok) return alert("Failed to update task");
@@ -445,7 +448,7 @@ function populateFacultyDropdown(facultyMembers) {
   facultyMembers.forEach(faculty => {
     const option = document.createElement('option');
     option.value = faculty.id; // better to store id, not just name
-    option.textContent = `${faculty.name} (${faculty.department})`;
+    option.textContent = `${faculty.name} (${faculty.department_code})`;
     option.setAttribute('id', faculty.id); // set id for easy access later
     select.appendChild(option);
   });
@@ -458,19 +461,21 @@ async function createTask(event) {
 
 
   const faculty = await getUserById(document.getElementById("taskAssignedTo").value);
-  console.log(faculty.department);
+
   const title = document.getElementById("taskTitle").value;
   const description = document.getElementById("taskDescription").value;
   const deadline = document.getElementById("taskDueDate").value;
   const priority = document.getElementById("taskPriority").value;
-  const status = document.getElementById("taskStatus").value;
+  const deliverables = document.getElementById("taskDeliverables").value;
   const assigned_to = document.getElementById("taskAssignedTo").value;
-  const department = faculty.department;
+  const assigned_by = currentUserid;
+  const department = faculty.department_id;
+
 
   const res = await fetch(`${API_BASE}/tasks`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify({ title, description, deadline, priority, status, assigned_to, department })
+    body: JSON.stringify({ title, description, deadline, priority, deliverables, assigned_to, assigned_by, department_id: department })
   });
 
   if (!res.ok) return alert("Failed to create task");
@@ -491,129 +496,203 @@ function formatDate(isoString) {
 async function loadEvents() {
   const res = await fetch(`${API_BASE}/events`, { headers: getHeaders() });
   if (!res.ok) return alert("Failed to load events");
+
   const events = await res.json();
 
-  const container = document.getElementById("eventRows");
-  if (!container) return;
+  renderApprovalCards(events);
+  renderEventsTable(events);
+}
+function renderApprovalCards(events) {
+  const container = document.getElementById("eventApprovalCards");
   container.innerHTML = "";
-  for (const ev of events) {
-    const tr = document.createElement("tr");
+  if (currentUser.role === "Department Head" || currentUser.role === "Professor Incharge") {
+    container.innerHTML = `
+  <!-- Propose New Event -->
+  <div onclick="openEventModal()" class="bg-green-100 h-[15vh] dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
+    <div>
+      <h2 class="text-lg font-semibold">Propose New Event</h2>
+      <p class="text-sm text-green-600 dark:text-green-300">Create a new event proposal</p>
+    </div>
+    <i class='bx bx-user-plus text-4xl p-3'></i>
+  </div>
 
-    const createdby = await getUserById(ev.created_by);
-    console.log(createdby)
+  <!-- Pending Approval -->
+  <div class="bg-yellow-100 h-[15vh] dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
+    <div>
+      <h2 class="text-lg font-semibold">Pending Approval</h2>
+      <p id="pendingEvents" class="text-2xl font-bold">4</p>
+    </div>
+    <i class='bx bx-hourglass text-4xl p-3'></i>
+  </div>
 
-    tr.className = "calendar-event " + ev.status.toLowerCase();
-    tr.innerHTML = `
-      <td>${ev.title}</td>
-      <td>${ev.department}</td>
-      <td>${formatDate(ev.created_at)}</td>
-      <td>${formatDate(ev.date)}</td>
-      <td>${ev.participants}</td>
-      <td><span class="events-status-badge events-status-${ev.status.toLowerCase()}">${ev.status}</span></td>
-      <td>${createdby.name}</td>
-      <td>
-      ${currentUser?.role === "Admin"
-        ? ev.status === 'Approved'
-          ? `<div class="events-action-buttons">
-          <button class="events-btn-edit" disabled style="opacity:0.5;cursor:not-allowed">
-            <i class="fas fa-edit"></i> Approve
-          </button>
-          <button class="events-btn-delete" disabled style="opacity:0.5;cursor:not-allowed">
-            <i class="fas fa-trash"></i> Reject
-          </button>
-          </div>`
-          : `<div class="events-action-buttons">
-          <button class="events-btn-edit" onclick="approveEvent('${ev.id}')">
-            <i class="fas fa-edit"></i> Approve
-          </button>
-          <button class="events-btn-delete" onclick="rejectEvent('${ev.id}')">
-            <i class="fas fa-trash"></i> Reject
-          </button>
-          </div>`
-        : `<span style="color:gray;">View Only</span>`
-      }
-      </td>
+  <!-- Events Approved -->
+  <div class="bg-blue-100 h-[15vh] dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
+    <div>
+      <h2 class="text-lg font-semibold">Events Approved</h2>
+      <p id="approvedEvents" class="text-2xl font-bold">15</p>
+    </div>
+    <i class='bx bx-check-circle text-4xl p-3'></i>
+  </div>
+
+  <!-- Events Rejected -->
+  <div class="bg-red-100 h-[15vh] dark:bg-red-900 text-red-800 dark:text-red-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
+    <div>
+      <h2 class="text-lg font-semibold">Events Rejected</h2>
+      <p id="rejectedEvents" class="text-2xl font-bold">3</p>
+    </div>
+    <i class='bx bx-x-circle text-4xl p-3'></i>
+  </div>
+`;
+  }
+  else {
+    events
+    .filter(ev => ev.status === "Pending")
+    .slice(0, 6) // show latest 6
+    .forEach(ev => {
+      container.innerHTML += `
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow">
+          <h4 class="font-semibold text-sm mb-2">
+            ${ev.title} proposed by ${ev.department_code || "-"}
+          </h4>
+          <p class="text-xs">Venue – ${ev.venue || "-"}</p>
+          <p class="text-xs mb-3">Participants – ${ev.participants}</p>
+          <div class="flex gap-2">
+            <button onclick="approveEvent(${ev.id})"
+              class="px-3 py-1 rounded-full text-xs bg-green-500 text-white">
+              Approve
+            </button>
+            <button onclick="rejectEvent(${ev.id})"
+              class="px-3 py-1 rounded-full text-xs bg-red-500 text-white">
+              Reject
+            </button>
+          </div>
+        </div>
+      `;
+    });
+  }
+  
+}
+function renderEventsTable(events) {
+  const tbody = document.getElementById("eventTableBody");
+  tbody.innerHTML = "";
+
+  events.forEach(ev => {
+    const badge =
+      ev.status === "Approved"
+        ? "bg-green-100 text-green-700"
+        : ev.status === "Rejected"
+          ? "bg-red-100 text-red-700"
+          : "bg-yellow-100 text-yellow-700";
+
+    tbody.innerHTML += `
+      <tr class="border-b dark:border-slate-700">
+        <td class="px-4 py-2">${ev.title}</td>
+        <td class="px-4 py-2">${ev.department_code || "-"}</td>
+        <td class="px-4 py-2">${formatDate(ev.event_date)}</td>
+        <td class="px-4 py-2">${ev.venue || "-"}</td>
+        <td class="px-4 py-2">
+          <span class="px-3 py-1 text-xs rounded-full ${badge}">
+            ${ev.status}
+          </span>
+        </td>
+      </tr>
     `;
-    container.appendChild(tr);
+  });
+}
+let calendar;
 
-    if (ev.status === "Approved") {
-      addApprovedEventToCalendar({
-        title: ev.title,
-        date: formatForCalendar(ev.date), // ensure proper format
-        department: ev.department,
-        participants: ev.participants,
-        createdBy: createdby?.name || "-"
-      });
+
+async function initCalendar() {
+  const calendarEl = document.getElementById("calendar");
+  if (calendar) return;
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: "dayGridMonth",
+    height: "auto",
+    headerToolbar: {
+      left: "prev ,today",
+      center: "title",
+      right: "next"
+
+    },
+    events: fetchCalendarEvents,
+    eventContent: renderEventSquare,
+    eventClick: handleEventClick,
+    dateClick: () => {
+      document.getElementById("eventDetailsWrapper").classList.add("hidden");
     }
 
-  }
-  //   for (const ev of events) {
-  //   if (ev.status === "Approved") {
-  //     const createdby = await getUserById(ev.created_by);
+  });
 
-  //     // Push into FullCalendar
-  //     addApprovedEventToCalendar({
-  //       title: ev.title,
-  //       date: ev.date,  // must be YYYY-MM-DD
-  //       department: ev.department,
-  //       participants: ev.participants,
-  //       createdBy: createdby?.name || "-"
-  //     });
-  //   }
-  // }
-
+  calendar.render();
 }
 
-// helper to ensure FullCalendar accepts the date
-function formatForCalendar(dateStr) {
-  return new Date(dateStr).toISOString().split("T")[0];// YYYY-MM-DD
-}
-async function approveEvent(id, title, date, department, participants, createdBy) {
+async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) {
+  console.log("🔥 fetchCalendarEvents CALLED");
   try {
-    const res = await fetch(`${API_BASE}/events/${id}/approve`, {
-      method: "PUT",
+    const res = await fetch(`${API_BASE}/events/approved`, {
       headers: getHeaders()
     });
-    if (!res.ok) return alert("Failed to approve event");
 
-    // ✅ Update table status badge
-    const row = document.querySelector(`#eventRows tr td span.events-status-badge`);
-    if (row) row.innerText = "Approved";
+    const events = await res.json();
 
-    // ✅ Add to calendar
-    addApprovedEventToCalendar({
-      title: title,
-      date: formatForCalendar(date),
-      department: department,
-      participants: participants,
-      createdBy: createdBy
-    });
+    const calendarEvents = events.map(ev => ({
+      id: ev.id,
+      title: ev.title,
+      start: ev.event_date, // YYYY-MM-DD
+      extendedProps: {
+        department: ev.department_code,
+        venue: ev.venue,
+        participants: ev.participants
+      }
+    }));
 
-    alert("✅ Event Approved and added to calendar!");
+    successCallback(calendarEvents);
   } catch (err) {
     console.error(err);
-    alert("Error approving event");
+    failureCallback(err);
   }
 }
+function handleEventClick(info) {
+  const ev = info.event;
 
-async function rejectEvent(id) {
-  try {
-    const res = await fetch(`${API_BASE}/events/${id}/reject`, {
-      method: "PUT",
-      headers: getHeaders()
+  // Fill data
+  document.getElementById("eventTitle").textContent = ev.title;
+  document.getElementById("eventVenue").textContent =
+    ev.extendedProps.venue || "-";
+  document.getElementById("eventDepartment").textContent =
+    ev.extendedProps.department || "-";
+  document.getElementById("eventParticipants").textContent =
+    ev.extendedProps.participants ?? "-";
+  document.getElementById("eventDate").textContent =
+    ev.start.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
     });
-    if (!res.ok) return alert("Failed to reject event");
 
-    // ✅ Update table status badge
-    const row = document.querySelector(`#eventRows tr td span.events-status-badge`);
-    if (row) row.innerText = "Rejected";
+  // Show the card
+  document.getElementById("eventDetailsWrapper").classList.remove("hidden");
+  const wrapper = document.getElementById("eventDetailsWrapper");
+  wrapper.classList.remove("hidden");
 
-    alert("❌ Event Rejected!");
-  } catch (err) {
-    console.error(err);
-    alert("Error rejecting event");
-  }
+  setTimeout(() => {
+    wrapper.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 0);
 }
+
+
+function renderEventSquare(arg) {
+  const dept = arg.event.title || "-";
+
+  const square = document.createElement("div");
+  square.className =
+    "dept-square flex items-center justify-center text-xs text-wrap text-center font-bold";
+
+  square.textContent = dept;
+
+  return { domNodes: [square] };
+}
+
 
 function openEventModal() {
   document.getElementById('proposeEventModal').style.display = 'block';
@@ -630,268 +709,63 @@ function closeEventModal() {
   document.querySelector('.events-modal-header h2').innerHTML = '<i class="fas fa-calendar-plus"></i> Propose New Event';
   document.querySelector('.events-btn-submit').textContent = 'Propose Event';
 }
+async function createEvent(form) {
+  const title = form.eventTitle?.value;
+  const event_date = form.eventDate?.value;
+  const participants = Number(form.eventParticipants?.value || 0);
+  const venue = form.eventVenue?.value || null;
+  const department_id = currentUser?.department_id;
 
-async function createEvent() {
-  const title = document.getElementById("eventTitle").value;
-  const department = document.getElementById("eventDepartment").value;
-  const date = document.getElementById("eventDate").value;
-  const participants = document.getElementById("eventParticipants").value;
+  console.log("Frontend values:", {
+    title,
+    event_date,
+    participants,
+    venue,
+    department_id
+  });
+
+  if (!title || !event_date || !department_id) {
+    alert("Missing required fields");
+    return;
+  }
 
   const res = await fetch(`${API_BASE}/events`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify({ title, department, date, participants })
+    body: JSON.stringify({
+      title,
+      department_id,
+      event_date,
+      participants,
+      venue
+    })
   });
 
-  if (!res.ok) return alert("Failed to create event");
+  if (!res.ok) {
+    const err = await res.json();
+    alert(err.message || "Failed to create event");
+    return;
+  }
+
   alert("Event created!");
   closeEventModal();
   loadEvents();
 }
 
 
+
 async function approveEvent(id) {
   await fetch(`${API_BASE}/events/${id}/approve`, { method: "POST", headers: getHeaders() });
+  alert("Event approved!");
   loadEvents();
 }
 async function rejectEvent(id) {
   await fetch(`${API_BASE}/events/${id}/reject`, { method: "POST", headers: getHeaders() });
+  alert("Event rejected!");
   loadEvents();
 }
 
 
-function generateTaskReport() {
-  // Create PDF content
-  const pdfContent = `
-COLLEGE TASK MONITORING SYSTEM
-Task Status Report
-Generated on: ${new Date().toLocaleDateString()}
-
-=== TASK SUMMARY ===
-Total Tasks: 40
-Pending: 12 (30%)
-In Progress: 5 (12.5%)
-Completed: 20 (50%)
-Overdue: 3 (7.5%)
-
-=== DEPARTMENT BREAKDOWN ===
-Computer Science:
-- Total Tasks: 15
-- Completed: 8
-- In Progress: 3
-- Pending: 3
-- Overdue: 1
-
-Information Technology:
-- Total Tasks: 12
-- Completed: 7
-- In Progress: 2
-- Pending: 2
-- Overdue: 1
-
-Mathematics:
-- Total Tasks: 8
-- Completed: 3
-- In Progress: 0
-- Pending: 4
-- Overdue: 1
-
-Physics:
-- Total Tasks: 5
-- Completed: 2
-- In Progress: 0
-- Pending: 3
-- Overdue: 0
-
-=== FACULTY WORKLOAD ANALYSIS ===
-Faculty X: 5 tasks (3 completed, 1 in progress, 1 pending)
-Dr. John Smith: 4 tasks (2 completed, 1 in progress, 1 pending)
-Prof. Sarah Johnson: 3 tasks (3 completed, 0 in progress, 0 pending)
-Dr. Mike Wilson: 6 tasks (4 completed, 1 in progress, 1 overdue)
-
-=== DEADLINE COMPLIANCE ===
-On-time completion rate: 85%
-Average completion time: 12 days
-Tasks completed before deadline: 17/20
-
-=== PRIORITY ANALYSIS ===
-High Priority: 8 tasks (6 completed, 1 in progress, 1 overdue)
-Medium Priority: 20 tasks (12 completed, 3 in progress, 5 pending)
-Low Priority: 12 tasks (2 completed, 1 in progress, 6 pending, 3 overdue)
-
-=== RECOMMENDATIONS ===
-1. Focus on overdue high-priority tasks
-2. Redistribute workload for Faculty with 6+ tasks
-3. Implement early warning system for approaching deadlines
-4. Provide additional support for Mathematics department
-
-Report generated by College Task Monitoring System
-Contact: admin@college.edu for queries
-            `;
-
-  // Create and download PDF-like text file
-  const blob = new Blob([pdfContent], { type: 'text/plain' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Task_Status_Report_${new Date().toISOString().split('T')[0]}.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
-
-  alert('📊 Task Status Report downloaded successfully!\n\nFile: Task_Status_Report_' + new Date().toISOString().split('T')[0] + '.txt\n\nThe report includes comprehensive task analytics, department breakdowns, and faculty workload analysis.');
-}
-
-function generateDeadlineReport() {
-  // Create Excel-like CSV content
-  const csvContent = `Task ID,Task Name,Assigned To,Department,Deadline,Days Remaining,Priority,Status,Progress
-TSK001,NAAC Accreditation File,Faculty X,Computer Science,2025-09-10,3,High,In Progress,50%
-TSK002,Syllabus File Update,Prof. Johnson,Mathematics,2025-09-15,8,Medium,Verified,100%
-TSK003,Student Attendance Report,Dr. Smith,Computer Science,2025-09-20,13,Low,Submitted,100%
-TSK004,Lab Equipment Inventory,Dr. Wilson,Physics,2025-09-08,1,High,Pending,0%
-TSK005,Course Outcome Analysis,Faculty Y,Information Technology,2025-09-12,5,Medium,In Progress,75%
-TSK006,Research Paper Review,Prof. Davis,Mathematics,2025-09-18,11,Low,Pending,0%
-TSK007,Student Feedback Analysis,Faculty Z,Computer Science,2025-09-14,7,Medium,In Progress,25%
-TSK008,Library Book Audit,Librarian,Administration,2025-09-16,9,Low,Pending,0%
-TSK009,Exam Schedule Preparation,Dr. Brown,Administration,2025-09-11,4,High,In Progress,80%
-TSK010,Faculty Performance Review,Principal,Management,2025-09-25,18,Medium,Pending,0%
-TSK011,Infrastructure Maintenance,Maintenance Head,Administration,2025-09-09,2,High,Overdue,0%
-TSK012,Student Placement Report,Placement Officer,Administration,2025-09-22,15,Medium,Pending,0%
-TSK013,Budget Allocation Review,Finance Head,Administration,2025-09-13,6,High,In Progress,60%
-TSK014,Academic Calendar Update,Academic Head,Administration,2025-09-17,10,Medium,Pending,0%
-TSK015,Quality Assurance Audit,QA Team,Administration,2025-09-19,12,High,Pending,0%
-
-SUMMARY STATISTICS:
-Total Tasks Due in Next 30 Days: 15
-Overdue Tasks: 1
-High Priority Tasks: 6
-Medium Priority Tasks: 6
-Low Priority Tasks: 3
-Average Days to Deadline: 8.2
-Tasks at Risk (Due in 3 days): 3
-
-DEPARTMENT WISE BREAKDOWN:
-Computer Science: 3 tasks
-Mathematics: 2 tasks
-Information Technology: 1 task
-Physics: 1 task
-Administration: 8 tasks
-
-PRIORITY ANALYSIS:
-High Priority Overdue: 1
-Medium Priority Due Soon: 2
-Low Priority Delayed: 1`;
-
-  // Create and download CSV file
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Deadline_Summary_Report_${new Date().toISOString().split('T')[0]}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
-
-  alert('📈 Deadline Summary Report downloaded successfully!\n\nFile: Deadline_Summary_Report_' + new Date().toISOString().split('T')[0] + '.csv\n\nOpen with Excel or Google Sheets for detailed analysis. Includes task deadlines, priority breakdown, and department-wise statistics.');
-}
-
-function generateEventReport() {
-  // Create iCal format calendar content
-  const calendarContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//College Task Monitoring System//Event Calendar//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-
-BEGIN:VEVENT
-UID:evt001@college.edu
-DTSTART:20250910T090000Z
-DTEND:20250910T170000Z
-SUMMARY:Workshop on Artificial Intelligence
-DESCRIPTION:Comprehensive workshop on AI technologies and applications. Resource persons: Industry Expert, Prof. Smith. Expected participants: 75.
-LOCATION:Tech Lab, Main Building
-STATUS:CONFIRMED
-CATEGORIES:WORKSHOP,COMPUTER SCIENCE
-PRIORITY:5
-END:VEVENT
-
-BEGIN:VEVENT
-UID:evt002@college.edu
-DTSTART:20250912T100000Z
-DTEND:20250912T160000Z
-SUMMARY:Guest Lecture on Cloud Computing
-DESCRIPTION:Expert lecture on cloud technologies and future trends. Resource person: Cloud Computing Expert. Expected participants: 60.
-LOCATION:Conference Hall, IT Block
-STATUS:CONFIRMED
-CATEGORIES:LECTURE,INFORMATION TECHNOLOGY
-PRIORITY:5
-END:VEVENT
-
-BEGIN:VEVENT
-UID:evt003@college.edu
-DTSTART:20250915T090000Z
-DTEND:20250915T170000Z
-SUMMARY:Web Development Workshop
-DESCRIPTION:Hands-on workshop on modern web development technologies. Resource persons: Industry Expert, Faculty Team. Expected participants: 50.
-LOCATION:Main Auditorium
-STATUS:TENTATIVE
-CATEGORIES:WORKSHOP,COMPUTER SCIENCE
-PRIORITY:3
-END:VEVENT
-
-BEGIN:VEVENT
-UID:evt004@college.edu
-DTSTART:20250918T140000Z
-DTEND:20250918T170000Z
-SUMMARY:Mathematics Symposium
-DESCRIPTION:Annual mathematics symposium with research presentations. Resource persons: Mathematics Faculty. Expected participants: 40.
-LOCATION:Mathematics Department
-STATUS:CONFIRMED
-CATEGORIES:SYMPOSIUM,MATHEMATICS
-PRIORITY:4
-END:VEVENT
-
-BEGIN:VEVENT
-UID:evt005@college.edu
-DTSTART:20250920T100000Z
-DTEND:20250920T150000Z
-SUMMARY:Physics Lab Demonstration
-DESCRIPTION:Advanced physics experiments demonstration for students. Resource persons: Physics Faculty. Expected participants: 30.
-LOCATION:Physics Laboratory
-STATUS:CONFIRMED
-CATEGORIES:DEMONSTRATION,PHYSICS
-PRIORITY:4
-END:VEVENT
-
-BEGIN:VEVENT
-UID:evt006@college.edu
-DTSTART:20250922T090000Z
-DTEND:20250922T120000Z
-SUMMARY:Career Guidance Session
-DESCRIPTION:Career counseling and placement guidance for final year students. Resource persons: Placement Team. Expected participants: 100.
-LOCATION:Main Auditorium
-STATUS:CONFIRMED
-CATEGORIES:GUIDANCE,PLACEMENT
-PRIORITY:5
-END:VEVENT
-
-END:VCALENDAR`;
-
-  // Create and download iCal file
-  const blob = new Blob([calendarContent], { type: 'text/calendar' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `College_Event_Calendar_${new Date().toISOString().split('T')[0]}.ics`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
-
-  alert('📅 Event Calendar downloaded successfully!\n\nFile: College_Event_Calendar_' + new Date().toISOString().split('T')[0] + '.ics\n\nImport this file into Google Calendar, Outlook, or any calendar application to view all college events. Includes approved events, pending proposals, and detailed event information.');
-}
 // ================= USERS =================
 // Load all users 
 async function loadUsers() {
@@ -903,32 +777,7 @@ async function loadUsers() {
 
   const users = await res.json();
 
-  const container = document.getElementById("tableRows");
-  if (!container) return users;
-  container.innerHTML = "";
 
-  users.forEach(u => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${u.name}</td>
-      <td>${u.email}</td>
-      <td>${u.role}</td>
-      <td>${u.department}</td>
-      <td>
-        ${currentUser?.role === "Admin"
-        ? `<div class="action-buttons">
-                <button class="btn-edit" onclick="editUser('${u.id}')">
-                  <i class="fas fa-edit"></i> Edit
-                </button>
-                <button class="btn-delete" onclick="deleteUser('${u.id}')">
-                  <i class="fas fa-trash"></i> Delete
-                </button>
-             </div>`
-        : `<span style="color:gray;">View Only</span>`}
-      </td>
-    `;
-    container.appendChild(tr);
-  });
 
   return users; // ✅ return array so openTaskModal() can use it
 }
@@ -992,7 +841,7 @@ async function openEditUserModal(userId) {
 // Open/close modal
 function openModal() {
 
-     if (currentDepartment) {
+  if (currentDepartment) {
     document.getElementById("userDepartmentDisplay").value =
       `${currentDepartment.department_code} - ${currentDepartment.department_name}`;
   }
@@ -1033,7 +882,7 @@ async function createUser() {
     alert("Contact must contain only numbers");
     return;
   }
-  
+
 
   const res = await fetch(`${API_BASE}/users`, {
     method: "POST",
@@ -1117,7 +966,7 @@ async function deleteUser(id) {
     }
   }
   if (!res.ok) return alert("Failed to delete user");
-  loadUsers();
+  loadDepartmentUsers(currentDepartment.id);
 }
 
 // Get user by ID
@@ -1179,7 +1028,7 @@ async function renderDepartments() {
   try {
     const response = await fetch("http://localhost:5000/api/departments");
     const departments = await response.json();
-window._departments = departments;
+    window._departments = departments;
     // ✅ SAFETY CHECK
     if (!Array.isArray(departments)) {
       console.error("Expected array, got:", departments);
@@ -1214,13 +1063,13 @@ window._departments = departments;
           console.log("Opening department:", dep);
           openDepartment(dep);
         }
-          
+
 
         departmentGrid.appendChild(card);
       });
-
-    // ✅ Add Department Card (always last)
-    departmentGrid.innerHTML += `
+    if (currentUser?.role === "Admin") {
+      // ✅ Add Department Card (always last)
+      departmentGrid.innerHTML += `
       <div id="addBtn"
            class="bg-white dark:bg-slate-800 rounded-xl p-5 shadow
            flex flex-col items-center justify-center gap-2
@@ -1237,6 +1086,8 @@ window._departments = departments;
 
       </div>
     `;
+    }
+
 
   } catch (error) {
     console.error("Error loading departments:", error);
@@ -1293,7 +1144,7 @@ async function loadDepartmentUsers(departmentId) {
     }
 
     users.forEach(user => {
-      console.log("user : ",user)
+      console.log("user : ", user)
       tbody.innerHTML += `
         <tr class="border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700">
           <td class="px-4 py-2">${user.name}</td>
@@ -1301,14 +1152,18 @@ async function loadDepartmentUsers(departmentId) {
           <td class="px-4 py-2">${user.email}</td>
           <td class="px-4 py-2">${user.contact}</td>
           <td class="px-4 py-2">${user.status}</td>
+          ${currentUser?.role === "Admin" ? `
           <td class="px-4 py-2">
-            <button class="edit-btn" onclick="openEditUserModal('${user.id}')">
+            <button class="edit-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" onclick="openEditUserModal('${user.id}')">
                         <i class='bx bx-edit-alt cursor-pointer hover:text-blue-600'></i>
                         
                     </button>
+                    <button class="del-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded" onclick="deleteUser('${user.id}')">
+                        <i class='bx bx-trash cursor-pointer hover:text-red-600'></i>
+                    </button>
                             
           </td>
-        </tr>
+        </tr>`: ``}
       `;
     });
 
@@ -1355,14 +1210,57 @@ function closeDepartmentModal() {
 
 
 
+function initDarkModeToggle() {
+  // Select ALL dark toggle buttons and add click listeners
+  document.querySelectorAll('.darkToggle').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log("Dark mode toggled");
+      document.documentElement.classList.toggle('dark');
+      // Save preference to localStorage
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('darkMode', isDark ? 'true' : 'false');
+    });
+  });
+}
+
+// Load dark mode preference on page load
+function loadDarkModePreference() {
+  const isDark = localStorage.getItem('darkMode') === 'true';
+  if (isDark) {
+    document.documentElement.classList.add('dark');
+  }
+}
+async function loadEventSummaryCards() {
+  const res = await fetch(`${API_BASE}/events/event-summary`, {
+    headers: getHeaders()
+  });
+
+  if (!res.ok) {
+    console.error("Failed to load event summary");
+    return;
+  }
+
+  const data = await res.json();
+
+  console.log("Event summary:", data);
+
+  document.getElementById("pendingEvents").textContent = data.pending;
+  document.getElementById("approvedEvents").textContent = data.approved;
+  document.getElementById("rejectedEvents").textContent = data.rejected;
+}
 
 // Attach handlers
 document.addEventListener("DOMContentLoaded", () => {
   console.log("App initialized");
+
   // Default section
-    loadDarkModePreference();
+
+  loadDarkModePreference();
   initDarkModeToggle();
   toggleVisibility("mainpage");
+
+  initCalendar();
 
 
   // Hide create button if not admin
@@ -1383,45 +1281,98 @@ document.addEventListener("DOMContentLoaded", () => {
   const sidebarTitle = document.getElementById("sidebarTitle");
   if (sidebarTitle) {
     sidebarTitle.innerHTML = `Welcome ${currentUser?.name || "Guest"}`;
-    loadEvents();
+    
   }
-
-   document.getElementById("showdepartments")?.addEventListener("click", () => {
+  const sidebartasks = document.getElementById("showtasks");
+  if (sidebartasks && currentUser?.role === "Department Head") {
+    sidebartasks.innerHTML = "View Tasks";
+  }
+  const sidebardepartments = document.getElementById("showdepartments");
+  if (sidebardepartments && currentUser?.role === "Department Head") {
+    sidebardepartments.innerHTML = "View Faculty";
+  }
+  const sidebarevents = document.getElementById("showevents");
+  if (sidebarevents && currentUser?.role === "Department Head") {
+    sidebarevents.innerHTML = "Propose Events";
+  }
+  const eventApprovalText = document.getElementById("eventApprovalText");
+  if (eventApprovalText && currentUser?.role === "Department Head") {
+    eventApprovalText.innerHTML = "";
+  }
+  document.getElementById("overview")?.addEventListener("click", () => {
+    console.log("Loading overview...");
+    renderDepartments();
+    toggleVisibility('mainpage');
+    document.querySelectorAll(".sideBtn").forEach(el => {
+    el.classList.remove("active");
+  });
+    
+    document.getElementById("overview").classList.add("active");
+    
+  });
+  document.getElementById("showdepartments")?.addEventListener("click", () => {
     console.log("Loading departments...");
     renderDepartments();
     toggleVisibility('allDepartments');
+    document.querySelectorAll(".sideBtn").forEach(el => {
+    el.classList.remove("active");
+  });
+    
+    document.getElementById("showdepartments").classList.add("active");
+    
   });
   // Sidebar buttons
   document.getElementById("showtasks")?.addEventListener("click", () => {
     console.log("Loading tasks...");
     loadTasks();
     toggleVisibility('taskManagement');
+    document.querySelectorAll(".sideBtn").forEach(el => {
+    el.classList.remove("active");
+  });
+    document.getElementById("showtasks").classList.add("active");
   });
 
-  document.getElementById("showusers")?.addEventListener("click", () => {
-    console.log("Loading users...");
-    loadUsers();
-    // loadFacultyMembers();
-    toggleVisibility('userManagement');
-  });
+  
   document.getElementById("showevents")?.addEventListener("click", () => {
     console.log("Loading events...");
-
-    //  loadEvents();
+     
+    loadEvents();
+    loadEventSummaryCards();
     toggleVisibility('eventManagement');
+    document.querySelectorAll(".sideBtn").forEach(el => {
+    el.classList.remove("active");
   });
-  document.getElementById("showreports")?.addEventListener("click", () => {
+    document.getElementById("showevents").classList.add("active");
+  });
+  document.getElementById("showreports")?.addEventListener("click", async () => {
     console.log("Loading reports...");
-    // loadReports();
+
+    await populateDepartmentFilter();
+    await populateFacultyFilter();
+    applyFilters();
     toggleVisibility('reportsPage');
+    document.querySelectorAll(".sideBtn").forEach(el => {
+    el.classList.remove("active");
+  });
+    document.getElementById("showreports").classList.add("active"); 
+    const darkModeToggle = document.getElementById('darkToggle');
+
+    darkModeToggle.addEventListener('click', () => {
+      console.log("Dark mode toggled from reports page");
+      document.documentElement.classList.toggle('dark');
+      const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      localStorage.setItem('theme', theme);
+    });
+
   });
 
-  document.getElementById("logoutBtn")?.addEventListener("click", () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/index.html";
-  });
-
+  const buttons = document.getElementsByClassName("logoutBtn");
+  for (const btn of buttons) {
+    btn.addEventListener("click", () => {
+      localStorage.clear();
+      window.location.href = "/index.html";
+    });
+  }
   // Login form
   const loginForm = document.getElementById("loginForm");
   if (loginForm) loginForm.addEventListener("submit", handleLogin);
@@ -1440,19 +1391,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   //department form
-  
-const createDepartmentForm = document.getElementById("createDepartmentForm");
 
-if (createDepartmentForm) {
-  createDepartmentForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  const createDepartmentForm = document.getElementById("createDepartmentForm");
 
-    await createDepartment();
-    
-  });
-}
+  if (createDepartmentForm) {
+    createDepartmentForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-// Event form
+      await createDepartment();
+
+    });
+  }
+
+  // Event form
   const eventUserForm = document.getElementById("proposeEventForm");
   if (eventUserForm) {
     eventUserForm.addEventListener("submit", async (event) => {
@@ -1460,7 +1411,7 @@ if (createDepartmentForm) {
       if (eventUserForm.dataset.mode === "edit") {
         await updateEvent(eventUserForm.dataset.eventId);
       } else {
-        await createEvent();
+        await createEvent(event.target);
       }
     });
   }
