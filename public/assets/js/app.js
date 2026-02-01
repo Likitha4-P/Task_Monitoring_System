@@ -10,11 +10,20 @@ function setAuth(token, user) {
   localStorage.setItem("user", JSON.stringify(user));
 }
 
-function getHeaders() {
-  return authToken
-    ? { "Content-Type": "application/json", "Authorization": "Bearer " + authToken }
-    : { "Content-Type": "application/json" };
+function getHeaders(isJson = true) {
+  const headers = {};
+
+  if (authToken) {
+    headers["Authorization"] = "Bearer " + authToken;
+  }
+
+  if (isJson) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  return headers;
 }
+
 // ---- Login ----
 function getParameterByName(name, url) {
   if (!url) url = window.location.href;
@@ -133,7 +142,7 @@ async function loadTasks() {
   tableHead.innerHTML = `
   <tr>
     <th>Title</th>
-    <th>Documents</th>
+    ${currentUser?.role === "Faculty/File Incharge" ? "<th>Upload Docs</th>" : "<th>View Docs</th>"}
     ${currentUser?.role === "Faculty/File Incharge" ? "" : "<th>Assigned To</th>"}
     <th>Department</th>
     <th>Priority</th>
@@ -230,7 +239,7 @@ async function loadTasks() {
     // ✅ Build the row using new schema fields
     row.innerHTML = `
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.title}</td>
-      <td class="text-slate-700 p-3 flex items-center justify-center"><i class='bx bx-show p-3 text-red-500 text-2xl cursor-pointer  dark:text-slate-200 hover:text-green-500 transition'></i></td>
+      ${currentUser?.role === "Faculty/File Incharge" ? `<td class='text-slate-700 p-3 flex items-center justify-center'><i onclick=openUploadDocModal('${task.id}') class='bx bx-upload p-3 text-red-500 text-2xl cursor-pointer  dark:text-slate-200 hover:text-green-500 transition'></i></td>` : "<td class='text-slate-700 p-3 flex items-center justify-center'><i class='bx bx-show p-3 text-red-500 text-2xl cursor-pointer  dark:text-slate-200 hover:text-green-500 transition'></i></td>"}
       ${currentUser?.role === "Faculty/File Incharge" ? "" : `<td class="text-slate-700 p-3 dark:text-slate-200">${task.assignee_name || "Unassigned"}</td>`}
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.department_name || "N/A"}</td>
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.priority}</td>
@@ -747,7 +756,7 @@ async function createEvent(form) {
     return;
   }
 
-  alert("Event created!");
+  alert("Event Proposed!");
   closeEventModal();
   loadEvents();
 }
@@ -1195,6 +1204,8 @@ async function createDepartment() {
 }
 
 
+
+
 function openDepartmentModal() {
   document.getElementById("createDepartmentModal").style.display = "block";
   document.body.style.overflow = "hidden";
@@ -1208,6 +1219,50 @@ function closeDepartmentModal() {
   document.body.style.overflow = "auto";
 }
 
+async function uploadDocument(event) {
+ const form = event.target; // 👈 this is the form
+  const currentTaskId = form.dataset.taskId;
+  console.log("Uploading document for task ID:", currentTaskId);
+    const file = document.getElementById("file").files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    
+
+    const res = await fetch(
+      `${API_BASE}/tasks/${currentTaskId}/deliverables`,
+      {
+        method: "POST",
+        headers: getHeaders(false), // No JSON header for FormData
+        body: formData
+      }
+    );
+if (!res.ok) {
+  const text = await res.text(); // 👈 NOT json()
+  console.error("Upload failed:", text);
+  alert("Upload failed. File may be too large.");
+  return;
+}
+    const data = await res.json();
+    alert(data.message);
+    closeUploadDocModal();
+    loadTasks();
+}
+function openUploadDocModal(taskId) {
+  const modal = document.getElementById("uploadDocumentModal");
+  const form = document.getElementById("uploadDocumentForm");
+
+  modal.style.display = "block";
+  form.dataset.taskId = taskId; // 👈 stored here  
+  document.body.style.overflow = "hidden";
+}
+
+function closeUploadDocModal() {
+  const form = document.getElementById("uploadDocumentForm");
+  form.reset();
+
+  document.getElementById("uploadDocumentModal").style.display = "none";
+  document.body.style.overflow = "auto";
+}
 
 
 function initDarkModeToggle() {
@@ -1253,6 +1308,7 @@ async function loadEventSummaryCards() {
 // Attach handlers
 document.addEventListener("DOMContentLoaded", () => {
   console.log("App initialized");
+  
 
   // Default section
 
@@ -1375,7 +1431,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   // Login form
   const loginForm = document.getElementById("loginForm");
-  if (loginForm) loginForm.addEventListener("submit", handleLogin);
+
+  if (loginForm) {
+    
+    loginForm.addEventListener("submit", handleLogin);
+  }
 
   // User form
   const createUserForm = document.getElementById("createUserForm");
@@ -1423,8 +1483,18 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("form submitted");
     if (createTaskForm.dataset.mode === "edit") {
       await updateTask(createTaskForm.dataset.taskId);
+      
     } else {
       await createTask(event);
     }
   });
+
+  const uploadDocumentForm = document.getElementById("uploadDocumentForm");
+  if (uploadDocumentForm) {
+    uploadDocumentForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      console.log("Uploading document...");
+      await uploadDocument(event);
+    });
+  }
 });

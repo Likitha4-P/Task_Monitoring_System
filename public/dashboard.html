@@ -55,7 +55,7 @@
 
 
         <!-- Main Content -->
-        <main class="main-content  page  overflow-y-auto dark:bg-slate-900" id="mainpage">
+        <main class="main-content  page  overflow-y-scroll dark:bg-slate-900" id="mainpage">
             <div class="border-blue-400 bg-white dark:bg-slate-800 shadow-lg p-2">
                 <!-- Main Section -->
                 <main class="col-span-9">
@@ -319,11 +319,11 @@
                                     <label for="userRole">Role</label>
                                     <select id="userRole" required>
                                         <option value="">Select role</option>
-                                        <option value="Admin">Admin</option>
+
                                         <option value="Department Head">Department Head</option>
                                         <option value="Professor Incharge">Professor Incharge</option>
                                         <option value="Faculty/File Incharge">Faculty/File Incharge</option>
-                                        <option value="View Only">View Only</option>
+
                                     </select>
                                 </div>
 
@@ -492,6 +492,33 @@
                     </div>
                 </div>
 
+                <!-- Upload Doc Modal -->
+                <div id="uploadDocumentModal" class="modal h-[100vh]">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2><i class="fas fa-building"></i> Upload Document</h2>
+                            <button class="close-btn" onclick="closeUploadDocModal()">&times;</button>
+                        </div>
+
+                        <div class="modal-body">
+                            <form id="uploadDocumentForm">
+                                <div class="form-group">
+                                    <input type="file" id="file" name="file" required />
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="button" class="btn-cancel"
+                                        onclick="closeUploadDocModal()">Cancel</button>
+                                    <button type="submit" class="btn-submit">
+                                        Upload Document
+                                    </button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Table -->
                 <div class="bg-white p-6 dark:bg-slate-800 rounded-xl shadow overflow-x-auto">
                     <table class="w-full text-sm p-3 bg-white dark:bg-slate-800 ">
@@ -510,7 +537,8 @@
         </div>
 
 
-        <div id="eventManagement" class="page bg-gray-50 w-full dark:bg-slate-900 text-slate-700 dark:text-slate-200">
+        <div id="eventManagement"
+            class="page bg-gray-50 overflow-y-scroll w-full dark:bg-slate-900 text-slate-700 dark:text-slate-200">
             <main class="flex-1 ">
 
 
@@ -553,7 +581,7 @@
                     <i class="bx bx-filter text-xl cursor-pointer hover:text-blue-500"></i>
                 </div>
                 <!-- Modal for Propose Event -->
-                <div id="proposeEventModal" class="events-modal">
+                <div id="proposeEventModal" class="events-modal h-[100vh]">
                     <div class="events-modal-content">
                         <div class="events-modal-header">
                             <h2><i class="fas fa-calendar-plus"></i> Propose New Event</h2>
@@ -569,7 +597,7 @@
                                         required />
                                 </div>
 
-                               
+
                                 <!-- Event Date -->
                                 <div class="events-form-group">
                                     <label for="eventDate">Event Date</label>
@@ -606,7 +634,7 @@
                 </div>
 
                 <!-- Table -->
-                <div class="bg-white p-6 dark:bg-slate-800 rounded-xl shadow overflow-x-auto">
+                <div class="bg-white p-6 dark:bg-slate-800 rounded-xl shadow ">
                     <table class="w-full text-sm px-3">
                         <thead class="bg-gray-700 text-white dark:bg-slate-700">
                             <tr>

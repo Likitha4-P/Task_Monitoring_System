@@ -72,6 +72,7 @@ export async function createEvent(req, res) {
   const departmentName = deptRows.length
     ? deptRows[0].department_name
     : null;
+    res.status(201).json({ id: result.insertId });
 
   try {
     await sendEventEmail(reviewerEmail, {
@@ -90,7 +91,7 @@ export async function createEvent(req, res) {
 }
 
 
-    res.status(201).json({ id: result.insertId });
+    
 
   } catch (e) {
     console.error("Create event error:", e);
@@ -119,6 +120,7 @@ export async function listEvents(req, res) {
         e.id,
         e.title,
         e.event_date,
+        e.participants,
         e.venue,
         e.status,
         d.department_code
@@ -165,7 +167,7 @@ export async function approveEvent(req, res) {
   [id]
 );
 
-    
+    res.json({ ok: true });
 
     if (event) {
       try {
@@ -177,7 +179,7 @@ export async function approveEvent(req, res) {
       }
     }
 
-    res.json({ ok: true });
+    
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Failed to approve event" });
@@ -198,6 +200,8 @@ export async function rejectEvent(req, res) {
       WHERE e.id = ?
     `, [id]);
 
+    res.json({ ok: true });
+
     if (event) {
       try {
         console.log(event);
@@ -208,7 +212,6 @@ export async function rejectEvent(req, res) {
       }
     }
 
-    res.json({ ok: true });
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Failed to reject event" });

@@ -24,7 +24,7 @@ This ensures that bcrypt.compare() works correctly and keeps user credentials se
 Create a simple Node.js script (e.g., generate-hash.js):
 
 ```
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 const passwords = ["admin123", "user123"]; // replace with your seed passwords
 

@@ -10,3 +10,4 @@ router.post("/", addDepartment);
 router.get("/:id/stats", getDepartmentStats);
 router.get("/:id/users", getDepartmentUsers);
 export default router;
+

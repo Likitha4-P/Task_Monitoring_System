@@ -13,6 +13,17 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+/*----------------Reset Password Email ------------------*/
+export async function sendEmail(to, subject, text) {
+ 
+  await transporter.sendMail({
+    from: `"Task Monitoring System" <${process.env.EMAIL_USER}>`,
+    to,
+    subject,
+    text
+  });
+}
+
 /* ------------------ TASK ASSIGNMENT EMAIL ------------------ */
 export async function sendTaskEmail(to, taskDetails) {
   const { title, description, deadline, priority , deliverables } = taskDetails;

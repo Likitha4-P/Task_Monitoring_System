@@ -86,10 +86,14 @@ res.json(filtered);
 
 
   }
-
 export async function getUpcomingEvents(req, res) {
   try {
-    const { department_id, from_date, to_date } = req.query;
+    const { from_date, to_date } = req.query;
+    const { role, department_id } = req.user;
+    console.log(req.user);
+    console.log(req.query);
+
+  
 
     let where = `
       WHERE e.status = 'Approved'
@@ -97,11 +101,13 @@ export async function getUpcomingEvents(req, res) {
     `;
     const params = [];
 
-    if (department_id) {
+    // 🔐 Role-based filtering
+    if (role !== "Admin") {
       where += " AND e.department_id = ?";
       params.push(department_id);
     }
 
+    // 📅 Date filter
     if (from_date && to_date) {
       where += " AND e.event_date BETWEEN ? AND ?";
       params.push(from_date, to_date);

@@ -4,14 +4,27 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import cron from "node-cron";
 import { sendDeadlineReminders } from "./utils/reminderScheduler.js";
+import { uploadDeliverable } from "./controllers/deliverableController.js";
+import { upload } from "./middleware/upload.js";
+import { authRequired } from "./middleware/auth.js";
 
 // Load env variables
 dotenv.config();
 
 const app = express();
 
+app.post(
+  "/api/tasks/:taskId/deliverables",
+  authRequired,
+  upload.single("file"),
+  uploadDeliverable
+);
+
+
 // Middleware
-app.use(express.json());
+app.use(express.json( ));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
 
 // --- Import your routes ---
 import authRoutes from "./routes/auth.js";
@@ -45,7 +58,7 @@ app.use(cors());
 console.log("Serving static files from:", path.join(__dirname, "public"));
 
 // Run every day at 11:40 AM
-cron.schedule("40 11 * * *", async () => {
+cron.schedule("12 9 * * *", async () => {
   console.log("⏳ Checking deadlines...");
   await sendDeadlineReminders();
 });

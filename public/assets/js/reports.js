@@ -112,7 +112,9 @@ function getFilterParams() {
 
 async function loadUpcomingEvents() {
     const qs = getFilterParams();
-    const res = await fetch(`${API_BASE}/reports/events/upcoming?${qs}`);
+const res= await fetch(`${API_BASE}/reports/events/upcoming?${qs}`, {
+  headers: getHeaders()
+});
 
     if (!res.ok) {
         console.error("Failed to load upcoming events");
@@ -141,7 +143,9 @@ async function loadUpcomingEvents() {
     });
 }
 async function loadPendingApprovals() {
-    const res = await fetch(`${API_BASE}/reports/events/pending`);
+    const res = await fetch(`${API_BASE}/reports/events/pending`, {
+      headers: getHeaders()
+    });
 
     if (!res.ok) {
         console.error("Failed to load pending approvals");
@@ -169,7 +173,9 @@ async function loadPendingApprovals() {
 }
 async function loadDeadlineSummary() {
     const qs = getFilterParams();
-    const res = await fetch(`${API_BASE}/reports/tasks/deadlines?${qs}`);
+    const res = await fetch(`${API_BASE}/reports/tasks/deadlines?${qs}`,{
+      headers:getHeaders()
+    });
 
     if (!res.ok) {
         console.error("Failed to load deadlines");
@@ -417,6 +423,6 @@ function showNotification(message) {
 }
 function exportReport() {
   const qs = getFilterParams();
-  return fetch(`${API_BASE}/reports/export?${qs}`)
+  return fetch(`${API_BASE}/reports/export?${qs}`,{headers:getHeaders()})
     .then(res => res.json());
 }

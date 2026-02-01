@@ -13,7 +13,7 @@ CREATE TABLE departments (
   department_code VARCHAR(20) UNIQUE NOT NULL,
   department_name VARCHAR(100) UNIQUE NOT NULL,
   is_active ENUM('Yes','No') DEFAULT 'Yes',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =========================================
@@ -136,35 +136,24 @@ CREATE TABLE user_notifications (
 );
 
 
-
-CREATE TABLE uploaded_files (
+CREATE TABLE task_deliverables (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  file_name VARCHAR(255) NOT NULL,
-  file_url TEXT NOT NULL,
-  file_type ENUM(
-    'Report',
-    'Image',
-    'Document',
-    'Spreadsheet',
-    'Presentation',
-    'Other'
-  ) DEFAULT 'Other',
+
+  task_id INT NOT NULL,
   uploaded_by INT NOT NULL,
-  uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE CASCADE
-);
 
-CREATE TABLE file_references (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  file_id INT NOT NULL,
-  reference_type ENUM(
-    'Task',
-    'Event',
-    'EventTask',
-    'User',
-    'System'
-  ) NOT NULL,
-  reference_id INT NOT NULL,
-  description VARCHAR(255),
-  FOREIGN KEY (file_id) REFERENCES uploaded_files(id) ON DELETE CASCADE
+  drive_file_id VARCHAR(255) NOT NULL,
+  drive_file_url TEXT NOT NULL,
+
+  uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_task
+    FOREIGN KEY (task_id)
+    REFERENCES tasks(id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_user
+    FOREIGN KEY (uploaded_by)
+    REFERENCES users(id)
+    ON DELETE CASCADE
 );

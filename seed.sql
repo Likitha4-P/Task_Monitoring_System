@@ -11,6 +11,6 @@ INSERT INTO departments (department_code, department_name) VALUES
 
 -- Seed minimal data (Admin with Generated Hashed password for first login)
 INSERT INTO users (name, email, password_hash, role, department_id, status)
-VALUES ('Admin', 'admin@example.com', '$2a$10$38F3HCwc/RzCJSHLkOYQOuv6xhIuvO3cUE57JErMcPqjsIUFjHUuW', 'Admin', null,'Active')
+VALUES ('Admin', 'admin@example.com', '$2a$10$38F3HCwc/RzCJSHLkOYQOuv6xhIuvO3cUE57JErMcPqjsIUFjHUuW', 'Admin', 1,'Active')
 ON DUPLICATE KEY UPDATE email = email;
 

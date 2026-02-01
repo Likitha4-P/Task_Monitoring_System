@@ -36,6 +36,7 @@ export async function createTask(req, res) {
         0
       ]
     );
+     res.status(201).json({ id: result.insertId });
 
     const [userRows] = await pool.query("SELECT email FROM users WHERE id = ?", [assigned_to]);
     if (userRows.length) {
@@ -43,7 +44,7 @@ export async function createTask(req, res) {
       sendTaskEmail(assigneeEmail, { title, description, deadline, priority, deliverables }).catch(console.error);
     }
 
-    res.status(201).json({ id: result.insertId });
+   
   } catch (e) {
     console.error(e);
     res.status(e.status || 500).json({ message: e.message || "Failed to create task" });
@@ -155,7 +156,7 @@ export async function updateTask(req, res) {
     else {
       return res.status(403).json({ message: "Unauthorized" });
     }
-
+res.json({ ok: true, message: "Task updated successfully" });
     if (assigned_to && (userRole === "Admin" || userRole === "Department Head")) {
       const [userRows] = await pool.query("SELECT email FROM users WHERE id = ?", [assigned_to]);
       if (userRows.length) {
@@ -164,7 +165,7 @@ export async function updateTask(req, res) {
       }
     }
 
-    res.json({ ok: true, message: "Task updated successfully" });
+    
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Failed to update task" });

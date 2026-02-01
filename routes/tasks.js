@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { authRequired, requireRole } from "../middleware/auth.js";
 import { createTask, listTasks, getTask, updateTask,deleteTask, updateProgress } from "../controllers/taskController.js";
+import { uploadDeliverable } from "../controllers/deliverableController.js";
+import { upload } from "../middleware/upload.js";
 
 const router = Router();
 router.use(authRequired);
