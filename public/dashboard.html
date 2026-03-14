@@ -61,25 +61,59 @@
                 <main class="col-span-9">
 
                     <!-- Top Bar -->
-                    <div class="flex justify-between items-center mb-8 p-6">
-                        <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100"></h2>
+                    <div class="flex justify-between items-center mb-8 p-6 dark:bg-slate-800 rounded-xl shadow">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Dashboard</h2>
 
                         <div class="flex items-center gap-4">
-                            <button
-                                class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
-                                <i class="fa-regular fa-bell"></i>
-                            </button>
 
+                            <!-- Notifications -->
+                            <div class="relative">
+
+                                <button
+                                    class="notificationBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition relative">
+
+                                    <i class="fa-regular fa-bell"></i>
+
+                                    <span
+                                        class="notificationCount hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
+                                        0
+                                    </span>
+                                </button>
+
+                                <!-- Dropdown -->
+                                <div
+                                    class="notificationDropdown hidden absolute right-0 mt-3 w-[500px] bg-white dark:bg-slate-800 rounded-xl shadow-lg border dark:border-slate-700 z-50">
+
+                                    <div class="p-3 font-semibold border-b dark:border-slate-700">
+                                        Notifications
+                                    </div>
+
+                                    <div class="notificationList max-h-80 overflow-y-auto"></div>
+
+                                    <div class="text-center p-2 border-t dark:border-slate-700">
+                                        <button onclick="markAllRead()" class="text-sm text-blue-500">
+                                            Mark all as read
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Dark Mode -->
                             <button
                                 class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
-                                <i class='bx bx-moon'></i>
+                                <i class="darkModeIcon bx bx-moon"></i>
                             </button>
 
+                            <!-- Logout -->
                             <button
                                 class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-red-400">
                                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                             </button>
+
                         </div>
+
                     </div>
 
                     <!-- Task Cards -->
@@ -175,16 +209,46 @@
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">All Departments</h2>
 
                     <div class="flex items-center gap-4">
-                        <button
-                            class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
-                            <i class="fa-regular fa-bell"></i>
-                        </button>
+                        <div class="relative">
 
+                            <button
+                                class="notificationBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition relative">
+
+                                <i class="fa-regular fa-bell"></i>
+
+                                <span
+                                    class="notificationCount hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
+                                    0
+                                </span>
+                            </button>
+
+                            <!-- Dropdown -->
+                            <div
+                                class="notificationDropdown hidden absolute right-0 mt-3 w-[500px] bg-white dark:bg-slate-800 rounded-xl shadow-lg border dark:border-slate-700 z-50">
+
+                                <div class="p-3 font-semibold border-b dark:border-slate-700">
+                                    Notifications
+                                </div>
+
+                                <div class="notificationList max-h-80 overflow-y-auto"></div>
+
+                                <div class="text-center p-2 border-t dark:border-slate-700">
+                                    <button onclick="markAllRead()" class="text-sm text-blue-500">
+                                        Mark all as read
+                                    </button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Dark Mode -->
                         <button
                             class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
-                            <i class='bx bx-moon'></i>
+                            <i class="darkModeIcon bx bx-moon"></i>
                         </button>
 
+                        <!-- Logout -->
                         <button
                             class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-red-400">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -204,7 +268,7 @@
                 <div id="createDepartmentModal" class="modal h-[100vh]">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h2><i class="fas fa-building"></i> Add Department</h2>
+                            <h2 id="deptModalTitle"><i class="fas fa-building"></i> Add Department</h2>
                             <button class="close-btn" onclick="closeDepartmentModal()">&times;</button>
                         </div>
 
@@ -225,7 +289,7 @@
                                 <div class="form-actions">
                                     <button type="button" class="btn-cancel"
                                         onclick="closeDepartmentModal()">Cancel</button>
-                                    <button type="submit" class="btn-submit">
+                                    <button type="submit" class="btn-submit" id="deptSubmitBtn">
                                         Add Department
                                     </button>
                                 </div>
@@ -257,7 +321,7 @@
 
                         <button
                             class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
-                            <i class='bx bx-moon'></i>
+                            <i class='darkModeIcon bx bx-moon'></i>
                         </button>
                         <button
                             class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
@@ -401,82 +465,53 @@
 
                     </div>
                     <div class="flex items-center gap-4 p-6">
-                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
-                            <i class="fa-regular fa-bell"></i>
+                        <div class="relative">
+
+                            <button
+                                class="notificationBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition relative">
+
+                                <i class="fa-regular fa-bell"></i>
+
+                                <span
+                                    class="notificationCount hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
+                                    0
+                                </span>
+                            </button>
+
+                            <!-- Dropdown -->
+                            <div
+                                class="notificationDropdown hidden absolute right-0 mt-3 w-[500px] bg-white dark:bg-slate-800 rounded-xl shadow-lg border dark:border-slate-700 z-50">
+
+                                <div class="p-3 font-semibold border-b dark:border-slate-700">
+                                    Notifications
+                                </div>
+
+                                <div class="notificationList max-h-80 overflow-y-auto"></div>
+
+                                <div class="text-center p-2 border-t dark:border-slate-700">
+                                    <button onclick="markAllRead()" class="text-sm text-blue-500">
+                                        Mark all as read
+                                    </button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Dark Mode -->
+                        <button
+                            class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
+                            <i class="darkModeIcon bx bx-moon"></i>
                         </button>
 
+                        <!-- Logout -->
                         <button
-                            class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
-                            <i class="bx bx-moon"></i>
-                        </button>
-
-                        <button
-                            class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                            class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-red-400">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         </button>
                     </div>
                 </header>
-                <div id="createTaskModal" class="tasks-modal">
-                    <div class="tasks-modal-content">
-                        <div class="tasks-modal-header">
-                            <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
-                            <button class="tasks-close-btn" onclick="closeTaskModal()">&times;</button>
-                        </div>
-                        <div class="tasks-modal-body">
-                            <form id="createTaskForm">
-
-
-                                <div class="tasks-form-group">
-                                    <label for="taskTitle">Task Title</label>
-                                    <input type="text" id="taskTitle" name="taskTitle" placeholder="Enter task title"
-                                        required>
-                                </div>
-
-                                <div class="tasks-form-group">
-                                    <label for="taskDescription">Description</label>
-                                    <textarea id="taskDescription" name="taskDescription"
-                                        placeholder="Enter task description" required></textarea>
-                                </div>
-
-                                <div class="tasks-form-group">
-                                    <label for="taskAssignedTo" id="taskAssignedToLabel">Assigned To</label>
-                                    <select id="taskAssignedTo" name="taskAssignedTo" required>
-
-                                    </select>
-                                </div>
-
-                                <input type="hidden" id="hiddenAssignedTo" name="hiddenAssignedTo" />
-                                <div class="tasks-form-group">
-                                    <label for="taskPriority">Priority</label>
-                                    <select id="taskPriority" name="taskPriority" required>
-                                        <option value="Low">Low</option>
-                                        <option value="Medium">Medium</option>
-                                        <option value="High">High</option>
-                                    </select>
-                                </div>
-
-                                <div class="tasks-form-group">
-                                    <label for="taskDeliverables">Deliverables(if any)</label>
-                                    <input type="text" id="taskDeliverables" name="taskDeliverables" required>
-
-                                </div>
-
-                                <div class="tasks-form-group">
-                                    <label for="taskDueDate">Due Date</label>
-                                    <input type="date" id="taskDueDate" name="taskDueDate" required>
-                                </div>
-
-
-                                <div class="tasks-form-actions">
-                                    <button type="button" class="tasks-btn-cancel"
-                                        onclick="closeTaskModal()">Cancel</button>
-                                    <button type="submit" class="tasks-btn-submit">Create Task</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
+                
                 <!-- Search -->
                 <div class="flex justify-between p-6 items-center mt-4 mb-4">
                     <input id="search" type="text" placeholder="Search ..." class="w-90 px-4 py-2 border rounded-xl outline-none
@@ -492,32 +527,7 @@
                     </div>
                 </div>
 
-                <!-- Upload Doc Modal -->
-                <div id="uploadDocumentModal" class="modal h-[100vh]">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h2><i class="fas fa-building"></i> Upload Document</h2>
-                            <button class="close-btn" onclick="closeUploadDocModal()">&times;</button>
-                        </div>
 
-                        <div class="modal-body">
-                            <form id="uploadDocumentForm">
-                                <div class="form-group">
-                                    <input type="file" id="file" name="file" required />
-                                </div>
-                                
-                                <div class="form-actions">
-                                    <button type="button" class="btn-cancel"
-                                        onclick="closeUploadDocModal()">Cancel</button>
-                                    <button type="submit" class="btn-submit">
-                                        Upload Document
-                                    </button>
-                                </div>
-                            </form>
-
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Table -->
                 <div class="bg-white p-6 dark:bg-slate-800 rounded-xl shadow overflow-x-auto">
@@ -550,17 +560,48 @@
 
                     </div>
                     <div class="flex items-center gap-4 p-6">
-                        <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
-                            <i class="fa-regular fa-bell"></i>
+                        <div class="relative">
+
+                            <button
+                                class="notificationBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition relative">
+
+                                <i class="fa-regular fa-bell"></i>
+
+                                <span
+                                    class="notificationCount hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
+                                    0
+                                </span>
+                            </button>
+
+                            <!-- Dropdown -->
+                            <div
+                                class="notificationDropdown hidden absolute right-0 mt-3 w-[500px] bg-white dark:bg-slate-800 rounded-xl shadow-lg border dark:border-slate-700 z-50">
+
+                                <div class="p-3 font-semibold border-b dark:border-slate-700">
+                                    Notifications
+                                </div>
+
+                                <div class="notificationList max-h-80 overflow-y-auto"></div>
+
+                                <div class="text-center p-2 border-t dark:border-slate-700">
+                                    <button onclick="markAllRead()" class="text-sm text-blue-500">
+                                        Mark all as read
+                                    </button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Dark Mode -->
+                        <button
+                            class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
+                            <i class="darkModeIcon bx bx-moon"></i>
                         </button>
 
+                        <!-- Logout -->
                         <button
-                            class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
-                            <i class="bx bx-moon"></i>
-                        </button>
-
-                        <button
-                            class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                            class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-red-400">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         </button>
                     </div>
@@ -716,16 +757,48 @@
                     <p class="text-gray-600 dark:text-gray-400 mt-1">Insights on tasks, events, and deadlines</p>
                 </div>
                 <div class="flex items-center gap-4 p-6">
-                    <button class="p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
-                        <i class="fa-regular fa-bell"></i>
+                    <div class="relative">
+
+                        <button
+                            class="notificationBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition relative">
+
+                            <i class="fa-regular fa-bell"></i>
+
+                            <span
+                                class="notificationCount hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
+                                0
+                            </span>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div
+                            class="notificationDropdown hidden absolute right-0 mt-3 w-[500px] bg-white dark:bg-slate-800 rounded-xl shadow-lg border dark:border-slate-700 z-50">
+
+                            <div class="p-3 font-semibold border-b dark:border-slate-700">
+                                Notifications
+                            </div>
+
+                            <div class="notificationList max-h-80 overflow-y-auto"></div>
+
+                            <div class="text-center p-2 border-t dark:border-slate-700">
+                                <button onclick="markAllRead()" class="text-sm text-blue-500">
+                                    Mark all as read
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Dark Mode -->
+                    <button
+                        class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
+                        <i class="darkModeIcon bx bx-moon"></i>
                     </button>
 
-                    <button id="darkToggle"
-                        class=" p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
-                        <i class="bx bx-moon"></i>
-                    </button>
-
-                    <button class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition">
+                    <!-- Logout -->
+                    <button
+                        class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-red-400">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     </button>
                 </div>
@@ -911,10 +984,239 @@
 
 
         </div>
+        <!-- Header -->
+        <div id="myTasks" class="page bg-white dark:bg-slate-800 w-full">
+
+            <!-- Top Bar -->
+            <header
+                class="bg-white flex justify-between items-center dark:bg-gray-800 border-b-2 border-[#2b3b50] dark:border-gray-700 shadow-sm transition-colors duration-300">
+                <div class="p-4">
+                    <div class="max-w-5xl mx-auto">
+                        <p class="text-3xl font-bold text-[#2b3b50] dark:text-white">Task Management</p>
+                        <h1 class="text-gray-600 dark:text-gray-800 py-4 px-2">My Task Board</h1>
+
+                    </div>
+
+                </div>
+                <div class="flex items-center gap-4 p-6">
+                    <div class="relative">
+
+                        <button
+                            class="notificationBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition relative">
+
+                            <i class="fa-regular fa-bell"></i>
+
+                            <span
+                                class="notificationCount hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
+                                0
+                            </span>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div
+                            class="notificationDropdown hidden absolute right-0 mt-3 w-[500px] bg-white dark:bg-slate-800 rounded-xl shadow-lg border dark:border-slate-700 z-50">
+
+                            <div class="p-3 font-semibold border-b dark:border-slate-700">
+                                Notifications
+                            </div>
+
+                            <div class="notificationList max-h-80 overflow-y-auto"></div>
+
+                            <div class="text-center p-2 border-t dark:border-slate-700">
+                                <button onclick="markAllRead()" class="text-sm text-blue-500">
+                                    Mark all as read
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Dark Mode -->
+                    <button
+                        class="darkToggle p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-yellow-300">
+                        <i class="darkModeIcon bx bx-moon"></i>
+                    </button>
+
+                    <!-- Logout -->
+                    <button
+                        class="logoutBtn p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:scale-110 transition text-gray-700 dark:text-red-400">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </div>
+            </header>
+            <div id="createTaskModal" class="tasks-modal">
+                <div class="tasks-modal-content">
+                    <div class="tasks-modal-header">
+                        <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
+                        <button class="tasks-close-btn" onclick="closeTaskModal()">&times;</button>
+                    </div>
+                    <div class="tasks-modal-body">
+                        <form id="createTaskForm">
+
+
+                            <div class="tasks-form-group">
+                                <label for="taskTitle">Task Title</label>
+                                <input type="text" id="taskTitle" name="taskTitle" placeholder="Enter task title"
+                                    required>
+                            </div>
+
+                            <div class="tasks-form-group">
+                                <label for="taskDescription">Description</label>
+                                <textarea id="taskDescription" name="taskDescription"
+                                    placeholder="Enter task description" required></textarea>
+                            </div>
+
+                            <div class="tasks-form-group">
+                                <label for="taskAssignedTo" id="taskAssignedToLabel">Assigned To</label>
+                                <select id="taskAssignedTo" name="taskAssignedTo" required>
+
+                                </select>
+                            </div>
+
+                            <input type="hidden" id="hiddenAssignedTo" name="hiddenAssignedTo" />
+                            <div class="tasks-form-group">
+                                <label for="taskPriority">Priority</label>
+                                <select id="taskPriority" name="taskPriority" required>
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                </select>
+                            </div>
+
+                            <div class="tasks-form-group">
+                                <label for="taskDeliverables">Deliverables(if any)</label>
+                                <input type="text" id="taskDeliverables" name="taskDeliverables" required>
+
+                            </div>
+
+                            <div class="tasks-form-group">
+                                <label for="taskDueDate">Due Date</label>
+                                <input type="date" id="taskDueDate" name="taskDueDate" required>
+                            </div>
+
+
+                            <div class="tasks-form-actions">
+                                <button type="button" class="tasks-btn-cancel"
+                                    onclick="closeTaskModal()">Cancel</button>
+                                <button type="submit" class="tasks-btn-submit">Create Task</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col justify-center items-center gap-6 ">
+
+                <div class="flex justify-center items-center bg-white/5 border-2 w-[100%] gap-6 mt-4 dark:bg-white/5 rounded-xl "
+                    id="tasksContent">
+
+                </div>
+                <!-- Upload Doc Modal -->
+                <div id="uploadDocumentModal" class="modal h-[100vh]">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2><i class="fas fa-building"></i> Upload Document</h2>
+                            <button class="close-btn" onclick="closeUploadDocModal()">&times;</button>
+                        </div>
+
+                        <div class="modal-body">
+                            <form id="uploadDocumentForm">
+                                <div class="form-group">
+                                    <input type="file" id="file" name="file" required />
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" class="btn-cancel"
+                                        onclick="closeUploadDocModal()">Cancel</button>
+                                    <button type="submit" class="btn-submit">
+                                        Upload Document
+                                    </button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <div id="cardGrid"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-5xl mx-auto px-6 py-8 -mt-6">
+                </div>
+                <div id="loaderOverlay" class="loader-overlay">
+                    <div class="loader-box">
+                        <div class="spinner"></div>
+                        <p>Uploading document...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+    </div>
+      <div  id="createTaskModal" class="tasks-modal">
+                    <div class="tasks-modal-content">
+                        <div class="tasks-modal-header">
+                            <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
+                            <button class="tasks-close-btn" onclick="closeTaskModal()">&times;</button>
+                        </div>
+                        <div class="tasks-modal-body">
+                            <form id="createTaskForm">
+
+
+                                <div class="tasks-form-group">
+                                    <label for="taskTitle">Task Title</label>
+                                    <input type="text" id="taskTitle" name="taskTitle" placeholder="Enter task title"
+                                        required>
+                                </div>
+
+                                <div class="tasks-form-group">
+                                    <label for="taskDescription">Description</label>
+                                    <textarea id="taskDescription" name="taskDescription"
+                                        placeholder="Enter task description" required></textarea>
+                                </div>
+
+                                <div class="tasks-form-group">
+                                    <label for="taskAssignedTo" id="taskAssignedToLabel">Assigned To</label>
+                                    <select id="taskAssignedTo" name="taskAssignedTo" required>
+
+                                    </select>
+                                </div>
+
+                                <input type="hidden" id="hiddenAssignedTo" name="hiddenAssignedTo" />
+                                <div class="tasks-form-group">
+                                    <label for="taskPriority">Priority</label>
+                                    <select id="taskPriority" name="taskPriority" required>
+                                        <option value="Low">Low</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="High">High</option>
+                                    </select>
+                                </div>
+
+                                <div class="tasks-form-group">
+                                    <label for="taskDeliverables">Deliverables(if any)</label>
+                                    <input type="text" id="taskDeliverables" name="taskDeliverables" required>
+
+                                </div>
+
+                                <div class="tasks-form-group">
+                                    <label for="taskDueDate">Due Date</label>
+                                    <input type="date" id="taskDueDate" name="taskDueDate" required>
+                                </div>
+
+
+                                <div class="tasks-form-actions">
+                                    <button type="button" class="tasks-btn-cancel"
+                                        onclick="closeTaskModal()">Cancel</button>
+                                    <button type="submit" class="tasks-btn-submit">Create Task</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+    <div id="toastContainer" class="fixed bottom-5 right-5 space-y-3 z-50">
     </div>
 
 
 
+    <script src="assets/js/taskCards.js"></script>
     <script src="assets/js/app.js"></script>
 
     <script src="assets/js/script.js"></script>

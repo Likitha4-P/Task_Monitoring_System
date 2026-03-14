@@ -8,10 +8,12 @@ import { uploadDeliverable } from "./controllers/deliverableController.js";
 import { upload } from "./middleware/upload.js";
 import { authRequired } from "./middleware/auth.js";
 
+
 // Load env variables
 dotenv.config();
 
 const app = express();
+
 
 app.post(
   "/api/tasks/:taskId/deliverables",
@@ -19,7 +21,6 @@ app.post(
   upload.single("file"),
   uploadDeliverable
 );
-
 
 // Middleware
 app.use(express.json( ));
@@ -31,18 +32,19 @@ import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import taskRoutes from "./routes/tasks.js";
 import eventRoutes from "./routes/events.js";
-import alertRoutes from "./routes/alertRoutes.js";
 import reportRoutes from "./routes/reports.js";
 import departmentRoutes from "./routes/departmentRoutes.js";
+import notificationRoutes from "./routes/notifications.js";
+
 
 // --- API routes ---
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/events", eventRoutes);
-app.use("/api/alerts", alertRoutes);
 app.use("/api/reports", reportRoutes);
-app.use("/api/departments", departmentRoutes);
+app.use("/api/departments", departmentRoutes);  
 
 // --- Serve Frontend (index.html + assets) ---
 const __filename = fileURLToPath(import.meta.url);

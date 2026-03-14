@@ -12,7 +12,7 @@ import { sendEmail } from "../utils/mailer.js";
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(req.body)
+   
 
     // 1. Find user
     const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);

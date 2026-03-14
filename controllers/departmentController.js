@@ -1,13 +1,7 @@
 import pool from "../config/db.js";
-// GET all departments
-// exports.getDepartments = (req, res) => {
-//   const sql = "SELECT * FROM departments";
+import { createNotification } from "../utils/notifyHelper.js";
 
-//   pool.query(sql, (err, results) => {
-//     if (err) return res.status(500).json(err);
-//     res.json(results);
-//   });
-// };
+// GET all departments
 export async function getDepartments(req, res) {
   try {
     const [rows] = await pool.query("SELECT * FROM departments");
@@ -42,7 +36,14 @@ export async function addDepartment(req, res) {
       message: "Department added successfully",
       departmentId: result.insertId
     });
-
+    const adminId = (await pool.query("SELECT id FROM users WHERE role = 'Admin' LIMIT 1"))[0][0].id;
+await createNotification(
+  adminId,
+  "Department Added",
+  `${department_name} has been added to the system.`,
+  "Department",
+  result.insertId
+)
   } catch (e) {
     if (e.code === "ER_DUP_ENTRY") {
       return res.status(409).json({
@@ -100,3 +101,60 @@ export async function getDepartmentUsers(req, res) {
     res.status(500).json({ message: "Failed to load department users" });
   }
 }
+
+
+// DELETE DEPARTMENT
+export const deleteDepartment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [result] = await pool.query(
+      "DELETE FROM departments WHERE id = ?",
+      [id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Department not found" });
+    }
+
+    res.json({ message: "Department deleted successfully" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// UPDATE / EDIT DEPARTMENT
+export const updateDepartment = async (req, res) => {
+  try {
+
+    const { id } = req.params;
+    const { department_code, department_name } = req.body;
+
+    const [result] = await pool.query(
+      `UPDATE departments
+       SET department_code = ?, department_name = ?
+       WHERE id = ?`,
+      [department_code, department_name, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Department not found" });
+    }
+
+    res.json({ message: "Department updated successfully" });
+
+  } catch (err) {
+
+    if (err.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({
+        message: "Department code or name already exists"
+      });
+    }
+
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

@@ -53,7 +53,7 @@ CREATE TABLE events (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
-  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+ FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- =========================================
@@ -73,30 +73,9 @@ CREATE TABLE tasks (
   progress INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL,
-  FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE CASCADE,
+FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
-);
-
--- =========================================
--- EVENT TASKS (TASKS UNDER EVENTS)
--- =========================================
-CREATE TABLE event_tasks (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  event_id INT NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  description TEXT,
-  assigned_to INT,
-  assigned_by INT,
-  deadline DATE,
-  priority ENUM('High','Medium','Low') DEFAULT 'Medium',
-  status ENUM('Pending','In Progress','Completed','Verified') DEFAULT 'Pending',
-  progress INT DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
-  FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL,
-  FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- =========================================

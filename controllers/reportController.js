@@ -6,7 +6,7 @@ export async function getTaskSummary(req, res) {
 
     let where = "WHERE 1=1";
     const params = [];
-console.log(req.user);
+
     if (["Department Head", "Professor Incharge"].includes(role)) {
       if (!department_id) {
         return res.json({ pending: 0, completed: 0, in_progress: 0, overdue: 0, total: 0 });
@@ -24,9 +24,9 @@ console.log(req.user);
       `
       SELECT
         COALESCE(SUM(status = 'Pending'), 0) AS pending,
-        COALESCE(SUM(status IN ('Completed','Closed')), 0) AS completed,
+        COALESCE(SUM(status IN ('Submitted','Closed')), 0) AS completed,
         COALESCE(SUM(status = 'In Progress'), 0) AS in_progress,
-        COALESCE(SUM(deadline < CURDATE() AND status NOT IN ('Completed','Closed')), 0) AS overdue,
+        COALESCE(SUM(deadline < CURDATE() AND status NOT IN ('Submitted','Closed')), 0) AS overdue,
         COUNT(*) AS total
       FROM tasks
       ${where}
@@ -43,55 +43,28 @@ console.log(req.user);
 
   }
 export async function getTasksByDepartment(req, res) {
- 
   try {
-    const { role, department_id, id: userId } = req.user;
-
-    let joinCondition = "ON t.department_id = d.id";
-    const params = [];
-
-    if (["Department Head", "Professor Incharge"].includes(role)) {
-      joinCondition += " AND d.id = ?";
-      params.push(department_id);
-    }
-
-    if (role === "Faculty/File Incharge") {
-      joinCondition += " AND t.assigned_to = ?";
-      params.push(userId);
-    }
-
-    const [rows] = await pool.query(
-      `
+    const [rows] = await pool.query(`
       SELECT
         d.department_code AS department,
         COUNT(t.id) AS count
       FROM departments d
-      LEFT JOIN tasks t
-        ${joinCondition}
+      LEFT JOIN tasks t ON t.department_id = d.id
       GROUP BY d.id
       ORDER BY count DESC
-      `,
-      params
-    );
-    const filtered = rows.filter(
-  row => row.department?.toLowerCase() !== "admin"
-);
+    `);
 
-res.json(filtered);
-
+    res.json(rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to load tasks by department" });
   }
-
-
-  }
+}
 export async function getUpcomingEvents(req, res) {
   try {
     const { from_date, to_date } = req.query;
     const { role, department_id } = req.user;
-    console.log(req.user);
-    console.log(req.query);
+
 
   
 
@@ -162,19 +135,19 @@ export async function getPendingEventApprovals(req, res) {
 }
 export async function getDeadlineSummary(req, res) {
   try {
-    const { department, faculty, from_date, to_date } = req.query;
+    const { department_id, faculty_id, from_date, to_date } = req.query;
 
     let where = "WHERE t.status != 'Closed'";
     const params = [];
 
-    if (department) {
-      where += " AND d.department_name = ?";
-      params.push(department);
+    if (department_id) {
+      where += " AND d.id = ?";
+      params.push(department_id);
     }
 
-    if (faculty) {
-      where += " AND u.name = ?";
-      params.push(faculty);
+    if (faculty_id) {
+      where += " AND u.id = ?";
+      params.push(faculty_id);
     }
 
     if (from_date && to_date) {

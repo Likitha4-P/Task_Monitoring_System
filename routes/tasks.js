@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authRequired, requireRole } from "../middleware/auth.js";
 import { createTask, listTasks, getTask, updateTask,deleteTask, updateProgress } from "../controllers/taskController.js";
-import { uploadDeliverable } from "../controllers/deliverableController.js";
+import { getFileURL, deleteDeliverable } from "../controllers/deliverableController.js";
 import { upload } from "../middleware/upload.js";
 
 const router = Router();
@@ -14,12 +14,17 @@ router.post("/", requireRole("Admin", "Professor Incharge"), createTask);
 router.get("/", listTasks);
 router.get("/:id", getTask);
 
-// Update status or assignee (Admin, Department Head, Professor Incharge)
-router.put("/:id", requireRole("Admin", "Department Head", "Professor Incharge"), updateTask);
+// Update status 
+router.put("/:id", updateTask);
 
-router.delete("/:id", requireRole("Admin", "Department Head"), deleteTask);
+router.delete("/:id", requireRole("Admin", "Professor Incharge"), deleteTask);
 
 // Update only progress (assigned user can update their own)
 router.patch("/:id/progress", updateProgress);
+
+
+router.get("/:id/viewDoc",getFileURL);
+
+router.delete("/:taskId/deliverable/:deliverableId", deleteDeliverable);
 
 export default router;

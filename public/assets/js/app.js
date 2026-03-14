@@ -88,19 +88,42 @@ function toggleVisibility(showId) {
 }
 // ---- Dark Mode Toggle ----
 function initDarkModeToggle() {
-  // Select ALL dark toggle buttons and add click listeners
-  document.querySelectorAll('.darkToggle').forEach(button => {
-    button.addEventListener('click', (e) => {
+
+  const savedTheme = localStorage.getItem("darkMode");
+
+  if (savedTheme === "true") {
+    document.documentElement.classList.add("dark");
+  }
+
+  updateDarkModeIcon(); // set icon on page load
+
+  document.querySelectorAll(".darkToggle").forEach(button => {
+    button.addEventListener("click", (e) => {
       e.preventDefault();
-      console.log("Dark mode toggled");
-      document.documentElement.classList.toggle('dark');
-      // Save preference to localStorage
-      const isDark = document.documentElement.classList.contains('dark');
-      localStorage.setItem('darkMode', isDark ? 'true' : 'false');
+
+      document.documentElement.classList.toggle("dark");
+
+      const isDark = document.documentElement.classList.contains("dark");
+      localStorage.setItem("darkMode", isDark);
+
+      updateDarkModeIcon(); // update ALL icons
     });
   });
 }
 
+function updateDarkModeIcon() {
+  const isDark = document.documentElement.classList.contains("dark");
+
+  document.querySelectorAll(".darkModeIcon").forEach(icon => {
+    icon.classList.remove("bx-moon", "bx-sun");
+
+    if (isDark) {
+      icon.classList.add("bx-sun");
+    } else {
+      icon.classList.add("bx-moon");
+    }
+  });
+}
 // Load dark mode preference on page load
 function loadDarkModePreference() {
   const isDark = localStorage.getItem('darkMode') === 'true';
@@ -144,11 +167,11 @@ async function loadTasks() {
     <th>Title</th>
     ${currentUser?.role === "Faculty/File Incharge" ? "<th>Upload Docs</th>" : "<th>View Docs</th>"}
     ${currentUser?.role === "Faculty/File Incharge" ? "" : "<th>Assigned To</th>"}
-    <th>Department</th>
+    ${!(currentUser?.role === "Admin") ? "" : "<th>Department</th>"}
     <th>Priority</th>
     <th>Due Date</th>
     <th>Status</th>
-    <th>Actions</th>
+    ${(currentUser?.role === "Department Head") ? "" : "<th>Actions</th>"}
   </tr>
 `;
   const tableBody = document.getElementById("taskrows");
@@ -169,6 +192,7 @@ async function loadTasks() {
           <option value="Submitted" ${task.status === "Submitted" ? "selected" : ""}>Submitted</option>
           <option value="Verified" ${task.status === "Verified" ? "selected" : ""}>Verified</option>
           <option value="Closed" ${task.status === "Closed" ? "selected" : ""}>Closed</option>
+          
         </select>
       `;
     } else {
@@ -229,19 +253,19 @@ async function loadTasks() {
         </div>
       `;
     } else {
-      actions = `
-        <div class="tasks-action-buttons" style="color:gray;">
-          View Only
-        </div>
-      `;
+      actions = "";
     }
 
     // ✅ Build the row using new schema fields
     row.innerHTML = `
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.title}</td>
-      ${currentUser?.role === "Faculty/File Incharge" ? `<td class='text-slate-700 p-3 flex items-center justify-center'><i onclick=openUploadDocModal('${task.id}') class='bx bx-upload p-3 text-red-500 text-2xl cursor-pointer  dark:text-slate-200 hover:text-green-500 transition'></i></td>` : "<td class='text-slate-700 p-3 flex items-center justify-center'><i class='bx bx-show p-3 text-red-500 text-2xl cursor-pointer  dark:text-slate-200 hover:text-green-500 transition'></i></td>"}
+      ${currentUser?.role === "Faculty/File Incharge" ? `<td class='text-slate-700 p-3 flex items-center justify-center'><i onclick=openUploadDocModal('${task.id}') class='bx bx-upload p-3 text-red-500 text-2xl cursor-pointer  dark:text-slate-200 hover:text-green-500 transition'></i></td>` : `<td class='text-slate-700 p-3 flex items-center justify-center'>
+      
+      <i  onclick=viewDoc('${task.id}') class='bx bx-show p-3 text-red-500 text-2xl cursor-pointer  dark:text-slate-200 hover:text-green-500 transition' ></i>
+      
+      </td>`}
       ${currentUser?.role === "Faculty/File Incharge" ? "" : `<td class="text-slate-700 p-3 dark:text-slate-200">${task.assignee_name || "Unassigned"}</td>`}
-      <td class="text-slate-700 p-3 dark:text-slate-200">${task.department_name || "N/A"}</td>
+     ${!(currentUser?.role === "Admin") ? "" : `<th>${task.department_name}</th>`}
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.priority}</td>
       <td class="text-slate-700 p-3 dark:text-slate-200">${formatDate(task.deadline)}</td>
       <td class="text-slate-700 p-3 dark:text-slate-200">${statusDropdown}</td>
@@ -252,6 +276,7 @@ async function loadTasks() {
     tableBody.appendChild(row);
   }
 }
+
 
 
 // Fetch task by ID
@@ -274,6 +299,8 @@ async function editTask(taskId) {
   if (!task) return alert("Task not found");
 
   const facultyMembers = await loadFacultyMembers();
+  
+  
   populateFacultyDropdown(facultyMembers);
 
 
@@ -327,6 +354,7 @@ async function updateTask(taskId) {
   alert("Task updated!");
   closeTaskModal();
   loadTasks();
+  loadTasksCards();
 }
 
 // Delete task
@@ -341,6 +369,7 @@ async function deleteTask(taskId) {
   if (!res.ok) return alert("Failed to delete task");
   alert("Task deleted!");
   loadTasks();
+  loadTasksCards();
 }
 
 
@@ -351,9 +380,15 @@ async function updateTaskProgress(taskId, progress) {
     body: JSON.stringify({ progress: Number(progress) })
   });
   if (!res.ok) return alert("Failed to update progress");
-  await loadTasks();
+  
+  if(progress == 100) {
+    updateTaskStatus(taskId, "Submitted");
+  } else {
+    updateTaskStatus(taskId, "In Progress");
+  } 
+  await loadTasksCards();
 }
-// ✅ Update Task Status (Professor Incharge Only)
+
 async function updateTaskStatus(taskId, newStatus) {
   try {
     const res = await fetch(`${API_BASE}/tasks/${taskId}`, {
@@ -372,7 +407,7 @@ async function updateTaskStatus(taskId, newStatus) {
     }
 
     alert("✅ Task status updated successfully!");
-    loadTasks(); // Refresh the tasks table
+    loadTasksCards(); // Refresh the tasks 
   } catch (err) {
     console.error("Error updating status:", err);
     alert("Something went wrong. Please try again.");
@@ -400,7 +435,6 @@ async function openTaskModal() {
     ["Faculty/File Incharge"].includes(u.role)
   );
 
-  console.log("Faculty Members:", facultyMembers);
 
   populateFacultyDropdown(facultyMembers);
 }
@@ -453,6 +487,11 @@ function populateFacultyDropdown(facultyMembers) {
     return;
   }
 
+  console.log(currentUser.role)
+  if(currentUser.role === "Professor Incharge") {
+    // If Professor Incharge, only show faculty from their department
+    facultyMembers = facultyMembers.filter(faculty => (faculty.department_id === currentUser.department_id)&&(faculty.status === "Active"));
+  }
   // Add filtered faculty
   facultyMembers.forEach(faculty => {
     const option = document.createElement('option');
@@ -491,6 +530,7 @@ async function createTask(event) {
   alert("Task created!");
   document.getElementById("createTaskForm").reset();
   loadTasks();
+  loadTasksCards();
 }
 
 // ---- Events ----
@@ -552,6 +592,8 @@ function renderApprovalCards(events) {
     <i class='bx bx-x-circle text-4xl p-3'></i>
   </div>
 `;
+  } else if(currentUser.role==="Faculty/File Incharge") {
+    container.innerHTML = ``
   }
   else {
     events
@@ -926,54 +968,7 @@ async function deleteUser(id) {
     method: "DELETE",
     headers: getHeaders()
   });
-  // Get tasks assigned to this user
-  const tasksRes = await fetch(`${API_BASE}/tasks?assigned_to=${id}`, {
-    headers: getHeaders()
-  });
-
-  if (!tasksRes.ok) {
-    console.error("Failed to get user's tasks");
-    return;
-  }
-
-  const tasks = await tasksRes.json();
-
-  // Only attempt delete if there are assigned tasks
-  if (tasks.length > 0) {
-    const deleteRes = await fetch(`${API_BASE}/tasks?assigned_to=${id}`, {
-      method: "DELETE",
-      headers: getHeaders()
-    });
-
-    if (!deleteRes.ok) {
-      console.error("Failed to delete user's tasks");
-      return;
-    }
-  }
-  // Get events created by this user
-  const eventsRes = await fetch(`${API_BASE}/events?created_by=${id}`, {
-    headers: getHeaders()
-  });
-
-  if (!eventsRes.ok) {
-    console.error("Failed to get user's events");
-    return;
-  }
-
-  const events = await eventsRes.json();
-
-  // Only attempt delete if there are events
-  if (events.length > 0) {
-    const deleteRes = await fetch(`${API_BASE}/events?created_by=${id}`, {
-      method: "DELETE",
-      headers: getHeaders()
-    });
-
-    if (!deleteRes.ok) {
-      console.error("Failed to delete user's events");
-      return;
-    }
-  }
+ 
   if (!res.ok) return alert("Failed to delete user");
   loadDepartmentUsers(currentDepartment.id);
 }
@@ -1051,18 +1046,21 @@ async function renderDepartments() {
       .filter(dep => dep.is_active === "Yes")
       .slice(1) // skip first department
       .forEach(dep => {
+        const outer = document.createElement("div");
+        outer.className = "flex flex-col justify-center items-center p-2 bg-[#6b728075] rounded-lg shadow hover:shadow-lg transition ";
         const card = document.createElement("div");
         card.className = `
-          bg-white dark:bg-slate-800 rounded-xl p-5 shadow
+          bg-white dark:bg-slate-800 rounded-xl p-5 shadow w-full
           hover:shadow-md hover:-translate-y-1 transition cursor-pointer
         `;
 
         card.innerHTML = `
-          <div class="flex justify-between items-center mb-2">
+          <div class="flex justify-between items-center mb-2 openArrow">
             <h3 class="font-semibold">${dep.department_code}</h3>
-            <i class="bx bx-right-arrow-alt text-xl"></i>
+            <i class=" bx bx-right-arrow-alt text-2xl"></i>
           </div>
           <p class="text-sm">${dep.department_name}</p>
+          
         `;
         card.dataset.departmentId = dep.id;
 
@@ -1073,14 +1071,28 @@ async function renderDepartments() {
           openDepartment(dep);
         }
 
+        const actions = document.createElement("div");
+        actions.className = "dept-action-buttons w-full mt-1 flex justify-between items-center w-full px-4";
+        actions.innerHTML=`
+            <button class="dept-btn-edit p-1"  onclick="editDepartment(${dep.id}, '${dep.department_code}', '${dep.department_name}')">
+              <i class="fas fa-edit text-xs"></i> 
+            </button>
+            <button class="dept-btn-delete p-1" onclick="deleteDepartment('${dep.id}')">
+              <i class="fas fa-trash text-xs"></i> 
+            </button>
+          `
 
-        departmentGrid.appendChild(card);
+
+          outer.appendChild(card);
+          if(currentUser?.role === "Admin")
+          outer.appendChild(actions);
+        departmentGrid.appendChild(outer);
       });
     if (currentUser?.role === "Admin") {
       // ✅ Add Department Card (always last)
       departmentGrid.innerHTML += `
       <div id="addBtn"
-           class="bg-white dark:bg-slate-800 rounded-xl p-5 shadow
+           class="bg-[#6b728075] dark:bg-slate-800 rounded-xl p-5 shadow
            flex flex-col items-center justify-center gap-2
            hover:shadow-md hover:-translate-y-1 transition cursor-pointer">
 
@@ -1180,34 +1192,74 @@ async function loadDepartmentUsers(departmentId) {
     console.error("Failed to load users", err);
   }
 }
-
+let editingDepartmentId = null;
 async function createDepartment() {
+
   const department_code =
     document.getElementById("departmentCode").value.trim();
+
   const department_name =
     document.getElementById("departmentName").value.trim();
 
-  const res = await fetch(`${API_BASE}/departments`, {
-    method: "POST",
+  const url = editingDepartmentId
+    ? `${API_BASE}/departments/${editingDepartmentId}`
+    : `${API_BASE}/departments`;
+
+  const method = editingDepartmentId ? "PUT" : "POST";
+
+  const res = await fetch(url, {
+    method,
     headers: getHeaders(),
     body: JSON.stringify({ department_code, department_name })
   });
 
   if (!res.ok) {
-    alert("Failed to add department");
+    alert("Failed to save department");
     return;
   }
 
-  alert("Department added!");
+  alert(editingDepartmentId ? "Department updated!" : "Department added!");
+
+  editingDepartmentId = null;
+
   closeDepartmentModal();
+  renderDepartments();
+}
+function editDepartment(id, code, name) {
+
+  editingDepartmentId = id;
+
+  document.getElementById("departmentCode").value = code;
+  document.getElementById("departmentName").value = name;
+
+
+  openDepartmentModal();
+}
+async function deleteDepartment(id) {
+  if (!confirm("Delete this department?")) return;
+
+  const res = await fetch(`${API_BASE}/departments/${id}`, {
+    method: "DELETE",
+    headers: getHeaders()
+  });
+
+  if (!res.ok) {
+    alert("Failed to delete department");
+    return;
+  }
+
   renderDepartments();
 }
 
 
 
-
 function openDepartmentModal() {
+  
   document.getElementById("createDepartmentModal").style.display = "block";
+  document.getElementById("deptModalTitle").textContent =
+  editingDepartmentId ? "Edit Department" : "Create Department";
+  document.getElementById("deptSubmitBtn").textContent =
+  editingDepartmentId ? "Update Department" : "Create Department";
   document.body.style.overflow = "hidden";
 }
 
@@ -1215,37 +1267,69 @@ function closeDepartmentModal() {
   const form = document.getElementById("createDepartmentForm");
   form.reset();
 
+    editingDepartmentId = null;
+
   document.getElementById("createDepartmentModal").style.display = "none";
   document.body.style.overflow = "auto";
 }
-
 async function uploadDocument(event) {
- const form = event.target; // 👈 this is the form
+  const form = event.target;
   const currentTaskId = form.dataset.taskId;
-  console.log("Uploading document for task ID:", currentTaskId);
+
+  const loader = document.getElementById("loaderOverlay");
+  loader.style.display = "flex"; // show overlay
+
+  try {
     const file = document.getElementById("file").files[0];
     const formData = new FormData();
     formData.append("file", file);
-    
 
     const res = await fetch(
       `${API_BASE}/tasks/${currentTaskId}/deliverables`,
       {
         method: "POST",
-        headers: getHeaders(false), // No JSON header for FormData
+        headers: getHeaders(false),
         body: formData
       }
     );
-if (!res.ok) {
-  const text = await res.text(); // 👈 NOT json()
-  console.error("Upload failed:", text);
-  alert("Upload failed. File may be too large.");
-  return;
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("Upload failed:", text);
+      alert("Upload failed. File may be too large.");
+      return;
+    }
+
+    alert("File uploaded successfully!");
+
+
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong");
+  } finally {
+    loader.style.display = "none"; // hide loader
+     
+     closeUploadDocModal();
+     updateTaskProgress(currentTaskId, 100);
+
+  
+  }
 }
-    const data = await res.json();
-    alert(data.message);
-    closeUploadDocModal();
-    loadTasks();
+async function viewDoc(taskId) {
+  try {
+    const response = await fetch(`/api/tasks/${taskId}/viewDoc`, {
+      headers: getHeaders()
+    });
+
+    if (!response.ok) throw new Error("No deliverables Uploaded Yet.");
+
+    const data = await response.json();
+
+    window.open(data.drive_file_url, "_blank");  
+    // open in new tab
+  } catch (err) {
+    alert(err.message);
+  }
 }
 function openUploadDocModal(taskId) {
   const modal = document.getElementById("uploadDocumentModal");
@@ -1264,20 +1348,6 @@ function closeUploadDocModal() {
   document.body.style.overflow = "auto";
 }
 
-
-function initDarkModeToggle() {
-  // Select ALL dark toggle buttons and add click listeners
-  document.querySelectorAll('.darkToggle').forEach(button => {
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      console.log("Dark mode toggled");
-      document.documentElement.classList.toggle('dark');
-      // Save preference to localStorage
-      const isDark = document.documentElement.classList.contains('dark');
-      localStorage.setItem('darkMode', isDark ? 'true' : 'false');
-    });
-  });
-}
 
 // Load dark mode preference on page load
 function loadDarkModePreference() {
@@ -1300,9 +1370,19 @@ async function loadEventSummaryCards() {
 
   console.log("Event summary:", data);
 
-  document.getElementById("pendingEvents").textContent = data.pending;
-  document.getElementById("approvedEvents").textContent = data.approved;
-  document.getElementById("rejectedEvents").textContent = data.rejected;
+  
+  const approvedEl = document.getElementById("approvedEvents");
+if (approvedEl) {
+  approvedEl.textContent = data.approved;
+}
+const pendingEl = document.getElementById("pendingEvents");
+if (pendingEl) {
+  pendingEl.textContent = data.pending; 
+}
+const rejectedEl = document.getElementById("rejectedEvents");
+if (rejectedEl) {
+  rejectedEl.textContent = data.rejected; 
+}
 }
 
 // Attach handlers
@@ -1317,7 +1397,8 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleVisibility("mainpage");
 
   initCalendar();
-
+  loadNotifications();
+setInterval(loadNotifications, 30000);
 
   // Hide create button if not admin
   if (currentUser?.role !== "Admin") {
@@ -1332,7 +1413,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".events-propose-btn")?.classList.add("hidden");
   }
 
-
+  if(currentUser?.role === "Faculty/File Incharge") {
+    document.getElementById("showdepartments")?.classList.add("hidden");
+    document.getElementById("showevents")?.classList.add("hidden");
+  }
   // Sidebar title
   const sidebarTitle = document.getElementById("sidebarTitle");
   if (sidebarTitle) {
@@ -1342,23 +1426,35 @@ document.addEventListener("DOMContentLoaded", () => {
   const sidebartasks = document.getElementById("showtasks");
   if (sidebartasks && currentUser?.role === "Department Head") {
     sidebartasks.innerHTML = "View Tasks";
+  } else if (sidebartasks && currentUser?.role === "Professor Incharge") {
+    sidebartasks.innerHTML = "Assign/Approve Tasks";
+  } else if (sidebartasks && currentUser?.role === "Faculty/File Incharge") {
+    sidebartasks.innerHTML = "My Tasks";
   }
+
   const sidebardepartments = document.getElementById("showdepartments");
-  if (sidebardepartments && currentUser?.role === "Department Head") {
-    sidebardepartments.innerHTML = "View Faculty";
+  if (sidebardepartments && (currentUser?.role === "Department Head" || currentUser?.role === "Professor Incharge")) {
+    
+    sidebardepartments.innerHTML = "My Department";
   }
+
+
+  
+
+
   const sidebarevents = document.getElementById("showevents");
-  if (sidebarevents && currentUser?.role === "Department Head") {
+  if (sidebarevents && (currentUser?.role === "Department Head" || currentUser?.role === "Professor Incharge")) {
     sidebarevents.innerHTML = "Propose Events";
   }
   const eventApprovalText = document.getElementById("eventApprovalText");
-  if (eventApprovalText && currentUser?.role === "Department Head") {
+  if (eventApprovalText && !(currentUser?.role === "Admin")) {
     eventApprovalText.innerHTML = "";
   }
   document.getElementById("overview")?.addEventListener("click", () => {
     console.log("Loading overview...");
     renderDepartments();
     toggleVisibility('mainpage');
+
     document.querySelectorAll(".sideBtn").forEach(el => {
     el.classList.remove("active");
   });
@@ -1366,22 +1462,36 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("overview").classList.add("active");
     
   });
-  document.getElementById("showdepartments")?.addEventListener("click", () => {
-    console.log("Loading departments...");
-    renderDepartments();
-    toggleVisibility('allDepartments');
-    document.querySelectorAll(".sideBtn").forEach(el => {
-    el.classList.remove("active");
-  });
+ 
+  document.getElementById("showdepartments")?.addEventListener("click", async () => {
+  console.log("Loading departments...");
+
+  await renderDepartments(); // wait until departments are ready
+  toggleVisibility('allDepartments');
+
+  if (currentUser?.role === "Professor Incharge" || currentUser?.role === "Department Head") {
+    const dep = window._departments?.find(d => d.id === currentUser.department_id);
+    if (dep) openDepartment(dep);
+  }
+
+
+
+  document.querySelectorAll(".sideBtn").forEach(el => el.classList.remove("active"));
+  document.getElementById("showdepartments").classList.add("active");
+});
     
-    document.getElementById("showdepartments").classList.add("active");
-    
-  });
+  
   // Sidebar buttons
   document.getElementById("showtasks")?.addEventListener("click", () => {
     console.log("Loading tasks...");
-    loadTasks();
-    toggleVisibility('taskManagement');
+    if(currentUser?.role === "Faculty/File Incharge" || currentUser?.role === "Professor Incharge") {
+      toggleVisibility('myTasks');
+      loadTasksCards();
+    } else {
+      toggleVisibility('taskManagement');
+      loadTasks();
+
+    }
     document.querySelectorAll(".sideBtn").forEach(el => {
     el.classList.remove("active");
   });
@@ -1403,6 +1513,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("showreports")?.addEventListener("click", async () => {
     console.log("Loading reports...");
 
+   
     await populateDepartmentFilter();
     await populateFacultyFilter();
     applyFilters();
@@ -1413,11 +1524,23 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("showreports").classList.add("active"); 
     const darkModeToggle = document.getElementById('darkToggle');
 
-    darkModeToggle.addEventListener('click', () => {
+    darkModeToggle?.addEventListener('click', () => {
       console.log("Dark mode toggled from reports page");
       document.documentElement.classList.toggle('dark');
+      
+
       const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
       localStorage.setItem('theme', theme);
+      const icon = document.querySelector(".darkModeIcon");
+      console.log(icon);
+
+        if (icon.classList.contains("bx-moon")) {
+    icon.classList.remove("bx-moon");
+    icon.classList.add("bx-sun");
+  } else {
+    icon.classList.remove("bx-sun");
+    icon.classList.add("bx-moon");
+  }
     });
 
   });

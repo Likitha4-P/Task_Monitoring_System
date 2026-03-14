@@ -43,6 +43,19 @@ export async function createUser(req, res) {
     );
 
     res.status(201).json({ id: result.insertId });
+    const department_name = department_id ? (await pool.query("SELECT department_name FROM departments WHERE id = ?", [department_id]))[0][0].department_name : null;
+    await pool.query(
+`INSERT INTO user_notifications
+(user_id,title,message,reference_type,reference_id)
+VALUES (?,?,?,?,?)`,
+[
+ req.user.id,
+ "New User Created",
+ `User ${name} was added to the ${department_name || 'system'} department.`,
+ "User",
+ result.insertId
+]
+);
   } catch (e) {
     console.error(e);
     res.status(e.status || 500).json({ message: e.message || "Failed to create user" });

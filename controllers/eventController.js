@@ -1,6 +1,7 @@
 import pool from "../config/db.js";
 import assertFields from "../utils/validate.js";
 import { sendEventEmail } from "../utils/mailer.js";
+import { createNotification } from "../utils/notifyHelper.js";
 export async function createEvent(req, res) {
  
   try {
@@ -39,7 +40,6 @@ export async function createEvent(req, res) {
       ]
     );
 
-    console.log("Creating event by user ID:", req.user.id);
 
     /* ---------------- FIND REVIEWER EMAIL ---------------- */
     const [userRows] = await pool.query(
@@ -83,11 +83,20 @@ export async function createEvent(req, res) {
       venue
     });
 
-    console.log("Event review email sent to:", reviewerEmail);
   } catch (err) {
     console.error("Failed to send email:", err.message);
     // Do NOT fail event creation
   }
+  const adminId = (await pool.query(
+    `SELECT id FROM users WHERE role = 'Admin' LIMIT 1`
+  ))[0][0].id;
+  await createNotification(
+  adminId,
+  "New Event Proposed",
+  `${title} has been proposed and is awaiting your review.`,
+  "Event",
+  result.insertId
+);
 }
 
 
@@ -156,6 +165,7 @@ export async function approveEvent(req, res) {
   SELECT 
     e.*,
     u.email AS creator_email,
+    u.id AS creator_id,
     d.department_name
   FROM events e
   JOIN users u 
@@ -171,14 +181,20 @@ export async function approveEvent(req, res) {
 
     if (event) {
       try {
-        console.log(event);
+        
         await sendEventStatusEmail(event.creator_email, event, "Approved");
-        console.log("Approval email sent to:", event.creator_email);
+        
       } catch (err) {
         console.error("Failed to send approval email:", err.message);
       }
     }
-
+await createNotification(
+  event.creator_id,
+  "Event Approved",
+  "Your event Hackathon 2026 was approved",
+  "Event",
+  id
+);
     
   } catch (e) {
     console.error(e);
@@ -195,7 +211,7 @@ export async function rejectEvent(req, res) {
 
     // Fetch event + creator email
     const [[event]] = await pool.query(`
-      SELECT e.*, u.email AS creator_email
+      SELECT e.*, u.email AS creator_email, u.id AS creator_id
       FROM events e JOIN users u ON e.created_by = u.id
       WHERE e.id = ?
     `, [id]);
@@ -204,14 +220,20 @@ export async function rejectEvent(req, res) {
 
     if (event) {
       try {
-        console.log(event);
+      
         await sendEventStatusEmail(event.creator_email, event, "Rejected");
-        console.log("Rejection email sent to:", event.creator_email);
+      
       } catch (err) {
         console.error("Failed to send rejection email:", err.message);
       }
     }
-
+await createNotification(
+  event.creator_id,
+  "Event Rejected",
+  "Your event Hackathon 2026 was rejected",
+  "Event",
+  id
+)
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Failed to reject event" });

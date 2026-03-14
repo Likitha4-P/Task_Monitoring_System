@@ -5,12 +5,17 @@ import { createEvent, listEvents, approveEvent, rejectEvent, getApprovedEvents,g
 const router = Router();
 router.use(authRequired);
 
-router.post("/", requireRole("Admin", "Principal/Management", "Department Head"),createEvent); // anyone logged-in can propose
+router.post("/", requireRole("Department Head","Professor Incharge"),createEvent);
 router.get("/", listEvents);
-router.post("/:id/approve", requireRole("Admin", "Principal/Management", "Department Head"), approveEvent);
-router.post("/:id/reject", requireRole("Admin", "Principal/Management", "Department Head"), rejectEvent);
+router.post("/:id/approve", requireRole("Admin"), approveEvent);
+router.post("/:id/reject", requireRole("Admin"), rejectEvent);
 router.get("/approved", getApprovedEvents);
 router.get("/event-summary", getEventSummary);
 
 
+
 export default router;
+
+
+
+
