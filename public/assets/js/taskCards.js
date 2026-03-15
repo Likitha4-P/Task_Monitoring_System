@@ -1,7 +1,5 @@
-// ---- TasksCards.js ----
 
-
-
+let allCardsTasks = [];
 // Priority pill styles
 const priorityPill = {
   Low: "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400",
@@ -20,20 +18,28 @@ const statusCfg = {
 
 // Fetch + filter tasks (reused from loadTasks)
 async function fetchFilteredTasks() {
+
   const res = await fetch(`${API_BASE}/tasks`, {
     headers: getHeaders(),
     cache: "no-store"
   });
+
   if (!res.ok) throw new Error("Failed to load tasks");
 
   const tasks = await res.json();
 
+  let filtered = tasks;
+
   if (currentUser?.role === "Faculty" || currentUser?.role === "Faculty/File Incharge") {
-    return tasks.filter(t => t.assigned_to === currentUser.id);
-  } else if (currentUser?.role === "Professor Incharge") {
-    return tasks.filter(t => t.department_id === currentUser.department_id);
+    filtered = tasks.filter(t => t.assigned_to === currentUser.id);
   }
-  return tasks; // Admin sees all
+  else if (currentUser?.role === "Professor Incharge") {
+    filtered = tasks.filter(t => t.department_id === currentUser.department_id);
+  }
+
+  allCardsTasks = filtered;   // ✅ store correctly
+  return filtered;
+
 }
 
 // Build a single card
@@ -157,43 +163,16 @@ function buildCard(task, index) {
   `;
 }
 
+const grid = document.getElementById('cardGrid');
+
 // Render all cards
 function renderCards(tasks) {
   console.log("Rendering cards for tasks:", tasks);
- 
-  const tasksContent = document.getElementById('tasksContent');
-
-  if (currentUser?.role === "Faculty/File Incharge") {
-    tasksContent.innerHTML = `<div class="px-5">
-                        <p class="text-[#2b3b50] font-bold dark:text-slate-500 text-l">Total Tasks</p>
-                        <p id="taskCount" class="text-[#2b3b50] dark:text-slate-100 text-xl font-bold">0</p>
-                    </div>
-                    <div class="w-px h-8 bg-white/20 dark:bg-white/10"></div>
-                    <div class="px-5">
-                        <p class="text-[#2b3b50] font-bold dark:text-slate-500 text-l">Avg Progress</p>
-                        <p id="avgProgress" class="text-teal-400 dark:text-teal-300 text-xl font-bold">0%</p>
-                    </div>`;
-    document.getElementById('taskCount').textContent = tasks.length;
-    const avg = Math.round(tasks.reduce((s, t) => s + t.progress, 0) / tasks.length);
-    document.getElementById('avgProgress').textContent = avg + '%';
+  if (tasks.length === 0) {
+    grid.innerHTML = "<p class='text-center text-gray-500 col-span-full'>No tasks found</p>";
+    return;
   }
-  else {
-    tasksContent.innerHTML = ` <!-- Search -->
-                <div class="flex justify-between py-3 items-center w-full ">
-                    <input id="search" type="text" placeholder="Search ..." class="w-90 px-4 py-2 border rounded-xl outline-none
-               bg-white dark:bg-slate-800
-               border-gray-500 dark:border-slate-600
-               focus:ring-2 focus:ring-slate-300">
 
-                    <div class="flex gap-4 px-3">
-                        <i class='bx bx-filter text-xl cursor-pointer hover:text-blue-500 transition'></i>
-                        <button class="tasks-create-btn" onClick="openTaskModal()">
-                            <i class='bx bxs-file-plus text-l px-3 hover:text-green-500 transition'></i>
-                        </button>
-                    </div>
-                </div>`
-  }
-  const grid = document.getElementById('cardGrid');
   grid.innerHTML = tasks.map((t, i) => buildCard(t, i)).join('');
 }
 
@@ -234,4 +213,36 @@ async function deleteDeliverable(taskId, deliverableId) {
     console.error(err);
     alert("Error deleting document");
   }
+}
+
+
+document.getElementById("taskCardSearch").addEventListener("input", filterCards);
+document.getElementById("taskCardFilterStatus").addEventListener("change", filterCards);
+document.getElementById("taskCardFilterPriority").addEventListener("change", filterCards);
+
+function filterCards() {
+
+  const keyword = document.getElementById("taskCardSearch").value.toLowerCase();
+  const status = document.getElementById("taskCardFilterStatus").value;
+  const priority = document.getElementById("taskCardFilterPriority").value;
+
+  let filtered = allCardsTasks;
+
+  if (keyword) {
+    filtered = filtered.filter(task =>
+      task.title.toLowerCase().includes(keyword) ||
+      (task.assignee_name || "").toLowerCase().includes(keyword)
+    );
+  }
+
+  if (status) {
+    filtered = filtered.filter(task => task.status === status);
+  }
+
+  if (priority) {
+    filtered = filtered.filter(task => task.priority === priority);
+  }
+
+
+  renderCards(filtered);
 }

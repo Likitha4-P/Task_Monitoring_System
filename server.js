@@ -60,7 +60,7 @@ app.use(cors());
 console.log("Serving static files from:", path.join(__dirname, "public"));
 
 // Run every day at 11:40 AM
-cron.schedule("12 9 * * *", async () => {
+cron.schedule("22 17 * * *", async () => {
   console.log("⏳ Checking deadlines...");
   await sendDeadlineReminders();
 });

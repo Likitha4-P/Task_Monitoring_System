@@ -74,11 +74,7 @@ export async function getUpcomingEvents(req, res) {
     `;
     const params = [];
 
-    // 🔐 Role-based filtering
-    if (role !== "Admin") {
-      where += " AND e.department_id = ?";
-      params.push(department_id);
-    }
+    
 
     // 📅 Date filter
     if (from_date && to_date) {
@@ -98,7 +94,7 @@ export async function getUpcomingEvents(req, res) {
       LEFT JOIN departments d ON e.department_id = d.id
       ${where}
       ORDER BY e.event_date ASC
-      LIMIT 5
+      
       `,
       params
     );
@@ -123,7 +119,7 @@ export async function getPendingEventApprovals(req, res) {
       LEFT JOIN departments d ON e.department_id = d.id
       WHERE e.status = 'Pending'
       ORDER BY e.created_at DESC
-      LIMIT 5
+     
       `
     );
 

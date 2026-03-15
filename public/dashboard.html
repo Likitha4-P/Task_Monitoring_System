@@ -53,7 +53,64 @@
 
         </aside>
 
+        <div id="createTaskModal" class="tasks-modal">
+            <div class="tasks-modal-content">
+                <div class="tasks-modal-header">
+                    <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
+                    <button class="tasks-close-btn" onclick="closeTaskModal()">&times;</button>
+                </div>
+                <div class="tasks-modal-body">
+                    <form id="createTaskForm">
 
+
+                        <div class="tasks-form-group">
+                            <label for="taskTitle">Task Title</label>
+                            <input type="text" id="taskTitle" name="taskTitle" placeholder="Enter task title" required>
+                        </div>
+
+                        <div class="tasks-form-group">
+                            <label for="taskDescription">Description</label>
+                            <textarea id="taskDescription" name="taskDescription" placeholder="Enter task description"
+                                required></textarea>
+                        </div>
+
+                        <div class="tasks-form-group">
+                            <label for="taskAssignedTo" id="taskAssignedToLabel">Assigned To</label>
+                            <select id="taskAssignedTo" name="taskAssignedTo" required>
+
+                            </select>
+                        </div>
+
+                        <input type="hidden" id="hiddenAssignedTo" name="hiddenAssignedTo" />
+                        <div class="tasks-form-group">
+                            <label for="taskPriority">Priority</label>
+                            <select id="taskPriority" name="taskPriority" required>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+
+                        <div class="tasks-form-group">
+                            <label for="taskDeliverables">Deliverables(if any)</label>
+                            <input type="text" id="taskDeliverables" name="taskDeliverables" required>
+
+                        </div>
+
+                        <div class="tasks-form-group">
+                            <label for="taskDueDate">Due Date</label>
+                            <input type="date" id="taskDueDate" name="taskDueDate" required>
+                        </div>
+
+
+                        <div class="tasks-form-actions">
+                            <button type="button" class="tasks-btn-cancel" onclick="closeTaskModal()">Cancel</button>
+                            <button type="submit" class="tasks-btn-submit">Create Task</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <!-- Main Content -->
         <main class="main-content  page  overflow-y-scroll dark:bg-slate-900" id="mainpage">
             <div class="border-blue-400 bg-white dark:bg-slate-800 shadow-lg p-2">
@@ -412,18 +469,16 @@
 
                     <!-- Search -->
                     <div class="flex justify-between items-center mb-4">
-                        <input type="text" placeholder="Search ..." class="w-60 px-4 py-2 border rounded-xl outline-none
-                 focus:ring-2 focus:ring-slate-300
-                 dark:bg-slate-700 dark:border-slate-600">
+                        <input id="userSearch" type="text" placeholder="Search users..." class="w-3/5 px-4 py-2 border border-gray-600 rounded-xl outline-none
+        focus:ring-2 focus:ring-slate-300
+        dark:bg-slate-700 dark:border-slate-600">
 
                         <div class="flex justify-center items-center gap-3 text-xl">
-                            <i class='bx bx-filter cursor-pointer text-3xl hover:text-blue-500 transition'></i>
+
+
                             <button class="create-btn" onclick="openModal()">
                                 <i class="bx bx-user-plus cursor-pointer hover:text-green-500 transition"></i>
-
                             </button>
-
-
                         </div>
                     </div>
 
@@ -511,16 +566,48 @@
                         </button>
                     </div>
                 </header>
-                
+
                 <!-- Search -->
                 <div class="flex justify-between p-6 items-center mt-4 mb-4">
-                    <input id="search" type="text" placeholder="Search ..." class="w-90 px-4 py-2 border rounded-xl outline-none
+                    <input id="taskSearch" type="text" placeholder="Search ..." class="w-2/5 px-4 py-2 border border-gray-500 rounded-xl outline-none
                bg-white dark:bg-slate-800
                border-gray-500 dark:border-slate-600
                focus:ring-2 focus:ring-slate-300">
 
-                    <div class="flex gap-4 text-xl px-3">
-                        <i class='bx bx-filter text-4xl cursor-pointer hover:text-blue-500 transition'></i>
+                    <div class="flex gap-4 justify-center items-center px-3">
+
+                        <select id="taskFilterDept"
+                            class="bg-gray-500 text-white font-semibold border-2 border-gray-500 cursor-pointer hover:bg-gray-600 dark:border-slate-600 rounded-xl gap-1 px-3 py-1">
+                            <option value="">
+
+                                All Departments
+                            </option>
+
+                        </select>
+
+                        <select id="taskFilterStatus"
+                            class="bg-gray-500 text-white font-semibold border-2 border-gray-500 cursor-pointer hover:bg-gray-600 dark:border-slate-600 rounded-xl gap-1 px-3 py-1">
+                            <option value="">
+
+                                All Status
+                            </option>
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Submitted">Submitted</option>
+                            <option value="Verified">Verified</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                        <select id="taskFilterPriority"
+                            class="bg-gray-500 text-white font-semibold border-2 border-gray-500 cursor-pointer hover:bg-gray-600 dark:border-slate-600 rounded-xl gap-1 px-3 py-1">
+                            <option value="">
+
+                                All Priority
+                            </option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+
                         <button class="tasks-create-btn" onClick="openTaskModal()">
                             <i class='bx bxs-file-plus text-2xl p-3 hover:text-green-500 transition'></i>
                         </button>
@@ -616,10 +703,33 @@
 
                 <!-- Search -->
                 <div class="flex justify-between items-center p-6 mb-4">
-                    <input type="text" placeholder="Search ..." class="w-72 px-4 py-2 border rounded-xl outline-none
-               dark:bg-slate-700 dark:border-slate-600">
+                    <input id="eventSearch" type="text" placeholder="Search ..." class="w-2/5 px-4 py-2 border border-gray-500 rounded-xl outline-none
+               bg-white dark:bg-slate-800
+               border-gray-500 dark:border-slate-600
+               focus:ring-2 focus:ring-slate-300">
 
-                    <i class="bx bx-filter text-xl cursor-pointer hover:text-blue-500"></i>
+                    <div class="flex gap-4 justify-center items-center px-3">
+
+
+                        <select id="eventFilterDept"
+                            class="bg-gray-500 text-white font-semibold border-2 border-gray-500 cursor-pointer hover:bg-gray-600 dark:border-slate-600 rounded-xl gap-1 px-3 py-1">
+                            <option value="">
+
+                                All Departments
+                            </option>
+
+                        </select>
+                        <select id="eventFilterStatus"
+                            class="bg-gray-500 text-white font-semibold border-2 border-gray-500 cursor-pointer hover:bg-gray-600 dark:border-slate-600 rounded-xl gap-1 px-3 py-1">
+                            <option value="">
+
+                                All Status
+                            </option>
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
                 </div>
                 <!-- Modal for Propose Event -->
                 <div id="proposeEventModal" class="events-modal h-[100vh]">
@@ -1045,72 +1155,51 @@
                     </button>
                 </div>
             </header>
-            <div id="createTaskModal" class="tasks-modal">
-                <div class="tasks-modal-content">
-                    <div class="tasks-modal-header">
-                        <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
-                        <button class="tasks-close-btn" onclick="closeTaskModal()">&times;</button>
-                    </div>
-                    <div class="tasks-modal-body">
-                        <form id="createTaskForm">
 
 
-                            <div class="tasks-form-group">
-                                <label for="taskTitle">Task Title</label>
-                                <input type="text" id="taskTitle" name="taskTitle" placeholder="Enter task title"
-                                    required>
-                            </div>
 
-                            <div class="tasks-form-group">
-                                <label for="taskDescription">Description</label>
-                                <textarea id="taskDescription" name="taskDescription"
-                                    placeholder="Enter task description" required></textarea>
-                            </div>
+            <div class="px-6 py-3 w-[100%] gap-6 mt-4 dark:bg-white/5 rounded-xl "
+                id="tasksContent">
+                <div class="flex justify-between  items-center ">
+                    <input id="taskCardSearch" type="text" placeholder="Search ..." class="w-2/5 px-4 py-2 border border-gray-500 rounded-xl outline-none
+               bg-white dark:bg-slate-800
+               border-gray-500 dark:border-slate-600
+               focus:ring-2 focus:ring-slate-300">
 
-                            <div class="tasks-form-group">
-                                <label for="taskAssignedTo" id="taskAssignedToLabel">Assigned To</label>
-                                <select id="taskAssignedTo" name="taskAssignedTo" required>
-
-                                </select>
-                            </div>
-
-                            <input type="hidden" id="hiddenAssignedTo" name="hiddenAssignedTo" />
-                            <div class="tasks-form-group">
-                                <label for="taskPriority">Priority</label>
-                                <select id="taskPriority" name="taskPriority" required>
-                                    <option value="Low">Low</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="High">High</option>
-                                </select>
-                            </div>
-
-                            <div class="tasks-form-group">
-                                <label for="taskDeliverables">Deliverables(if any)</label>
-                                <input type="text" id="taskDeliverables" name="taskDeliverables" required>
-
-                            </div>
-
-                            <div class="tasks-form-group">
-                                <label for="taskDueDate">Due Date</label>
-                                <input type="date" id="taskDueDate" name="taskDueDate" required>
-                            </div>
+                    <div class="flex gap-4 justify-center items-center px-3">
 
 
-                            <div class="tasks-form-actions">
-                                <button type="button" class="tasks-btn-cancel"
-                                    onclick="closeTaskModal()">Cancel</button>
-                                <button type="submit" class="tasks-btn-submit">Create Task</button>
-                            </div>
-                        </form>
+                        <select id="taskCardFilterStatus"
+                            class="bg-gray-500 text-white font-semibold border-2 border-gray-500 cursor-pointer hover:bg-gray-600 dark:border-slate-600 rounded-xl gap-1 px-3 py-1">
+                            <option value="">
+
+                                All Status
+                            </option>
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Submitted">Submitted</option>
+                            <option value="Verified">Verified</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                        <select id="taskCardFilterPriority"
+                            class="bg-gray-500 text-white font-semibold border-2 border-gray-500 cursor-pointer hover:bg-gray-600 dark:border-slate-600 rounded-xl gap-1 px-3 py-1">
+                            <option value="">
+
+                                All Priority
+                            </option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+
+                        <button class="tasks-create-btn" onClick="openTaskModal()">
+                            <i class='bx bxs-file-plus text-2xl p-3 hover:text-green-500 transition'></i>
+                        </button>
                     </div>
                 </div>
-            </div>
-            <div class="flex flex-col justify-center items-center gap-6 ">
 
-                <div class="flex justify-center items-center bg-white/5 border-2 w-[100%] gap-6 mt-4 dark:bg-white/5 rounded-xl "
-                    id="tasksContent">
 
-                </div>
+
                 <!-- Upload Doc Modal -->
                 <div id="uploadDocumentModal" class="modal h-[100vh]">
                     <div class="modal-content">
@@ -1137,9 +1226,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="cardGrid"
-                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-5xl mx-auto px-6 py-8 -mt-6">
-                </div>
+                
                 <div id="loaderOverlay" class="loader-overlay">
                     <div class="loader-box">
                         <div class="spinner"></div>
@@ -1147,86 +1234,37 @@
                     </div>
                 </div>
             </div>
+            <div id="cardGrid"
+                    class="grid grid-cols-1 mt-5  sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-5xl mx-auto px-6 py-8 -mt-6">
+                </div>
         </div>
 
-        
+
     </div>
-      <div  id="createTaskModal" class="tasks-modal">
-                    <div class="tasks-modal-content">
-                        <div class="tasks-modal-header">
-                            <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
-                            <button class="tasks-close-btn" onclick="closeTaskModal()">&times;</button>
-                        </div>
-                        <div class="tasks-modal-body">
-                            <form id="createTaskForm">
 
-
-                                <div class="tasks-form-group">
-                                    <label for="taskTitle">Task Title</label>
-                                    <input type="text" id="taskTitle" name="taskTitle" placeholder="Enter task title"
-                                        required>
-                                </div>
-
-                                <div class="tasks-form-group">
-                                    <label for="taskDescription">Description</label>
-                                    <textarea id="taskDescription" name="taskDescription"
-                                        placeholder="Enter task description" required></textarea>
-                                </div>
-
-                                <div class="tasks-form-group">
-                                    <label for="taskAssignedTo" id="taskAssignedToLabel">Assigned To</label>
-                                    <select id="taskAssignedTo" name="taskAssignedTo" required>
-
-                                    </select>
-                                </div>
-
-                                <input type="hidden" id="hiddenAssignedTo" name="hiddenAssignedTo" />
-                                <div class="tasks-form-group">
-                                    <label for="taskPriority">Priority</label>
-                                    <select id="taskPriority" name="taskPriority" required>
-                                        <option value="Low">Low</option>
-                                        <option value="Medium">Medium</option>
-                                        <option value="High">High</option>
-                                    </select>
-                                </div>
-
-                                <div class="tasks-form-group">
-                                    <label for="taskDeliverables">Deliverables(if any)</label>
-                                    <input type="text" id="taskDeliverables" name="taskDeliverables" required>
-
-                                </div>
-
-                                <div class="tasks-form-group">
-                                    <label for="taskDueDate">Due Date</label>
-                                    <input type="date" id="taskDueDate" name="taskDueDate" required>
-                                </div>
-
-
-                                <div class="tasks-form-actions">
-                                    <button type="button" class="tasks-btn-cancel"
-                                        onclick="closeTaskModal()">Cancel</button>
-                                    <button type="submit" class="tasks-btn-submit">Create Task</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
     <div id="toastContainer" class="fixed bottom-5 right-5 space-y-3 z-50">
     </div>
 
 
+   <!-- Core app logic -->
+<script src="assets/js/app.js"></script>
+<script src="assets/js/script.js"></script>
 
-    <script src="assets/js/taskCards.js"></script>
-    <script src="assets/js/app.js"></script>
+<!-- Feature modules -->
+<script src="assets/js/tasks.js"></script>
+<script src="assets/js/taskCards.js"></script>
+<script src="assets/js/departments.js"></script>
+<script src="assets/js/events.js"></script>
 
-    <script src="assets/js/script.js"></script>
-    <!-- jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Shared UI logic -->
+<script src="assets/js/searchFilter.js"></script>
 
-    <!-- jsPDF AutoTable (required for tables) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<!-- External libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
-    <script src="assets/js/reports.js"></script>
+<!-- Reports module -->
+<script src="assets/js/reports.js"></script>
 
 </body>
 

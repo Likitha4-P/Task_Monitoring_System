@@ -122,6 +122,7 @@ const res= await fetch(`${API_BASE}/reports/events/upcoming?${qs}`, {
     }
 
     const events = await res.json();
+    console.log("Upcoming events:", events);
     const container = document.getElementById("upcomingEventsList");
     container.innerHTML = "";
 
@@ -153,6 +154,7 @@ async function loadPendingApprovals() {
     }
 
     const events = await res.json();
+    console.log("Pending approvals:", events);
     const container = document.getElementById("pendingApprovalsList");
     container.innerHTML = "";
 
@@ -209,49 +211,6 @@ async function loadDeadlineSummary() {
     `;
     });
 }
-
-
-// Dummy Data for Reports
-const reportData = {
-    summary: {
-        totalEvents: 15,
-        pendingApprovals: 8,
-        upcomingDeadlines: 12,
-        overdueItems: 3,
-        completedTasks: 45
-    },
-    events: [
-        { id: 1, name: 'Tech Symposium 2026', department: 'Computer Science & Engineering', date: '2026-01-25', status: 'Scheduled', attendees: 250 },
-        { id: 2, name: 'Annual Sports Day', department: 'Physical Education', date: '2026-02-02', status: 'Scheduled', attendees: 500 },
-        { id: 3, name: 'Research Conference', department: 'All Departments', date: '2026-02-10', status: 'Scheduled', attendees: 180 },
-        { id: 4, name: 'Industrial Visit', department: 'Mechanical Engineering', date: '2026-01-28', status: 'Pending Approval', attendees: 60 },
-        { id: 5, name: 'Guest Lecture Series', department: 'Electronics & Communication', date: '2026-02-05', status: 'Pending Approval', attendees: 120 },
-        { id: 6, name: 'Workshop on AI', department: 'Computer Science & Engineering', date: '2026-01-30', status: 'Approved', attendees: 80 },
-        { id: 7, name: 'Cultural Fest', department: 'Student Affairs', date: '2026-03-15', status: 'Scheduled', attendees: 600 },
-        { id: 8, name: 'Blood Donation Camp', department: 'NSS', date: '2026-02-20', status: 'Approved', attendees: 150 },
-        { id: 9, name: 'Hackathon 2026', department: 'Computer Science & Engineering', date: '2026-03-01', status: 'Pending Approval', attendees: 200 },
-        { id: 10, name: 'Career Fair', department: 'Placement Cell', date: '2026-02-25', status: 'Scheduled', attendees: 400 }
-    ],
-    tasks: [
-        { id: 1, task: 'Assignment Submission', course: 'Data Structures', dueDate: '2026-01-18', status: 'Overdue', priority: 'High' },
-        { id: 2, task: 'Lab Report Submission', course: 'Physics Laboratory', dueDate: '2026-01-22', status: 'Pending', priority: 'Medium' },
-        { id: 3, task: 'Project Proposal', course: 'Final Year Project', dueDate: '2026-01-15', status: 'Completed', priority: 'High' },
-        { id: 4, task: 'Mid-term Exam Preparation', course: 'Database Management', dueDate: '2026-01-26', status: 'Pending', priority: 'High' },
-        { id: 5, task: 'Research Paper Review', course: 'Machine Learning', dueDate: '2026-01-24', status: 'Pending', priority: 'Medium' },
-        { id: 6, task: 'Code Review', course: 'Software Engineering', dueDate: '2026-01-19', status: 'Overdue', priority: 'High' },
-        { id: 7, task: 'Presentation Slides', course: 'Computer Networks', dueDate: '2026-01-27', status: 'Pending', priority: 'Low' },
-        { id: 8, task: 'Case Study Analysis', course: 'Management', dueDate: '2026-01-23', status: 'Pending', priority: 'Medium' },
-        { id: 9, task: 'Quiz Preparation', course: 'Operating Systems', dueDate: '2026-01-21', status: 'Completed', priority: 'Low' },
-        { id: 10, task: 'Group Discussion', course: 'Communication Skills', dueDate: '2026-01-25', status: 'Pending', priority: 'Low' }
-    ],
-    faculty: [
-        { name: 'Dr. Smith Johnson', department: 'Computer Science & Engineering', tasksAssigned: 15, eventsOrganized: 3 },
-        { name: 'Prof. Maria Garcia', department: 'Electronics & Communication', tasksAssigned: 12, eventsOrganized: 2 },
-        { name: 'Dr. Rajesh Kumar', department: 'Mechanical Engineering', tasksAssigned: 10, eventsOrganized: 4 },
-        { name: 'Prof. Sarah Williams', department: 'Civil Engineering', tasksAssigned: 8, eventsOrganized: 1 },
-        { name: 'Dr. Ahmed Hassan', department: 'Computer Science & Engineering', tasksAssigned: 14, eventsOrganized: 2 }
-    ]
-};
 
 // Set default dates
 const today = new Date();

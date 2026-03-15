@@ -121,3 +121,161 @@ curl http://localhost:5000/api/users -H "Authorization: Bearer $TOKEN"
 Update your frontend `app.js` to call these endpoints using `fetch` and store the JWT in `localStorage`.
 
 
+# Google Drive File Upload Integration (Node.js)
+
+This guide explains how to upload files from a **Node.js backend** to **Google Drive** using the **Google Drive API**.
+
+In this project, uploaded task deliverables are stored in Google Drive instead of the local server.
+
+---
+
+# Overview
+
+The application allows users to upload files which are then stored securely in Google Drive.
+
+The backend uses:
+
+- Node.js
+- Express.js
+- Multer
+- Google Drive API
+
+## Workflow
+
+1. User uploads a file from the frontend.
+2. Backend receives the file using Multer.
+3. The file is uploaded to Google Drive.
+4. Google Drive returns a **fileId**.
+5. A shareable link is generated and stored in the database.
+
+---
+
+# Step 1: Create a Google Cloud Project
+
+1. Open: https://console.cloud.google.com
+2. Click **Select Project → New Project**
+3. Enter:
+
+Project Name: Task Monitoring App
+
+
+
+4. Click **Create**
+5. Select the newly created project.
+
+---
+
+# Step 2: Enable Google Drive API
+
+1. Go to:
+APIs & Services → Library
+Search : Google Drive API
+
+
+3. Click **Enable**
+
+This allows your application to interact with Google Drive programmatically.
+
+---
+
+# Step 3: Configure OAuth Consent Screen
+
+1. Navigate to:
+
+APIs & Services → OAuth Consent Screen
+
+2. Select: External
+
+
+3. Fill the required fields:
+
+| Field | Value |
+|------|------|
+App Name | Task Monitoring App |
+User Support Email | Your Email |
+Developer Email | Your Email |
+
+4. Click **Save and Continue**
+
+Scopes and Test Users can be skipped for development.
+
+---
+
+# Step 4: Create OAuth Credentials
+
+1. Go to:
+APIs & Services → Credentials
+
+
+2. Click:
+Create Credentials → OAuth Client ID
+
+3. Choose:
+
+Application Type: Desktop App
+
+
+4. Name:
+
+Drive Upload Client
+
+
+5. Click **Create**
+
+---
+
+# Step 5: Download Credentials
+
+After creating credentials:
+
+1. Click **Download JSON**
+2. Rename the file to:
+
+
+credentials.json
+
+
+3. Place it inside the project root.
+
+Example structure:
+
+
+project-root
+│
+├── credentials.json
+├── driveAuth.js
+├── uploadRoute.js
+└── server.js
+
+
+⚠️ Do not upload this file to GitHub.
+
+Add to `.gitignore`:
+
+
+credentials.json
+token.json
+
+
+---
+
+# Step 6: Install Dependencies
+
+Install required packages.
+
+
+npm install googleapis multer
+
+
+Packages used:
+
+| Package | Purpose |
+|------|------|
+googleapis | Access Google APIs |
+multer | Handle file uploads |
+
+---
+
+# Step 7: Setup Google Drive Authentication
+
+

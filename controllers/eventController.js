@@ -132,7 +132,8 @@ export async function listEvents(req, res) {
         e.participants,
         e.venue,
         e.status,
-        d.department_code
+        d.department_code,
+        d.id AS department_id
       FROM events e
       LEFT JOIN departments d ON e.department_id = d.id
       WHERE ${where}
@@ -188,13 +189,23 @@ export async function approveEvent(req, res) {
         console.error("Failed to send approval email:", err.message);
       }
     }
-await createNotification(
-  event.creator_id,
-  "Event Approved",
-  "Your event Hackathon 2026 was approved",
-  "Event",
-  id
+    
+const [users] = await pool.query(
+  `SELECT id FROM users 
+   WHERE department_id = ? 
+   AND status='Active'`,
+  [event.department_id]
 );
+
+for (const user of users) {
+  await createNotification(
+    user.id,
+    "Event Approved",
+    `Event "${event.title}" has been approved`,
+    "Event",
+    event.id
+  );
+}
     
   } catch (e) {
     console.error(e);

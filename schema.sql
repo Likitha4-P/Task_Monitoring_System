@@ -78,19 +78,7 @@ FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
 );
 
--- =========================================
--- ADMIN AUDIT LOGS
--- =========================================
-CREATE TABLE admin_audit_logs (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  admin_id INT NOT NULL,
-  action_type VARCHAR(100) NOT NULL,
-  target_table VARCHAR(50),
-  target_id INT,
-  description TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE CASCADE
-);
+
 
 -- =========================================
 -- USER NOTIFICATIONS

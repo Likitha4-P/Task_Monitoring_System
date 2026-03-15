@@ -99,23 +99,6 @@ async function loadTaskCounters() {
   document.getElementById("completedtasks").innerText = data.completed ?? 0;
 }
 
-/* -----------------------------
-   AUTO REFRESH
-------------------------------*/
-
-document.addEventListener("DOMContentLoaded", () => {
-  
-
-  loadTaskCounters();
-  loadDonutChart();
-  loadBarChart();
-
-  setInterval(() => {
-    loadTaskCounters();
-    loadDonutChart();
-    loadBarChart();
-  }, 120000); // refresh every 120 seconds
-});
 
 /* PAGE LOAD ANIMATION */
 window.addEventListener("load", () => {
@@ -131,18 +114,8 @@ window.addEventListener("load", () => {
   });
 });
 
-/* SEARCH FILTER */
-const search = document.getElementById("search");
-const rows = document.querySelectorAll("#taskTable tr");
 
-search.addEventListener("input", () => {
-  const value = search.value.toLowerCase();
-  rows.forEach(row => {
-    row.style.display = row.innerText.toLowerCase().includes(value)
-      ? ""
-      : "none";
-  });
-});
+const rows = document.querySelectorAll("#taskTable tr");
 
 /* PROGRESS BAR ANIMATION */
 document.querySelectorAll(".progress-bar").forEach(bar => {
@@ -172,7 +145,7 @@ document.querySelectorAll("i").forEach(icon => {
     setTimeout(() => (icon.style.transform = "scale(1)"), 150);
   });
 });
-let lastNotificationId = null;
+
 async function loadNotifications() {
 
   try {
@@ -185,15 +158,12 @@ async function loadNotifications() {
     const notifications = await res.json();
     notifications.forEach(n => {
 
-  if (!lastNotificationId || n.id > lastNotificationId) {
+  if (n.is_read === "No") {
       showToast(n.title, n.message);
   }
 
 });
 
-if (notifications.length > 0) {
-  lastNotificationId = notifications[0].id;
-}
 
     const lists = document.querySelectorAll(".notificationList");
     const counts = document.querySelectorAll(".notificationCount");

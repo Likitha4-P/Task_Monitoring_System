@@ -1076,7 +1076,7 @@ html {
 }
 
 .dept-square {
-  width: 112px;
+  width: fit-content;
   height: 72px;
   margin:10px;
   border-radius: 4px;

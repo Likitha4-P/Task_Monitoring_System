@@ -7,16 +7,16 @@ import { createNotification } from "../utils/notifyHelper.js";
 // ---------------- CREATE TASK ----------------
 export async function createTask(req, res) {
   try {
-    const { 
-      title, 
-      description, 
-      assigned_to, 
+    const {
+      title,
+      description,
+      assigned_to,
       assigned_by,
-      department_id, 
+      department_id,
       deliverables,
-      deadline, 
-      priority = "Medium", 
-      status = "Pending" 
+      deadline,
+      priority = "Medium",
+      status = "Pending"
     } = req.body;
 
     assertFields(req.body, ["title", "assigned_to", "deadline"]);
@@ -26,27 +26,27 @@ export async function createTask(req, res) {
         (title, description, assigned_to, assigned_by, department_id, deliverables, deadline, priority, status, progress) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        title, 
-        description || null, 
-        assigned_to, 
-        assigned_by, 
-        department_id || null, 
+        title,
+        description || null,
+        assigned_to,
+        assigned_by,
+        department_id || null,
         deliverables || null,
-        deadline, 
-        priority, 
+        deadline,
+        priority,
         status,
         0
       ]
     );
-     res.status(201).json({ id: result.insertId });
-      const taskId = result.insertId;
-      await createNotification(
- assigned_to,
- "New Task Assigned",
- `You have been assigned task: ${title} with deadline ${new Date(deadline).toLocaleDateString()}.`,
- "Task",
- taskId
-);
+    res.status(201).json({ id: result.insertId });
+    const taskId = result.insertId;
+    await createNotification(
+      assigned_to,
+      "New Task Assigned",
+      `You have been assigned task: ${title} with deadline ${new Date(deadline).toLocaleDateString()}.`,
+      "Task",
+      taskId
+    );
 
     const [userRows] = await pool.query("SELECT email FROM users WHERE id = ?", [assigned_to]);
     if (userRows.length) {
@@ -54,7 +54,7 @@ export async function createTask(req, res) {
       sendTaskEmail(assigneeEmail, { title, description, deadline, priority, deliverables }).catch(console.error);
     }
 
-   
+
   } catch (e) {
     console.error(e);
     res.status(e.status || 500).json({ message: e.message || "Failed to create task" });
@@ -70,6 +70,7 @@ export async function listTasks(req, res) {
         u.name AS assignee_name, 
         ab.name AS assigner_name, 
         d.department_name AS department_name,
+        d.id AS department_id,
         CASE 
           WHEN EXISTS (
             SELECT 1 
@@ -96,7 +97,7 @@ export async function listTasks(req, res) {
     q += ` ORDER BY t.id DESC`;
 
     const [rows] = await pool.query(q, params);
-   
+
     res.json(rows);
   } catch (e) {
     console.error(e);
@@ -160,23 +161,42 @@ export async function updateTask(req, res) {
 
     const oldTask = taskRows[0];
 
+    const clean = v => (v === "" ? null : v);
+
+    const titleVal = clean(title);
+    const descriptionVal = clean(description);
+    const assignedToVal = clean(assigned_to);
+    const deliverablesVal = clean(deliverables);
+    const deadlineVal = clean(deadline);
+    const priorityVal = clean(priority);
+    const statusVal = clean(status);
+
     // Update task
     await pool.query(
       `UPDATE tasks SET
-        title = COALESCE(?, title),
-        description = COALESCE(?, description),
-        assigned_to = COALESCE(?, assigned_to),
-        deliverables = COALESCE(?, deliverables),
-        deadline = COALESCE(?, deadline),
-        priority = COALESCE(?, priority),
-        status = COALESCE(?, status)
-      WHERE id = ?`,
-      [title, description, assigned_to, deliverables, deadline, priority, status, id]
+  title = COALESCE(?, title),
+  description = COALESCE(?, description),
+  assigned_to = COALESCE(?, assigned_to),
+  deliverables = COALESCE(?, deliverables),
+  deadline = COALESCE(?, deadline),
+  priority = COALESCE(?, priority),
+  status = COALESCE(?, status)
+WHERE id = ?`,
+      [
+        titleVal,
+        descriptionVal,
+        assignedToVal,
+        deliverablesVal,
+        deadlineVal,
+        priorityVal,
+        statusVal,
+        id
+      ]
     );
 
     const newAssignee = assigned_to || oldTask.assigned_to;
 
- 
+
 
     // -------- Notification when status changed --------
     if (status) {
@@ -188,18 +208,18 @@ export async function updateTask(req, res) {
         id
       );
     } else {
-         // -------- Notification when task updated --------
-    await createNotification(
-      newAssignee,
-      "Task Updated",
-      `Task "${title || oldTask.title}" was updated`,
-      "Task",
-      id
-    );
+      // -------- Notification when task updated --------
+      await createNotification(
+        newAssignee,
+        "Task Updated",
+        `Task "${title || oldTask.title}" was updated`,
+        "Task",
+        id
+      );
     }
 
     // -------- Email notification --------
-   
+
     if (assigned_to && (userRole === "Admin" || userRole === "Professor Incharge")) {
 
       const [userRows] = await pool.query(
@@ -271,6 +291,6 @@ export async function deleteTask(req, res) {
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Failed to delete task" });
-    
+
   }
 }
