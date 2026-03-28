@@ -38,7 +38,7 @@
 
 
 <body>
-    <div class="dashboard-container bg-gray-100 dark:bg-slate-900  overflow-hidden">
+    <div class="dashboard-container bg-gray-100 dark:bg-slate-900 overflow-hidden">
 
         <!-- Sidebar -->
         <aside class="col-span-3 bg-[#2B3D50] dark:bg-[#1a2332] p-6 w-[20vw] flex flex-col gap-4 h-full">
@@ -148,7 +148,7 @@
                                     <div class="notificationList max-h-80 overflow-y-auto"></div>
 
                                     <div class="text-center p-2 border-t dark:border-slate-700">
-                                        <button onclick="markAllRead()" class="text-sm text-blue-500">
+                                        <button onclick="markAllRead()" class="text-sm text-white bg-blue-500 hover:bg-blue-600 w-full px-3 py-1 rounded-full">
                                             Mark all as read
                                         </button>
                                     </div>
@@ -174,25 +174,30 @@
                     </div>
 
                     <!-- Task Cards -->
-                    <div class="grid grid-cols-4 gap-4 mb-6">
-                        <div class="statCard dark:bg-slate-700">
-                            <p class="font-medium text-gray-700 dark:text-slate-200">Total Tasks</p>
-                            <h2 class="text-3xl font-semibold !text-purple-600 dark:text-purple-400" id="totaltasks">138
+                    <div class="grid grid-cols-5 gap-4 mb-6">
+                        <div class="statCard statCardUsers dark:bg-slate-700">
+                            <p class="font-medium !text-white font-bold text-xl text-lg/50 dark:text-slate-200">Total Users</p>
+                            <h2 class="text-3xl font-semibold text-white dark:text-purple-400" id="totalUsers">138
                             </h2>
                         </div>
-                        <div class="statCard dark:bg-slate-700">
-                            <p class="font-medium text-gray-700 dark:text-slate-200">Pending</p>
-                            <h2 class="text-3xl font-semibold !text-pink-600 dark:text-pink-400" id="pendingtasks">30
+                        <div class="statCard statCardTotal dark:bg-slate-700">
+                            <p class="font-medium !text-white font-bold text-xl text-lg/50 dark:text-slate-200">Total Tasks</p>
+                            <h2 class="text-3xl font-semibold text-white dark:text-purple-400" id="totaltasks">138
                             </h2>
                         </div>
-                        <div class="statCard dark:bg-slate-700">
-                            <p class="font-medium text-gray-700 dark:text-slate-200">In-Progress</p>
-                            <h2 class="text-3xl font-semibold !text-indigo-600 dark:text-indigo-400"
+                        <div class="statCard statCardPending dark:bg-slate-700">
+                            <p class="font-medium !text-white font-bold text-xl text-lg/50 dark:text-slate-200">Pending</p>
+                            <h2 class="text-3xl font-semibold text-white dark:text-pink-400" id="pendingtasks">30
+                            </h2>
+                        </div>
+                        <div class="statCard statCardInProgress dark:bg-slate-700">
+                            <p class="font-medium !text-white font-bold text-xl text-lg/50 dark:text-slate-200">In-Progress</p>
+                            <h2 class="text-3xl font-semibold text-white dark:text-indigo-400"
                                 id="inprogresstasks">64</h2>
                         </div>
-                        <div class="statCard dark:bg-slate-700">
-                            <p class="font-medium text-gray-700 dark:text-slate-200">Completed</p>
-                            <h2 class="text-3xl font-semibold !text-green-600 dark:text-green-400" id="completedtasks">
+                        <div class="statCard statCardCompleted dark:bg-slate-700">
+                            <p class="font-medium !text-white font-bold text-xl text-lg/50 dark:text-slate-200">Completed</p>
+                            <h2 class="text-3xl font-semibold text-white dark:text-green-400" id="completedtasks">
                                 44</h2>
                         </div>
                     </div>
@@ -213,35 +218,13 @@
                                 <div id="calendar" style="min-height: 400px;"></div>
                             </div>
                             <!-- Event Details Container -->
-                            <div id="eventDetailsWrapper" class="w-full h-[40vh] border border-gray-200 shadow-2xs rounded-xl p-4 mt-4
-            flex items-center justify-center hidden">
+                            <div id="eventDetailsWrapper"
+     class="w-full max-h-[40vh] border border-gray-200 shadow rounded-xl p-4 mt-4
+     flex flex-col gap-4 overflow-y-auto hidden">
 
-                                <div class="flex flex-col w-[100vw]  bg-green-100 border border-gray-200 shadow-2xs
-           rounded-xl p-4 md:p-5 max-w-md dark:bg-slate-700 dark:border-slate-600">
+    <div id="eventDetailsContainer" class="flex flex-col gap-4 w-full"></div>
 
-                                    <h3 id="eventTitle" class="text-2xl font-bold text-gray-800 dark:text-slate-200">
-                                        Event title
-                                    </h3>
-
-                                    <p id="eventVenue"
-                                        class="mt-1 text-xl font-medium uppercase text-red-800 dark:text-gray-400">
-                                        Venue
-                                    </p>
-
-                                    <!-- Structured details -->
-                                    <div class="mt-4 space-y-2 text-sm text-gray-700 dark:text-slate-300">
-                                        <p><span class="font-semibold text-xl">Department: </span> <span
-                                                id="eventDepartment" class="text-xl font-awesome"></span>
-                                        </p>
-                                        <p><span class="font-semibold text-xl">Date: </span> <span id="eventDate"
-                                                class="text-xl font-awesome"></span></p>
-                                        <p><span class="font-semibold text-xl">Participants: </span> <span
-                                                id="eventParticipants" class="text-xl font-awesome"></span>
-                                        </p>
-                                    </div>
-
-                                </div>
-                            </div>
+</div>
 
                         </div>
 
@@ -388,23 +371,29 @@
                 </div>
 
                 <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 shadow hover:shadow-md transition">
-                        <p class="text-sm">Total Tasks</p>
-                        <h2 class="text-2xl font-bold text-purple-700 dark:text-purple-400" id="depttotalTasks">0</h2>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+
+                    <div class="statCard statCardUsers dark:bg-slate-700">
+                            <p class="font-medium !text-white font-bold text-xl text-lg/50 dark:text-slate-200">Total Users</p>
+                            <h2 class="text-3xl font-semibold text-white dark:text-purple-400" id="totalDeptUsers">138
+                            </h2>
+                        </div>
+                    <div class="statCard statCardTotal dark:bg-slate-700">
+                        <p class="font-medium !text-white font-bold text-xl text-lg/50 dark:text-slate-200">Total Tasks</p>
+                        <h2 class="text-3xl font-semibold text-white dark:text-purple-400" id="depttotalTasks">0</h2>
                     </div>
-                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 shadow hover:shadow-md transition">
-                        <p class="text-sm">Pending</p>
-                        <h2 class="text-2xl font-bold text-purple-700 dark:text-purple-400" id="deptpendingTasks">0</h2>
+                    <div class="statCard statCardPending dark:bg-slate-700">
+                        <p class="font-medium !text-white font-bold text-xl text-lg/50 dark:text-slate-200">Pending</p>
+                        <h2 class="text-3xl font-semibold text-white dark:text-purple-400" id="deptpendingTasks">0</h2>
                     </div>
-                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 shadow hover:shadow-md transition">
-                        <p class="text-sm">In-Progress</p>
-                        <h2 class="text-2xl font-bold text-purple-700 dark:text-purple-400" id="deptinProgressTasks">0
+                    <div class="statCard statCardInProgress dark:bg-slate-700">
+                        <p class="font-medium !text-white font-bold text-xl text-lg/50 dark:text-slate-200">In-Progress</p>
+                        <h2 class="text-3xl font-semibold text-white dark:text-purple-400" id="deptinProgressTasks">0
                         </h2>
                     </div>
-                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 shadow hover:shadow-md transition">
-                        <p class="text-sm">Completed</p>
-                        <h2 class="text-2xl font-bold text-purple-700 dark:text-purple-400" id="deptcompletedTasks">0
+                    <div class="statCard statCardCompleted dark:bg-slate-700">
+                        <p class="font-medium !text-white font-bold text-xl text-lg/50 dark:text-slate-200">Completed</p>
+                        <h2 class="text-3xl font-semibold text-white dark:text-purple-400" id="deptcompletedTasks">0
                         </h2>
                     </div>
                 </div>
@@ -485,7 +474,7 @@
                     <!-- Table -->
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
-                            <thead class="bg-gray-100 dark:bg-slate-700">
+                            <thead class="bg-gray-700 text-white dark:bg-slate-700">
                                 <tr>
                                     <th class="text-left px-4 py-2">Name</th>
                                     <th class="text-left px-4 py-2">Role</th>
@@ -944,7 +933,7 @@
                         <div>
                             <label class="block text-sm font-medium text-[#2b3b50] dark:text-gray-300 mb-2">Date
                                 From</label>
-                            <input type="date" id="dateFrom"
+                            <input type="date" id="dateFrom" 
                                 class="w-full px-4 py-2 border-2 border-[#2b3b50] dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2b3b50] dark:focus:ring-blue-500">
                         </div>
                         <div>
@@ -1095,7 +1084,7 @@
 
         </div>
         <!-- Header -->
-        <div id="myTasks" class="page bg-white dark:bg-slate-800 w-full">
+        <div id="myTasks" class="page bg-white dark:bg-slate-800 w-full overflow-y-scroll transition-colors duration-300">
 
             <!-- Top Bar -->
             <header
@@ -1158,7 +1147,7 @@
 
 
 
-            <div class="px-6 py-3 w-[100%] gap-6 mt-4 dark:bg-white/5 rounded-xl "
+            <div class="px-6 py-3 w-[100%] gap-6 mt-4 dark:bg-white/5 rounded-xl"
                 id="tasksContent">
                 <div class="flex justify-between  items-center ">
                     <input id="taskCardSearch" type="text" placeholder="Search ..." class="w-2/5 px-4 py-2 border border-gray-500 rounded-xl outline-none
@@ -1235,7 +1224,7 @@
                 </div>
             </div>
             <div id="cardGrid"
-                    class="grid grid-cols-1 mt-5  sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-5xl mx-auto px-6 py-8 -mt-6">
+                    class=" grid grid-cols-1 mt-5  sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-5xl mx-auto px-6 py-8 -mt-6">
                 </div>
         </div>
 
@@ -1256,8 +1245,6 @@
 <script src="assets/js/departments.js"></script>
 <script src="assets/js/events.js"></script>
 
-<!-- Shared UI logic -->
-<script src="assets/js/searchFilter.js"></script>
 
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

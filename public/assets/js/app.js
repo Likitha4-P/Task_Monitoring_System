@@ -69,6 +69,21 @@ async function handleLogin(event) {
 
 }
 
+let allUsers = [];
+async function loadUsers() {
+  const res = await fetch(`${API_BASE}/users`, { headers: getHeaders() });
+  if (!res.ok) {
+    alert("Failed to load users");
+    return []; // return empty array instead of undefined
+  }
+
+  const users = await res.json();
+
+  allUsers = users; // store in global variable for search/filtering
+
+  return users; // ✅ return array so openTaskModal() can use it
+}
+
 function toggleVisibility(showId) {
 
   document.querySelectorAll(".page").forEach(el => {
@@ -81,7 +96,7 @@ function toggleVisibility(showId) {
   const showEl = document.getElementById(showId);
   if (showEl) {
     showEl.style.display = "block"; // show selected page
-    console.log(`Showing: ${showId}`);
+   
   } else {
     console.warn(`❌ Element with ID "${showId}" not found`);
   }
@@ -160,6 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initCalendar();
   loadNotifications();
   
+  loadUsers(); // load users on app start for caching and search functionality
   loadTaskCounters();
   loadDonutChart();
   loadBarChart();
@@ -224,7 +240,7 @@ setInterval(loadNotifications, 30000);
     eventApprovalText.innerHTML = "";
   }
   document.getElementById("overview")?.addEventListener("click", () => {
-    console.log("Loading overview...");
+    
     renderDepartments();
     toggleVisibility('mainpage');
 
@@ -237,7 +253,7 @@ setInterval(loadNotifications, 30000);
   });
  
   document.getElementById("showdepartments")?.addEventListener("click", async () => {
-  console.log("Loading departments...");
+
 
   await renderDepartments(); // wait until departments are ready
   toggleVisibility('allDepartments');
@@ -283,7 +299,7 @@ setInterval(loadNotifications, 30000);
 
   // Sidebar buttons
   document.getElementById("showtasks")?.addEventListener("click", () => {
-    console.log("Loading tasks...");
+    
     if(currentUser?.role === "Faculty/File Incharge" || currentUser?.role === "Professor Incharge") {
       toggleVisibility('myTasks');
       const taskDeptFilter = document.getElementById("taskDeptFilter");
@@ -305,7 +321,7 @@ setInterval(loadNotifications, 30000);
 
   
   document.getElementById("showevents")?.addEventListener("click", () => {
-    console.log("Loading events...");
+   
      
     loadEvents();
     populateEventDepartmentFilter();
@@ -318,7 +334,7 @@ setInterval(loadNotifications, 30000);
     document.getElementById("showevents").classList.add("active");
   });
   document.getElementById("showreports")?.addEventListener("click", async () => {
-    console.log("Loading reports...");
+    
 
    
     await populateDepartmentFilter();
@@ -332,14 +348,14 @@ setInterval(loadNotifications, 30000);
     const darkModeToggle = document.getElementById('darkToggle');
 
     darkModeToggle?.addEventListener('click', () => {
-      console.log("Dark mode toggled from reports page");
+     
       document.documentElement.classList.toggle('dark');
       
 
       const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
       localStorage.setItem('theme', theme);
       const icon = document.querySelector(".darkModeIcon");
-      console.log(icon);
+      
 
         if (icon.classList.contains("bx-moon")) {
     icon.classList.remove("bx-moon");
@@ -410,7 +426,7 @@ setInterval(loadNotifications, 30000);
   const createTaskForm = document.getElementById("createTaskForm");
   if (createTaskForm) createTaskForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    console.log("form submitted");
+   
     if (createTaskForm.dataset.mode === "edit") {
       await updateTask(createTaskForm.dataset.taskId);
       
@@ -423,7 +439,7 @@ setInterval(loadNotifications, 30000);
   if (uploadDocumentForm) {
     uploadDocumentForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      console.log("Uploading document...");
+     
       await uploadDocument(event);
     });
   }

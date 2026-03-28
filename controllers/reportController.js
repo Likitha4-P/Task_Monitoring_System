@@ -263,7 +263,9 @@ export async function exportReportData(req, res) {
         u.name,
         d.department_name AS department,
         COUNT(DISTINCT t.id) AS tasksAssigned,
-        COUNT(DISTINCT e.id) AS eventsOrganized
+        COUNT(DISTINCT e.id) AS eventsOrganized,
+        COUNT(DISTINCT CASE WHEN t.status IN ('submitted', 'verified') THEN t.id END) AS tasksCompleted
+        
       FROM users u
       LEFT JOIN departments d ON u.department_id = d.id
       LEFT JOIN tasks t ON t.assigned_to = u.id

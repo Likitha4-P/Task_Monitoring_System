@@ -52,15 +52,15 @@ function renderApprovalCards(events) {
     <i class='bx bx-x-circle text-4xl p-3'></i>
   </div>
 `;
-  } else if(currentUser.role==="Faculty/File Incharge") {
+  } else if (currentUser.role === "Faculty/File Incharge") {
     container.innerHTML = ``
   }
   else {
     events
-    .filter(ev => ev.status === "Pending")
-    .slice(0, 6) // show latest 6
-    .forEach(ev => {
-      container.innerHTML += `
+      .filter(ev => ev.status === "Pending")
+      .slice(0, 6) // show latest 6
+      .forEach(ev => {
+        container.innerHTML += `
         <div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow">
           <h4 class="font-semibold text-sm mb-2">
             ${ev.title} proposed by ${ev.department_code || "-"}
@@ -79,9 +79,9 @@ function renderApprovalCards(events) {
           </div>
         </div>
       `;
-    });
+      });
   }
-  
+
 }
 function renderEventsTable(events) {
   const tbody = document.getElementById("eventTableBody");
@@ -118,6 +118,7 @@ async function initCalendar() {
   if (calendar) return;
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
+
     height: "auto",
     headerToolbar: {
       left: "prev ,today",
@@ -138,7 +139,7 @@ async function initCalendar() {
 }
 
 async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) {
-  console.log("🔥 fetchCalendarEvents CALLED");
+  
   try {
     const res = await fetch(`${API_BASE}/events/approved`, {
       headers: getHeaders()
@@ -163,42 +164,67 @@ async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) 
     failureCallback(err);
   }
 }
-function handleEventClick(info) {
-  const ev = info.event;
-  console.log("Event clicked:", ev);
 
-  // Fill data
-  document.getElementById("eventTitle").textContent = ev.title;
-  document.getElementById("eventVenue").textContent =
-    ev.extendedProps.venue || "-";
-  document.getElementById("eventDepartment").textContent =
-    ev.extendedProps.department || "-";
-  document.getElementById("eventParticipants").textContent =
-    ev.extendedProps.participants ?? "-";
-  document.getElementById("eventDate").textContent =
-    ev.start.toLocaleDateString("en-IN", {
+function handleEventClick(info) {
+  const clickedDate = info.event.startStr;
+
+  // get all events loaded in the calendar
+  const events = calendar.getEvents();
+
+  // filter events for the same date
+  const sameDayEvents = events.filter(ev => ev.startStr === clickedDate);
+
+  const wrapper = document.getElementById("eventDetailsWrapper");
+  wrapper.classList.remove("hidden");
+
+  const container = document.getElementById("eventDetailsContainer");
+  container.innerHTML = "";
+
+  sameDayEvents.forEach(ev => {
+    container.innerHTML += `
+      <div class="flex flex-col w-[100vw]  bg-green-100 border border-gray-200 shadow-2xs
+           rounded-xl p-4 md:p-5 max-w-md dark:bg-slate-700 dark:border-slate-600">
+
+                                    <h3 id="eventTitle" class="text-xl font-bold text-gray-800 dark:text-slate-200">
+                                        ${ev.title}
+                                    </h3>
+
+                                    <p id="eventVenue"
+                                        class="mt-1 text-l font-medium uppercase text-red-800 dark:text-gray-400">
+                                        ${ev.extendedProps.venue || "-"}
+                                    </p>
+
+                                    <!-- Structured details -->
+                                    <div class="mt-4 space-y-2 text-sm text-gray-700 dark:text-slate-300">
+                                        <p><span class="font-bold text-xl">Department: </span> <span
+                                                id="eventDepartment" class="text-xl font-awesome">${ev.extendedProps.department || "-"}</span>
+                                        </p>
+                                        <p><span class="font-bold text-xl">Date: </span> <span id="eventDate"
+                                                class="text-xl font-awesome">${new Date(ev.start).toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "short",
       year: "numeric"
-    });
+    })}</span></p>
+                                        <p><span class="font-semibold text-xl">Participants: </span> <span
+                                                id="eventParticipants" class="text-xl font-awesome">${ev.extendedProps.participants || "-"}</span>
+                                        </p>
+                                    </div>
 
-  // Show the card
-  document.getElementById("eventDetailsWrapper").classList.remove("hidden");
-  const wrapper = document.getElementById("eventDetailsWrapper");
-  wrapper.classList.remove("hidden");
+                                </div>
+    `;
+  });
 
   setTimeout(() => {
     wrapper.scrollIntoView({ behavior: "smooth", block: "start" });
   }, 0);
 }
 
-
 function renderEventSquare(arg) {
   const dept = arg.event.title || "-";
 
   const square = document.createElement("div");
   square.className =
-    "dept-square flex items-center justify-center text-xs text-wrap text-center font-bold";
+    "dept-square cursor-pointer flex items-center justify-center text-xs text-wrap text-center font-bold";
 
   square.textContent = dept;
 
@@ -228,14 +254,7 @@ async function createEvent(form) {
   const venue = form.eventVenue?.value || null;
   const department_id = currentUser?.department_id;
 
-  console.log("Frontend values:", {
-    title,
-    event_date,
-    participants,
-    venue,
-    department_id
-  });
-
+ 
   if (!title || !event_date || !department_id) {
     alert("Missing required fields");
     return;
@@ -290,21 +309,21 @@ async function loadEventSummaryCards() {
 
   const data = await res.json();
 
-  console.log("Event summary:", data);
 
-  
+
+
   const approvedEl = document.getElementById("approvedEvents");
-if (approvedEl) {
-  approvedEl.textContent = data.approved;
-}
-const pendingEl = document.getElementById("pendingEvents");
-if (pendingEl) {
-  pendingEl.textContent = data.pending; 
-}
-const rejectedEl = document.getElementById("rejectedEvents");
-if (rejectedEl) {
-  rejectedEl.textContent = data.rejected; 
-}
+  if (approvedEl) {
+    approvedEl.textContent = data.approved;
+  }
+  const pendingEl = document.getElementById("pendingEvents");
+  if (pendingEl) {
+    pendingEl.textContent = data.pending;
+  }
+  const rejectedEl = document.getElementById("rejectedEvents");
+  if (rejectedEl) {
+    rejectedEl.textContent = data.rejected;
+  }
 }
 
 document.getElementById("eventSearch").addEventListener("input", filterEvents);
@@ -338,7 +357,7 @@ function filterEvents() {
       Number(ev.department_id) === Number(dept)
     );
   }
-console.log("Filtered events:", filtered);
+  
   renderEventsTable(filtered);
   renderApprovalCards(filtered);
 }
@@ -364,9 +383,9 @@ async function populateEventDepartmentFilter() {
       .filter(dep => dep.is_active === "Yes")
       .forEach(dep => {
 
-if(dep.id === 1) return; // Skip "General" department
+        if (dep.id === 1) return; // Skip "General" department
         const option = document.createElement("option");
-                                                   
+
         option.value = dep.id;                     // used for filtering
         option.textContent = dep.department_code; // display
 

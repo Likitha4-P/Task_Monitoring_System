@@ -167,7 +167,7 @@ const grid = document.getElementById('cardGrid');
 
 // Render all cards
 function renderCards(tasks) {
-  console.log("Rendering cards for tasks:", tasks);
+
   if (tasks.length === 0) {
     grid.innerHTML = "<p class='text-center text-gray-500 col-span-full'>No tasks found</p>";
     return;
@@ -197,7 +197,7 @@ function formatDate(dateStr) {
 
 async function deleteDeliverable(taskId, deliverableId) {
   if (!confirm("Are you sure you want to delete this document?")) return;
-  console.log(`Deleting deliverable ${deliverableId} for task ${taskId}`);
+
 
   try {
     const res = await fetch(`${API_BASE}/tasks/${taskId}/deliverable/${deliverableId}`, {

@@ -93,6 +93,7 @@ async function loadTaskCounters() {
 
   const data = await res.json();
 
+  document.getElementById("totalUsers").innerText = allUsers.length ?? 0;
   document.getElementById("totaltasks").innerText = data.total ?? 0;
   document.getElementById("pendingtasks").innerText = data.pending ?? 0;
   document.getElementById("inprogresstasks").innerText = data.in_progress ?? 0;

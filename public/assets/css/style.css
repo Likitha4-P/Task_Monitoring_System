@@ -16,7 +16,7 @@
 }
 
 .statCard {
-  background: white;
+ 
   padding: 14px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -25,6 +25,26 @@
 .statCard:hover {
   transform: translateY(-4px);
 }
+.statCard p {
+  text-shadow: -1px -1px 0 #4764f5;
+}
+
+.statCardUsers {
+  background: linear-gradient(190deg, #FFCAA6, #F86594);
+}
+.statCardTotal {
+ background: linear-gradient(190deg, #9BAFD9, #103783);
+}
+
+.statCardPending {
+background: linear-gradient(190deg, #FFCF67, #D3321D);}
+
+.statCardInProgress {
+background: linear-gradient(190deg, #5DA92F, #9BD46A);
+}
+
+.statCardCompleted {
+background: linear-gradient(190deg, #FFFBAF, #AB2AED);}
 
 /* Dark Mode Styles */
 :root.dark .statCard {

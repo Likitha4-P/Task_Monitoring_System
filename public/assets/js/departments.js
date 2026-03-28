@@ -1,20 +1,5 @@
 
 // ================= USERS =================
-// Load all users 
-async function loadUsers() {
-  const res = await fetch(`${API_BASE}/users`, { headers: getHeaders() });
-  if (!res.ok) {
-    alert("Failed to load users");
-    return []; // return empty array instead of undefined
-  }
-
-  const users = await res.json();
-
-
-
-  return users; // ✅ return array so openTaskModal() can use it
-}
-
 let departmentUsers = [];
 
 async function loadDepartmentsForUserForm() {
@@ -205,7 +190,7 @@ document.addEventListener("click", (e) => {
   if (!card) return;
 
   const depId = card.dataset.departmentId;
-  console.log("Delegated click:", depId);
+ 
 
   // Find department object
   const dep = window._departments.find(d => d.id == depId);
@@ -251,7 +236,7 @@ async function renderDepartments() {
 
         // ✅ CLICK → OPEN DEPARTMENT DASHBOARD
         card.onclick = () => {
-          console.log("Opening department:", dep);
+         
           openDepartment(dep);
         }
 
@@ -309,7 +294,7 @@ function openDepartment(dep) {
 
   // Switch page (your existing system)
   toggleVisibility("departmentDashboard");
-  console.log("Opened department:", dep);
+
 
   // Load department-specific data
   loadDepartmentStats(dep.id);
@@ -333,7 +318,9 @@ async function loadDepartmentUsers(departmentId) {
   try {
     const res = await fetch(`${API_BASE}/departments/${departmentId}/users`);
     const users = await res.json();
+
     departmentUsers = users;
+      document.getElementById("totalDeptUsers").innerText = users.length ?? 0;
     renderDepartmentUsers(users);
   
 

@@ -23,13 +23,13 @@ async function loadTasks() {
 
   // Admin sees all tasks, no filtering needed
 
-renderTasks(filteredTasks);
- 
-  
+  renderTasks(filteredTasks);
+
+
 }
 
 function renderTasks(tasks) {
-   const container = document.getElementById("taskrows");
+  const container = document.getElementById("taskrows");
   if (!container) return;
   container.innerHTML = "";
   const tableHead = document.getElementById("taskTableHeader");
@@ -47,7 +47,7 @@ function renderTasks(tasks) {
     ${(currentUser?.role === "Department Head") ? "" : "<th>Actions</th>"}
   </tr>
 `;
-const tableBody = document.getElementById("taskrows");
+  const tableBody = document.getElementById("taskrows");
   tableBody.innerHTML = ""; // Reset table before rendering
 
   for (const task of tasks) {
@@ -131,11 +131,11 @@ const tableBody = document.getElementById("taskrows");
     // ✅ Build the row using new schema fields
     row.innerHTML = `
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.title}</td>
-      ${currentUser?.role === "Faculty/File Incharge" ? `<td class='text-slate-700 p-3 flex items-center justify-center'><i onclick=openUploadDocModal('${task.id}') class='bx bx-upload p-3 text-red-500 text-2xl cursor-pointer  dark:text-slate-200 hover:text-green-500 transition'></i></td>` : `<td class='text-slate-700 p-3 '>
+      <td class='text-slate-700 p-3 '>
+     ${task.has_deliverables != 0 ? `<i  onclick=viewDoc('${task.id}') class='bx bx-show p-3 text-blue-700 text-2xl cursor-pointer  dark:text-slate-200 hover:text-green-500 transition' ></i>
+`: `<i class='bx bx-hide text-red-400 text-2xl'></i>`}
       
-      <i  onclick=viewDoc('${task.id}') class='bx bx-show p-3 text-red-500 text-2xl cursor-pointer  dark:text-slate-200 hover:text-green-500 transition' ></i>
-      
-      </td>`}
+      </td>
       ${currentUser?.role === "Faculty/File Incharge" ? "" : `<td class="text-slate-700 p-3 dark:text-slate-200">${task.assignee_name || "Unassigned"}</td>`}
      ${!(currentUser?.role === "Admin") ? "" : `<td class="text-slate-700 font-bold word-wrap w-60 dark:text-slate-200">${task.department_name}</td>`}
       <td class="text-slate-700 p-3 dark:text-slate-200">${task.priority}</td>
@@ -146,6 +146,7 @@ const tableBody = document.getElementById("taskrows");
     row.className = "border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700";
 
     tableBody.appendChild(row);
+
   }
 }
 
@@ -171,16 +172,16 @@ async function editTask(taskId) {
   if (!task) return alert("Task not found");
 
   const facultyMembers = await loadFacultyMembers();
-  
-  
+
+
   populateFacultyDropdown(facultyMembers);
 
 
   // Fill other form fields
   document.getElementById("taskTitle").value = task.title;
   document.getElementById("taskDescription").value = task.description;
-document.getElementById("taskDueDate").value =
-  task.deadline;
+  document.getElementById("taskDueDate").value =
+    task.deadline;
   document.getElementById("taskPriority").value = task.priority;
   document.getElementById("taskDeliverables").value = task.deliverables;
   document.getElementById("taskAssignedTo").value = task.assigned_to;
@@ -253,18 +254,18 @@ async function updateTaskProgress(taskId, progress) {
     body: JSON.stringify({ progress: Number(progress) })
   });
   if (!res.ok) return alert("Failed to update progress");
-  
-  if(progress == 100) {
+
+  if (progress == 100) {
     updateTaskStatus(taskId, "Submitted");
   } else {
     updateTaskStatus(taskId, "In Progress");
-  } 
+  }
   await loadTasksCards();
 }
 
 async function updateTaskStatus(taskId, newStatus) {
   try {
-    if(!newStatus) return; // No status selected
+    if (!newStatus) return; // No status selected
     const res = await fetch(`${API_BASE}/tasks/${taskId}`, {
       method: "PUT",
       headers: {
@@ -279,7 +280,7 @@ async function updateTaskStatus(taskId, newStatus) {
       alert(errorData.message || "Failed to update status");
       return;
     }
-  
+
 
     alert("✅ Task status updated successfully!");
     loadTasks();
@@ -305,7 +306,7 @@ async function openTaskModal() {
   document.body.style.overflow = 'hidden';
 
   const users = await loadUsers();
-  console.log("All users loaded for task assignment:", users);
+
 
   // ✅ Only include Faculty/File Incharge (adjust roles if needed)
   const facultyMembers = users.filter(u =>
@@ -364,10 +365,9 @@ function populateFacultyDropdown(facultyMembers) {
     return;
   }
 
-  console.log(currentUser.role)
-  if(currentUser.role === "Professor Incharge") {
+  if (currentUser.role === "Professor Incharge") {
     // If Professor Incharge, only show faculty from their department
-    facultyMembers = facultyMembers.filter(faculty => (faculty.department_id === currentUser.department_id)&&(faculty.status === "Active"));
+    facultyMembers = facultyMembers.filter(faculty => (faculty.department_id === currentUser.department_id) && (faculty.status === "Active"));
   }
   // Add filtered faculty
   facultyMembers.forEach(faculty => {
@@ -475,9 +475,9 @@ async function populateTaskDepartmentFilter() {
       .filter(dep => dep.is_active === "Yes")
       .forEach(dep => {
 
-if(dep.id === 1) return; // Skip "General" department
+        if (dep.id === 1) return; // Skip "General" department
         const option = document.createElement("option");
-                                                   
+
         option.value = dep.id;                     // used for filtering
         option.textContent = dep.department_code; // display
 

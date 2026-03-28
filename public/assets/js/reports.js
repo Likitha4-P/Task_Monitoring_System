@@ -29,7 +29,7 @@ let _facultyCache = [];
 
 async function populateFacultyFilter() {
   _facultyCache = await loadFacultyMembers();
-console.log("Faculty cache:", _facultyCache);
+
 
   const facultySelect = document.getElementById("facultyFilter");
   facultySelect.innerHTML = `<option value="">All Faculty</option>`;
@@ -45,7 +45,6 @@ facultyFilter.addEventListener("change", () => {
   const facultyId = facultyFilter.value;
   const deptSelect = document.getElementById("deptFilter");
 
-  console.log("Selected faculty ID:", facultyId);
 
   // Reset case
   if (!facultyId) {
@@ -57,7 +56,6 @@ facultyFilter.addEventListener("change", () => {
   // IMPORTANT: loose equality to handle string vs number
   const faculty = _facultyCache.find(f => f.id == facultyId);
 
-  console.log("Matched faculty:", faculty);
 
   if (!faculty || !faculty.department_id) {
     console.warn("Faculty has no department_id");
@@ -122,7 +120,7 @@ const res= await fetch(`${API_BASE}/reports/events/upcoming?${qs}`, {
     }
 
     const events = await res.json();
-    console.log("Upcoming events:", events);
+   
     const container = document.getElementById("upcomingEventsList");
     container.innerHTML = "";
 
@@ -154,7 +152,7 @@ async function loadPendingApprovals() {
     }
 
     const events = await res.json();
-    console.log("Pending approvals:", events);
+    
     const container = document.getElementById("pendingApprovalsList");
     container.innerHTML = "";
 
@@ -241,6 +239,7 @@ function resetFilters() {
 async function exportPDF() {
   const reportData = await exportReport();
 
+  
   const facultyId = facultyFilter.value;
   const isFacultySelected = Boolean(facultyId);
 
@@ -337,12 +336,12 @@ async function exportPDF() {
 
     doc.autoTable({
       startY: y,
-      head: [["Faculty Name", "Department", "Tasks Assigned", "Events Organized"]],
+      head: [["Faculty Name", "Department", "Tasks Assigned", "Tasks Completed"]],
       body: reportData.faculty.map(f => [
         f.name,
         f.department,
         f.tasksAssigned,
-        f.eventsOrganized
+        f.tasksCompleted
       ]),
       styles: { fontSize: 9 },
       headStyles: { fillColor: [43, 59, 80] }
