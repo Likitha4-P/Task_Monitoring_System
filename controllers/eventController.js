@@ -16,6 +16,7 @@ export async function createEvent(req, res) {
     // Validate required fields
     assertFields(req.body, ["title", "event_date"]);
 
+    const updated_at = Now(); // Set updated_at to current time on creation
     // Insert event
     const [result] = await pool.query(
       `
@@ -26,9 +27,11 @@ export async function createEvent(req, res) {
         participants,
         venue,
         status,
-        created_by
+        created_by,
+        updated_at
+        
       )
-      VALUES (?, ?, ?, ?, ?, 'Pending', ?)
+      VALUES (?, ?, ?, ?, ?, 'Pending', ?, ?)
       `,
       [
         title,
@@ -36,7 +39,8 @@ export async function createEvent(req, res) {
         event_date,
         participants,
         venue,
-        req.user.id
+        req.user.id,
+        updated_at
       ]
     );
 

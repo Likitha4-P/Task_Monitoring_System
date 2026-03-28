@@ -51,7 +51,7 @@ CREATE TABLE events (
   status ENUM('Pending','Approved','Rejected') DEFAULT 'Pending',
   created_by INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NUll
   FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -72,7 +72,7 @@ CREATE TABLE tasks (
   status ENUM('Pending','In Progress','Submitted','Verified','Closed') DEFAULT 'Pending',
   progress INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL,
   FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE CASCADE,
 FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL

@@ -21,10 +21,11 @@ export async function createTask(req, res) {
 
     assertFields(req.body, ["title", "assigned_to", "deadline"]);
 
+const updated_at = Now(); // Set updated_at to current time on creation
     const [result] = await pool.query(
       `INSERT INTO tasks 
-        (title, description, assigned_to, assigned_by, department_id, deliverables, deadline, priority, status, progress) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (title, description, assigned_to, assigned_by, department_id, deliverables, deadline, priority, status, progress,updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         title,
         description || null,
@@ -35,7 +36,8 @@ export async function createTask(req, res) {
         deadline,
         priority,
         status,
-        0
+        0,
+        updated_at
       ]
     );
     res.status(201).json({ id: result.insertId });
