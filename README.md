@@ -276,6 +276,5 @@ multer | Handle file uploads |
 
 ---
 
-# Step 7: Setup Google Drive Authentication
 
 
