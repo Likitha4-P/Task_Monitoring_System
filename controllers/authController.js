@@ -106,7 +106,7 @@ export async function forgotPassword(req, res) {
     [token, expiry, user.id]
   );
 
-  const resetLink = `http://localhost:5000/reset-password.html?token=${token}`;
+  const resetLink = `https://task-monitoring-system-z2lx.onrender.com/reset-password.html?token=${token}`;
 
   await sendEmail(email, "Reset Password", `
     Click the link to reset password:

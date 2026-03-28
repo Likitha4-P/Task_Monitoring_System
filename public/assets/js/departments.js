@@ -199,7 +199,7 @@ document.addEventListener("click", (e) => {
 
 async function renderDepartments() {
   try {
-    const response = await fetch("http://localhost:5000/api/departments");
+    const response = await fetch(`${API_BASE}/departments`);
     const departments = await response.json();
     window._departments = departments;
     // ✅ SAFETY CHECK
