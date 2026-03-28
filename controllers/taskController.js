@@ -6,6 +6,7 @@ import { createNotification } from "../utils/notifyHelper.js";
 
 // ---------------- CREATE TASK ----------------
 export async function createTask(req, res) {
+  console.log(`📌 createTask called by user ${req.user?.id || "unknown"}`);
   try {
     const {
       title,
@@ -19,8 +20,10 @@ export async function createTask(req, res) {
       status = "Pending"
     } = req.body;
 
+    console.log(`🔍 Validating task data: title=${title}, assigned_to=${assigned_to}, deadline=${deadline}`);
     assertFields(req.body, ["title", "assigned_to", "deadline"]);
 
+    console.log(`💾 Inserting task into database`);
     const [result] = await pool.query(
       `INSERT INTO tasks 
         (title, description, assigned_to, assigned_by, department_id, deliverables, deadline, priority, status, progress, updated_at) 
@@ -39,8 +42,12 @@ export async function createTask(req, res) {
         
       ]
     );
+    console.log(`✅ Task inserted with id ${result.insertId}`);
+
     res.status(201).json({ id: result.insertId });
     const taskId = result.insertId;
+
+    console.log(`📢 Creating notification for assigned user ${assigned_to}`);
     await createNotification(
       assigned_to,
       "New Task Assigned",
@@ -49,21 +56,25 @@ export async function createTask(req, res) {
       taskId
     );
 
+    console.log(`📧 Sending task email to assignee`);
     const [userRows] = await pool.query("SELECT email FROM users WHERE id = ?", [assigned_to]);
     if (userRows.length) {
       const assigneeEmail = userRows[0].email;
       sendTaskEmail(assigneeEmail, { title, description, deadline, priority, deliverables }).catch(console.error);
+      console.log(`📧 Task email sent to ${assigneeEmail}`);
+    } else {
+      console.warn(`⚠️ No email found for user ${assigned_to}`);
     }
 
-
   } catch (e) {
-    console.error(e);
+    console.error("createTask error:", e);
     res.status(e.status || 500).json({ message: e.message || "Failed to create task" });
   }
 }
 
 // ---------------- LIST TASKS ----------------
 export async function listTasks(req, res) {
+  console.log(`📋 listTasks called by user ${req.user?.id || "unknown"} (role: ${req.user?.role})`);
   try {
     let q = `
       SELECT 
@@ -93,15 +104,18 @@ export async function listTasks(req, res) {
       q += ` WHERE t.assigned_to = ? 
              OR t.department_id IN (SELECT department_id FROM users WHERE id = ?)`;
       params.push(req.user.id, req.user.id);
+      console.log(`🔐 Filtering tasks for user ${req.user.id}`);
     }
 
     q += ` ORDER BY t.id DESC`;
 
+    console.log(`📊 Querying tasks with params: ${params}`);
     const [rows] = await pool.query(q, params);
+    console.log(`✅ listTasks returned ${rows.length} rows for user ${req.user?.id || "unknown"}`);
 
     res.json(rows);
   } catch (e) {
-    console.error(e);
+    console.error("listTasks error:", e);
     res.status(500).json({ message: "Failed to list tasks" });
   }
 }
@@ -109,8 +123,11 @@ export async function listTasks(req, res) {
 
 // ---------------- GET TASK ----------------
 export async function getTask(req, res) {
+  console.log(`🔍 getTask called with id=${req.params.id} by user ${req.user?.id || "unknown"}`);
   try {
     const { id } = req.params;
+
+    console.log(`📊 Querying task ${id} details`);
     const [rows] = await pool.query(
       `SELECT 
          t.*, 
@@ -125,15 +142,22 @@ export async function getTask(req, res) {
       [id]
     );
 
-    if (!rows.length) return res.status(404).json({ message: "Task not found" });
+    if (!rows.length) {
+      console.warn(`⚠️ Task ${id} not found`);
+      return res.status(404).json({ message: "Task not found" });
+    }
+    console.log(`✅ Task ${id} retrieved: ${rows[0].title}`);
+
     res.json(rows[0]);
   } catch (e) {
+    console.error("getTask error:", e);
     res.status(500).json({ message: "Failed to get task" });
   }
 }
 
 // ---------------- UPDATE TASK ----------------
 export async function updateTask(req, res) {
+  console.log(`✏️ updateTask called for task ${req.params.id} by user ${req.user?.id || "unknown"}`);
   try {
 
     const { id } = req.params;
@@ -157,10 +181,12 @@ export async function updateTask(req, res) {
     );
 
     if (!taskRows.length) {
+      console.warn(`⚠️ Task ${id} not found for update`);
       return res.status(404).json({ message: "Task not found" });
     }
 
     const oldTask = taskRows[0];
+    console.log(`✅ Found task: ${oldTask.title}, assigned to ${oldTask.assigned_to}`);
 
     const clean = v => (v === "" ? null : v);
 
@@ -194,6 +220,7 @@ WHERE id = ?`,
         id
       ]
     );
+    console.log(`✅ Task ${id} updated successfully`);
 
     const newAssignee = assigned_to || oldTask.assigned_to;
 
@@ -201,6 +228,7 @@ WHERE id = ?`,
 
     // -------- Notification when status changed --------
     if (status) {
+      console.log(`📢 Creating status update notification for user ${newAssignee}`);
       await createNotification(
         newAssignee,
         "Task Status Updated",
@@ -209,6 +237,7 @@ WHERE id = ?`,
         id
       );
     } else {
+      console.log(`📢 Creating task update notification for user ${newAssignee}`);
       // -------- Notification when task updated --------
       await createNotification(
         newAssignee,
@@ -254,26 +283,37 @@ WHERE id = ?`,
 }
 // ---------------- UPDATE PROGRESS ----------------
 export async function updateProgress(req, res) {
+  console.log(`📈 updateProgress called for task ${req.params.id} by user ${req.user?.id || "unknown"}`);
   try {
     const { id } = req.params;
     const { progress } = req.body;
 
+    console.log(`🔍 Validating progress: ${progress}`);
     if (progress < 0 || progress > 100) {
+      console.warn(`⚠️ Invalid progress value: ${progress}`);
       return res.status(400).json({ message: "Progress must be 0-100" });
     }
 
+    console.log(`👤 Checking task ownership for user ${req.user.id}`);
     const [rows] = await pool.query("SELECT assigned_to FROM tasks WHERE id = ?", [id]);
-    if (!rows.length) return res.status(404).json({ message: "Task not found" });
+    if (!rows.length) {
+      console.warn(`⚠️ Task ${id} not found`);
+      return res.status(404).json({ message: "Task not found" });
+    }
 
     const task = rows[0];
     if (task.assigned_to !== req.user.id) {
+      console.warn(`🚫 Permission denied: user ${req.user.id} trying to update task ${id} assigned to ${task.assigned_to}`);
       return res.status(403).json({ message: "You can only update your own tasks" });
     }
 
+    console.log(`💾 Updating progress to ${progress} for task ${id}`);
     await pool.query("UPDATE tasks SET progress = ? WHERE id = ?", [progress, id]);
+    console.log(`✅ Progress updated for task ${id}`);
+
     res.json({ ok: true });
   } catch (e) {
-    console.error(e);
+    console.error("updateProgress error:", e);
     res.status(500).json({ message: "Failed to update progress" });
   }
 }
@@ -281,16 +321,24 @@ export async function updateProgress(req, res) {
 
 // ---------------- DELETE TASK ----------------
 export async function deleteTask(req, res) {
+  console.log(`🗑️ deleteTask called for task ${req.params.id} by user ${req.user?.id || "unknown"}`);
   try {
     const { id } = req.params;
 
+    console.log(`🔍 Checking if task ${id} exists`);
     const [rows] = await pool.query("SELECT * FROM tasks WHERE id = ?", [id]);
-    if (!rows.length) return res.status(404).json({ message: "Task not found" });
+    if (!rows.length) {
+      console.warn(`⚠️ Task ${id} not found`);
+      return res.status(404).json({ message: "Task not found" });
+    }
 
+    console.log(`💾 Deleting task ${id} from database`);
     await pool.query("DELETE FROM tasks WHERE id = ?", [id]);
+    console.log(`✅ Task ${id} deleted successfully`);
+
     res.json({ ok: true, message: "Task deleted successfully" });
   } catch (e) {
-    console.error(e);
+    console.error("deleteTask error:", e);
     res.status(500).json({ message: "Failed to delete task" });
 
   }

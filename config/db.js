@@ -14,5 +14,15 @@ const pool = mysql.createPool({
   dateStrings: true
 });
 
+(async () => {
+  try {
+    const conn = await pool.getConnection();
+    console.log("✅ DB connection check passed");
+    conn.release();
+  } catch (error) {
+    console.error("❌ DB connection check failed:", error.message);
+  }
+})();
+
 export default pool;
 

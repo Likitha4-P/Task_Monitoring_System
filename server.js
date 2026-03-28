@@ -14,6 +14,9 @@ dotenv.config();
 
 const app = express();
 
+console.log("🚀 Starting app with NODE_ENV=", process.env.NODE_ENV);
+console.log("📌 Database host=", process.env.DB_HOST || process.env.MYSQLHOST);
+console.log("📌 Google drive folder=", process.env.DRIVE_DELIVERABLES_FOLDER_ID);
 
 app.post(
   "/api/tasks/:taskId/deliverables",
@@ -56,6 +59,11 @@ app.use(express.static(path.join(__dirname, "public")));
 import cors from "cors";
 app.use(cors());
 
+// Basic request logging for Render debugging
+app.use((req, res, next) => {
+  console.log(`➡️ [${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
 
 console.log("Serving static files from:", path.join(__dirname, "public"));
 
