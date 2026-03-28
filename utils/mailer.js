@@ -10,8 +10,13 @@ const transporter = nodemailer.createTransport({
   },
   tls: {
     rejectUnauthorized: false
-  }
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000
 });
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
 
 /*----------------Reset Password Email ------------------*/
 export async function sendEmail(to, subject, text) {
@@ -154,6 +159,8 @@ export async function sendEventEmail(to, eventDetails) {
       <p style="color:#555;">Best Regards,<br><strong>College Task Monitoring System</strong></p>
     </div>
   `;
+  console.log("Preparing to send event email to:", to);
+  console.log("Event details:", eventDetails);
 
   return transporter.sendMail({
     from: process.env.EMAIL_USER,
