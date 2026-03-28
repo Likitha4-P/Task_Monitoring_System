@@ -8,6 +8,9 @@ client.authentications["api-key"].apiKey = process.env.BREVO_API_KEY;
 
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
+console.log("API exists:", !!process.env.BREVO_API_KEY);
+console.log("EMAIL:", process.env.EMAIL_USER);
+
 // Common send function
 async function sendMail(to, subject, html) {
   try {
