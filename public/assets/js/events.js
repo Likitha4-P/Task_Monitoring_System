@@ -69,11 +69,11 @@ function renderApprovalCards(events) {
           <p class="text-xs mb-3">Participants – ${ev.participants}</p>
           <div class="flex gap-2">
             <button onclick="approveEvent(${ev.id})"
-              class="px-3 py-1 rounded-full text-xs bg-green-500 text-white">
+              class="px-4 py-2 rounded-full text-xs bg-green-500 text-white active:bg-amber-700 active:scale-95">
               Approve
             </button>
             <button onclick="rejectEvent(${ev.id})"
-              class="px-3 py-1 rounded-full text-xs bg-red-500 text-white">
+              class="px-4 py-2 rounded-full text-xs bg-red-500 text-white active:bg-amber-700 active:scale-95">
               Reject
             </button>
           </div>
