@@ -26,7 +26,7 @@ async function sendMail(to, subject, html) {
 
     console.log("✅ Email sent:", response.messageId);
   } catch (err) {
-    console.error("❌ Email error:", err.message || err);
+    console.error("❌ Email error FULL:", err);
   }
 }
 
