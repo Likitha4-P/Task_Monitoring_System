@@ -67,8 +67,8 @@ app.use((req, res, next) => {
 
 console.log("Serving static files from:", path.join(__dirname, "public"));
 
-// Run every day at 11:40 AM
-cron.schedule("22 17 * * *", async () => {
+// Run every day at 10:00 AM server time
+cron.schedule("30 4 * * *", async () => {
   console.log("⏳ Checking deadlines...");
   await sendDeadlineReminders();
 });
