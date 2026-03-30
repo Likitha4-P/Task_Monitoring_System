@@ -12,11 +12,11 @@ import { sendEmail } from "../utils/mailer.js";
 export const login = async (req, res) => {
   console.log(`🔐 Login attempt for email: ${req.body.email}`);
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
    
 
     // 1. Find user
-    const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);
+    const [rows] = await pool.query("SELECT * FROM users WHERE email = ? AND role = ?", [email, role]);
     if (rows.length === 0) {
       console.log("User not found", email);
       return res.status(400).json({ message: "Invalid credentials" });

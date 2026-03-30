@@ -37,6 +37,10 @@ function getParameterByName(name, url) {
 
 
 async function handleLogin(event) {
+
+
+  console.log("Login attempt for role:", role);
+
   event.preventDefault();
 
   const email = document.getElementById("loginEmail").value;
@@ -46,7 +50,7 @@ async function handleLogin(event) {
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password, role })
     });
 
     const data = await res.json();
