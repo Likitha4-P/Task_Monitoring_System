@@ -8,6 +8,10 @@ async function loadEvents() {
   const events = await res.json();
   allEvents = events;
 
+  if(currentUser.role === "Faculty/File Incharge" || currentUser.role === "Admin"){
+    document.getElementById("propose-card").style.display = "none";
+  }
+
   renderApprovalCards(events);
   renderEventsTable(events);
 }
@@ -22,7 +26,7 @@ function renderApprovalCards(events) {
   <div class="bg-yellow-100 h-[15vh] dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
     <div>
       <h2 class="text-lg font-semibold">Pending Approval</h2>
-      <p id="pendingEvents" class="text-2xl font-bold">4</p>
+      <p id="pendingEvents" class="text-2xl font-bold"></p>
     </div>
     <i class='bx bx-hourglass text-4xl p-3'></i>
   </div>
@@ -31,7 +35,7 @@ function renderApprovalCards(events) {
   <div class="bg-blue-100 h-[15vh] dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
     <div>
       <h2 class="text-lg font-semibold">Events Approved</h2>
-      <p id="approvedEvents" class="text-2xl font-bold">15</p>
+      <p id="approvedEvents" class="text-2xl font-bold"></p>
     </div>
     <i class='bx bx-check-circle text-4xl p-3'></i>
   </div>
@@ -40,7 +44,7 @@ function renderApprovalCards(events) {
   <div class="bg-red-100 h-[15vh] dark:bg-red-900 text-red-800 dark:text-red-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
     <div>
       <h2 class="text-lg font-semibold">Events Rejected</h2>
-      <p id="rejectedEvents" class="text-2xl font-bold">3</p>
+      <p id="rejectedEvents" class="text-2xl font-bold"></p>
     </div>
     <i class='bx bx-x-circle text-4xl p-3'></i>
   </div>
@@ -48,7 +52,7 @@ function renderApprovalCards(events) {
   <div class="bg-green-400 h-[15vh] dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
     <div>
       <h2 class="text-lg font-semibold">Events Completed</h2>
-      <p id="completedEvents" class="text-2xl font-bold">10</p>
+      <p id="completedEvents" class="text-2xl font-bold"></p>
     </div>
     <i class='bx bx-check-circle text-4xl p-3'></i>
   </div>
@@ -56,7 +60,7 @@ function renderApprovalCards(events) {
   <div class="bg-amber-300 h-[15vh] dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
     <div>
       <h2 class="text-lg font-semibold">Events Cancelled</h2>
-      <p id="cancelledEvents" class="text-2xl font-bold">5</p>
+      <p id="cancelledEvents" class="text-2xl font-bold"></p>
     </div>
     <i class='bx bx-x-circle text-4xl p-3'></i>
   </div>
@@ -357,6 +361,14 @@ async function loadEventSummaryCards() {
   const rejectedEl = document.getElementById("rejectedEvents");
   if (rejectedEl) {
     rejectedEl.textContent = data.rejected;
+  }
+  const completedEl = document.getElementById("completedEvents");
+  if (completedEl) {
+    completedEl.textContent = data.completed;
+  }
+  const cancelledEl = document.getElementById("cancelledEvents");
+  if (cancelledEl) {
+    cancelledEl.textContent = data.cancelled;
   }
 }
 
