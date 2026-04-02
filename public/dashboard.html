@@ -59,23 +59,23 @@
                     <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
                     <button class="tasks-close-btn active:bg-amber-700 active:scale-95" onclick="closeTaskModal()">&times;</button>
                 </div>
-                <div class="tasks-modal-body">
+                <div class="tasks-modal-body" dark:bg-zinc-800>
                     <form id="createTaskForm">
 
 
                         <div class="tasks-form-group">
-                            <label for="taskTitle">Task Title</label>
+                            <label for="taskTitle"  class="dark:text-white">Task Title</label>
                             <input type="text" id="taskTitle" name="taskTitle" placeholder="Enter task title" required>
                         </div>
 
                         <div class="tasks-form-group">
-                            <label for="taskDescription">Description</label>
+                            <label for="taskDescription" class="dark:text-white">Description</label>
                             <textarea id="taskDescription" name="taskDescription" placeholder="Enter task description"
                                 required></textarea>
                         </div>
 
                         <div class="tasks-form-group">
-                            <label for="taskAssignedTo" id="taskAssignedToLabel">Assigned To</label>
+                            <label for="taskAssignedTo" id="taskAssignedToLabel" class="dark:text-white">Assigned To</label>
                             <select id="taskAssignedTo" name="taskAssignedTo" required>
 
                             </select>
@@ -83,7 +83,7 @@
 
                         <input type="hidden" id="hiddenAssignedTo" name="hiddenAssignedTo" />
                         <div class="tasks-form-group">
-                            <label for="taskPriority">Priority</label>
+                            <label for="taskPriority" class="dark:text-white">Priority</label>
                             <select id="taskPriority" name="taskPriority" required>
                                 <option value="Low">Low</option>
                                 <option value="Medium">Medium</option>
@@ -92,19 +92,19 @@
                         </div>
 
                         <div class="tasks-form-group">
-                            <label for="taskDeliverables">Deliverables(if any)</label>
+                            <label for="taskDeliverables" class="dark:text-white">Deliverables(if any)</label>
                             <input type="text" id="taskDeliverables" name="taskDeliverables" required>
 
                         </div>
 
                         <div class="tasks-form-group">
-                            <label for="taskDueDate">Due Date</label>
+                            <label for="taskDueDate" class="dark:text-white">Due Date</label>
                             <input type="date" id="taskDueDate" name="taskDueDate" required>
                         </div>
 
 
                         <div class="tasks-form-actions">
-                            <button type="button" class="tasks-btn-cancel active:bg-amber-700 active:scale-95" onclick="closeTaskModal()">Cancel</button>
+                            <button type="button" class="tasks-btn-cancel active:bg-amber-700 active:scale-95 dark:bg-red-700" onclick="closeTaskModal()">Cancel</button>
                             <button type="submit" class="tasks-btn-submit active:bg-amber-700 active:scale-95">Create Task</button>
                         </div>
                     </form>
@@ -312,22 +312,22 @@
                             <button class="close-btn active:bg-amber-700 active:scale-95" onclick="closeDepartmentModal()">&times;</button>
                         </div>
 
-                        <div class="modal-body">
+                        <div class="modal-body dark:bg-zinc-800">
                             <form id="createDepartmentForm">
 
                                 <div class="form-group">
-                                    <label for="departmentCode">Department Code</label>
+                                    <label for="departmentCode" class="dark:text-white">Department Code</label>
                                     <input type="text" id="departmentCode" placeholder="CSE" required>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="departmentName">Department Name</label>
+                                    <label for="departmentName" class="dark:text-white">Department Name</label>
                                     <input type="text" id="departmentName"
                                         placeholder="Computer Science and Engineering" required>
                                 </div>
 
                                 <div class="form-actions">
-                                    <button type="button" class="btn-cancel active:bg-amber-700 active:scale-95"
+                                    <button type="button" class="btn-cancel active:bg-amber-700 active:scale-95 dark:bg-red-700"
                                         onclick="closeDepartmentModal()">Cancel</button>
                                     <button type="submit" class="btn-submit active:bg-amber-700 active:scale-95" id="deptSubmitBtn">
                                         Add Department
@@ -404,29 +404,29 @@
                             <button class="close-btn active:bg-amber-700 active:scale-95" onclick="closeModal()">&times;</button>
                         </div>
 
-                        <div class="modal-body">
+                        <div class="modal-body dark:bg-zinc-800">
                             <form id="createUserForm">
 
                                 <div class="form-group">
-                                    <label for="userName">Full Name</label>
+                                    <label for="userName" class="dark:text-white">Full Name</label>
                                     <input type="text" id="userName" required>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="userEmail">Email Address</label>
+                                    <label for="userEmail" class="dark:text-white">Email Address</label>
                                     <input type="email" id="userEmail" required>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="userPass">User Password</label>
+                                    <label for="userPass" class="dark:text-white">User Password</label>
                                     <input type="password" id="userPass" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="userContact">Contact</label>
+                                    <label for="userContact" class="dark:text-white">Contact</label>
                                     <input type="text" id="userContact" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="userRole">Role</label>
+                                    <label for="userRole" class="dark:text-white">Role</label>
                                     <select id="userRole" required>
                                         <option value="">Select role</option>
 
@@ -438,13 +438,13 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Department</label>
+                                    <label class="dark:text-white">Department</label>
                                     <input type="text" id="userDepartmentDisplay" disabled>
                                 </div>
 
 
                                 <div class="form-actions">
-                                    <button type="button" class="btn-cancel active:bg-amber-700 active:scale-95" onclick="closeModal()">Cancel</button>
+                                    <button type="button" class="btn-cancel active:bg-amber-700 active:scale-95 dark:bg-red-700" onclick="closeModal()">Cancel</button>
                                     <button type="submit" class="btn-submit active:bg-amber-700 active:scale-95">Create User</button>
                                 </div>
 
