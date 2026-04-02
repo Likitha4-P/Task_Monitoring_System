@@ -14,6 +14,7 @@ async function loadEvents() {
 
   renderApprovalCards(events);
   renderEventsTable(events);
+  loadEventSummaryCards();
 }
 function renderApprovalCards(events) {
   const container = document.getElementById("eventApprovalCards");
@@ -314,7 +315,7 @@ async function createEvent(form) {
   alert("Event Proposed!");
   closeEventModal();
   loadEvents();
-  loadEventSummaryCards()
+ 
 }
 
 
@@ -323,20 +324,20 @@ async function approveEvent(id) {
   await fetch(`${API_BASE}/events/${id}/approve`, { method: "POST", headers: getHeaders() });
   alert("Event approved!");
   loadEvents();
-  loadEventSummaryCards()
+  
 }
 async function rejectEvent(id) {
   await fetch(`${API_BASE}/events/${id}/reject`, { method: "POST", headers: getHeaders() });
   alert("Event rejected!");
   loadEvents();
-  loadEventSummaryCards()
+
 }
 
 async function updateEvent(id,status) {
   await fetch(`${API_BASE}/events/${id}/${status}`, { method: "PUT", headers: getHeaders() });
   alert("Event Status Updated!");
   loadEvents();
-  loadEventSummaryCards()
+  
 }
 
 async function loadEventSummaryCards() {

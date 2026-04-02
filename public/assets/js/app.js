@@ -189,6 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadTaskCounters();
     loadDonutChart();
     loadBarChart();
+    loadEventSummaryCards();
   }, 120000); // refresh every 120 seconds
 setInterval(loadNotifications, 30000);
 
