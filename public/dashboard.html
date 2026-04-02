@@ -692,7 +692,7 @@
 
                   <!-- Propose New Event -->
                 <div onclick="openEventModal()" id="propose-card"
-                    class="bg-zinc-200 h-[15vh] w-full p-4 cursor-pointer dark:text-green-200 rounded-lg p-5 flex items-center justify-center shadow hover:shadow-lg transition">
+                    class="bg-zinc-200 h-[15vh] w-full p-4 cursor-pointer dark:bg-slate-700 dark:text-green-200 rounded-lg p-5 flex items-center justify-center shadow hover:shadow-lg transition">
                     <div class="bg-emerald-400 rounded-lg flex justify-center items-center gap-2 p-4 dark:bg-green-300 dark:text-slate-900">
                         <div>
                           <h2 class="text-lg font-semibold">Propose New Event</h2>
@@ -743,12 +743,12 @@
                             <h2><i class="fas fa-calendar-plus"></i> Propose New Event</h2>
                             <button class="events-close-btn active:bg-amber-700 active:scale-95" onclick="closeEventModal()">&times;</button>
                         </div>
-                        <div class="events-modal-body">
+                        <div class="events-modal-body dark:bg-zinc-800">
                             <form id="proposeEventForm">
 
                                 <!-- Event Title -->
                                 <div class="events-form-group">
-                                    <label for="eventTitle">Event Title</label>
+                                    <label for="eventTitle" class="dark:text-white">Event Title</label>
                                     <input type="text" id="eventTitle" name="eventTitle" placeholder="Enter event title"
                                         required />
                                 </div>
@@ -756,28 +756,28 @@
 
                                 <!-- Event Date -->
                                 <div class="events-form-group">
-                                    <label for="eventDate">Event Date</label>
+                                    <label for="eventDate" class="dark:text-white">Event Date</label>
                                     <input type="date" id="eventDate" name="eventDate" required />
                                 </div>
 
                                 <!-- Participants -->
                                 <div class="events-form-group">
-                                    <label for="eventParticipants">Expected Participants</label>
+                                    <label for="eventParticipants" class="dark:text-white">Expected Participants</label>
                                     <input type="number" id="eventParticipants" name="eventParticipants" min="1"
                                         placeholder="Enter number of participants" required />
                                 </div>
                                 <!-- Venue -->
                                 <div class="events-form-group">
-                                    <label for="eventVenue">Venue</label>
+                                    <label for="eventVenue" class="dark:text-white">Venue</label>
                                     <input type="text" id="eventVenue" name="eventVenue" placeholder="Enter venue"
                                         required />
                                 </div>
 
                                 <!-- Actions -->
                                 <div class="events-form-actions">
-                                    <button type="button" class="events-btn-cancel active:bg-amber-700 active:scale-95" onclick="closeEventModal()">
+                                    <button type="button" class="events-btn-cancel active:bg-amber-700 active:scale-95 dark:bg-red-700" onclick="closeEventModal()">
                                         Cancel
-                                    </button>
+                                    </button>   
                                     <button type="submit" class="events-btn-submit active:bg-amber-700 active:scale-95">
                                         Propose Event
                                     </button>
