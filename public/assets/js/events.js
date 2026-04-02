@@ -16,14 +16,7 @@ function renderApprovalCards(events) {
   container.innerHTML = "";
   if (currentUser.role === "Department Head" || currentUser.role === "Professor Incharge") {
     container.innerHTML = `
-  <!-- Propose New Event -->
-  <div onclick="openEventModal()" class="bg-green-100 h-[15vh] dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
-    <div>
-      <h2 class="text-lg font-semibold">Propose New Event</h2>
-      <p class="text-sm text-green-600 dark:text-green-300">Create a new event proposal</p>
-    </div>
-    <i class='bx bx-user-plus text-4xl p-3'></i>
-  </div>
+
 
   <!-- Pending Approval -->
   <div class="bg-yellow-100 h-[15vh] dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
