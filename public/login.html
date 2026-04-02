@@ -12,13 +12,11 @@
 <body class="min-h-screen flex items-center justify-center bg-gray-200">
 
   <!-- MAIN CONTAINER -->
-  <div class="relative w-full h-[100vh] flex  overflow-hidden shadow-2xl">
+  <div class="relative w-full h-[100vh] flex flex-col lg:flex-row overflow-hidden shadow-2xl">
 
     <!-- LEFT 70% -->
-    <div class="w-[70%] bg-[#2F4156] flex items-center justify-center">
-      <div class="w-[720px] h-[720px] rounded-full overflow-hidden 
-            bg-gradient-to-br from-purple-500 via-blue-500 to-pink-400 
-            flex items-center justify-center">
+    <div class="w-full lg:w-[70%] bg-[#2F4156] flex items-center justify-center">
+      <div class="w-[250px] h-[250px] md:w-[400px] md:h-[400px] lg:w-[720px] lg:h-[720px] rounded-full overflow-hidden bg-gradient-to-br from-purple-500 via-blue-500 to-pink-400 flex items-center justify-center">
   <img
     src=""
     alt="Admin Illustration"
@@ -30,13 +28,12 @@
     </div>
 
     <!-- RIGHT 30% -->
-    <div class="w-[30%] bg-white"></div>
+    <div class="hidden lg:block lg:w-[30%] bg-white"></div>
 
     <!-- LOGIN CARD (CENTERED ON PARTITION) -->
     
-<div class="absolute top-1/2 left-[70%] -translate-x-1/2 -translate-y-1/2">
-  <div class="bg-slate-200 w-[520px] rounded-2xl p-12 shadow-2xl">
-
+<div class="absolute lg:top-1/2 lg:left-[70%] lg:-translate-x-1/2 lg:-translate-y-1/2 w-full flex justify-center top-[20%] left-auto translate-x-0 translate-y-0 mt-10 lg:mt-0">
+  <div class="bg-slate-200 w-[90%] max-w-[520px] rounded-2xl p-6 md:p-10 lg:p-12 shadow-2xl">
     <!-- Icon -->
     <div class="flex justify-center mb-8">
       <div class="w-14 h-14 rounded-full bg-[#2F4156] flex items-center justify-center text-white text-2xl">
@@ -45,10 +42,10 @@
     </div>
 
     <!-- Heading -->
-    <h2 class="text-3xl font-bold text-center text-slate-800" id="welcomeMsg">
+    <h2 class="text-2xl md:text-3xl font-bold text-center text-slate-800" id="welcomeMsg">
       
     </h2>
-    <p class="text-center text-slate-600 mt-2 mb-10 text-lg">
+    <p class="text-center text-slate-600 mt-2 mb-8 md:mb-10 text-base md:text-lg">
       Sign in to access your dashboard
     </p>
 
@@ -64,7 +61,7 @@
           id="loginEmail"
           type="email"
           placeholder="Email"
-          class="w-full py-4 pl-14 pr-4 rounded-full outline-none text-lg focus:ring-2 focus:ring-[#2F4156]"
+          class="w-full py-3 md:py-4 pl-12 md:pl-14 pr-4 rounded-full outline-none text-base md:text-lg focus:ring-2 focus:ring-[#2F4156]"
           autocomplete="username"
         />
       </div>
@@ -78,7 +75,7 @@
             id="loginPassword"
           type="password"
           placeholder="Password"
-          class="w-full py-4 pl-14 pr-4 rounded-full outline-none text-lg focus:ring-2 focus:ring-[#2F4156]"
+         class="w-full py-3 md:py-4 pl-12 md:pl-14 pr-4 rounded-full outline-none text-base md:text-lg focus:ring-2 focus:ring-[#2F4156]"
           autocomplete="new-password"
         />
       </div>
@@ -86,14 +83,14 @@
       <!-- Button -->
       <button
         type="submit"
-        class="w-full bg-[#2F4156] text-white py-4 rounded-full font-semibold text-lg hover:bg-[#263445] transition active:bg-amber-700 active:scale-95"
-      >
+        class="w-full bg-[#2F4156] text-white py-3 md:py-4 rounded-full font-semibold text-base md:text-lg hover:bg-[#263445] transition active:bg-amber-700 active:scale-95">
+      
         Login
       </button>
 
 
     </form>
-    <a href="forgot-password.html" class="text-blue-500 text-bolder text-xl p-6 hover:text-blue-900" >Forgot Password ></a>
+    <a href="forgot-password.html" class="text-blue-500 text-bolder text-xs lg:text-xl p-6 hover:text-blue-900" >Forgot Password ></a>
   </div>
 </div>
 

@@ -100,6 +100,11 @@ function getFilterParams() {
   const fromDate = document.getElementById("dateFrom").value;
   const toDate = document.getElementById("dateTo").value;
 
+   if (fromDate && toDate && fromDate > toDate) {
+    alert("'From' date cannot be after 'To' date");
+    return ""; // Return empty string to prevent API call
+  }
+
   if (deptId) params.append("department_id", deptId);
   if (facultyId) params.append("faculty_id", facultyId);
   if (fromDate) params.append("from_date", fromDate);
@@ -110,6 +115,11 @@ function getFilterParams() {
 
 async function loadUpcomingEvents() {
     const qs = getFilterParams();
+     if (!qs) {
+    const container = document.getElementById("upcomingEventsList");
+    container.innerHTML = `<p class="text-sm text-gray-500">Please fix filter errors to load events</p>`;
+    return;
+  }
 const res= await fetch(`${API_BASE}/reports/events/upcoming?${qs}`, {
   headers: getHeaders()
 });
@@ -173,6 +183,11 @@ async function loadPendingApprovals() {
 }
 async function loadDeadlineSummary() {
     const qs = getFilterParams();
+      if (!qs) {
+      const container = document.getElementById("deadlineSummaryList");
+      container.innerHTML = `<p class="text-sm text-gray-500">Please fix filter errors to load deadlines</p>`;
+      return;
+    }
     const res = await fetch(`${API_BASE}/reports/tasks/deadlines?${qs}`,{
       headers:getHeaders()
     });

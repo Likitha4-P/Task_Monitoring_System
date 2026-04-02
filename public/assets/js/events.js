@@ -51,6 +51,22 @@ function renderApprovalCards(events) {
     </div>
     <i class='bx bx-x-circle text-4xl p-3'></i>
   </div>
+  <!-- Events Completed -->
+  <div class="bg-green-400 h-[15vh] dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
+    <div>
+      <h2 class="text-lg font-semibold">Events Completed</h2>
+      <p id="completedEvents" class="text-2xl font-bold">10</p>
+    </div>
+    <i class='bx bx-check-circle text-4xl p-3'></i>
+  </div>
+  <!-- Events Cancelled -->
+  <div class="bg-amber-300 h-[15vh] dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-lg p-5 flex items-center justify-between shadow hover:shadow-lg transition">
+    <div>
+      <h2 class="text-lg font-semibold">Events Cancelled</h2>
+      <p id="cancelledEvents" class="text-2xl font-bold">5</p>
+    </div>
+    <i class='bx bx-x-circle text-4xl p-3'></i>
+  </div>
 `;
   } else if (currentUser.role === "Faculty/File Incharge") {
     container.innerHTML = ``
@@ -88,12 +104,29 @@ function renderEventsTable(events) {
   tbody.innerHTML = "";
 
   events.forEach(ev => {
-    const badge =
-      ev.status === "Approved"
-        ? "bg-green-100 text-green-700"
-        : ev.status === "Rejected"
-          ? "bg-red-100 text-red-700"
-          : "bg-yellow-100 text-yellow-700";
+     // Decide badge style
+    let badgeClass =
+      ev.status === "Approved" ? "bg-green-100 text-green-700" :
+      ev.status === "Rejected" ? "bg-red-100 text-red-700" :
+      ev.status === "Completed" ? "bg-blue-100 text-blue-700" :
+      ev.status === "Cancelled" ? "bg-gray-100 text-gray-700" :
+      "bg-yellow-100 text-yellow-700";
+
+    // Decide actions
+    let actions = "";
+    if (currentUser?.role === "Department Head" && ev.status === "Approved") {
+      actions = `
+        <div class="flex gap-2 justify-center items-center">
+          <button onclick="updateEvent(${ev.id},'Completed')" class="px-2 py-1 bg-blue-500 text-white rounded">
+            <i class="fas fa-check"></i> Completed
+          </button>
+          <button onclick="updateEvent(${ev.id},'Cancelled')" class="px-2 py-1 bg-gray-500 text-white rounded">
+            <i class="fas fa-times"></i> Cancelled
+          </button>
+        </div>
+      `;
+    }
+
 
     tbody.innerHTML += `
       <tr class="border-b dark:border-slate-700">
@@ -102,9 +135,12 @@ function renderEventsTable(events) {
         <td class="px-4 py-2">${formatDate(ev.event_date)}</td>
         <td class="px-4 py-2">${ev.venue || "-"}</td>
         <td class="px-4 py-2">
-          <span class="px-3 py-1 text-xs rounded-full ${badge}">
+          <span class="px-3 py-1 text-xs rounded-full ${badgeClass}">
             ${ev.status}
           </span>
+        </td>
+        <td class="px-4 py-2">
+          ${actions}
         </td>
       </tr>
     `;
@@ -296,6 +332,11 @@ async function rejectEvent(id) {
   loadEvents();
 }
 
+async function updateEvent(id,status) {
+  await fetch(`${API_BASE}/events/${id}/${status}`, { method: "PUT", headers: getHeaders() });
+  alert("Event Status Updated!");
+  loadEvents();
+}
 
 async function loadEventSummaryCards() {
   const res = await fetch(`${API_BASE}/events/event-summary`, {

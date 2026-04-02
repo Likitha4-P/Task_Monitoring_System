@@ -40,6 +40,7 @@ async function handleLogin(event) {
 
 
   console.log("Login attempt for role:", role);
+  
 
   event.preventDefault();
 

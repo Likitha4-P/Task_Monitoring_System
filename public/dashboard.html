@@ -625,7 +625,7 @@
 
         <div id="eventManagement"
             class="page bg-gray-50 overflow-y-scroll w-full dark:bg-slate-900 text-slate-700 dark:text-slate-200">
-            <main class="flex-1 ">
+            <main class="flex-1 justify-center items-center  h-[100vh]">
 
 
                 <!-- Top Bar -->
@@ -690,6 +690,20 @@
 
                 </div>
 
+                  <!-- Propose New Event -->
+                <div onclick="openEventModal()"
+                    class="bg-zinc-200 h-[15vh] w-full p-4 cursor-pointer dark:text-green-200 rounded-lg p-5 flex items-center justify-center shadow hover:shadow-lg transition">
+                    <div class="bg-emerald-400 rounded-lg flex justify-center items-center gap-2 p-4 dark:bg-green-300 dark:text-slate-900">
+                        <div>
+                          <h2 class="text-lg font-semibold">Propose New Event</h2>
+                          <p class="text-sm text-zinc-900 font-medium dark:text-slate-800">Create a new event proposal</p>  
+                        </div>
+                        
+                        <i class='bx bx-user-plus text-4xl p-3'></i>
+                    </div>
+                </div>
+
+
                 <!-- Search -->
                 <div class="flex justify-between items-center p-6 mb-4">
                     <input id="eventSearch" type="text" placeholder="Search ..." class="w-2/5 px-4 py-2 border border-gray-500 rounded-xl outline-none
@@ -717,6 +731,8 @@
                             <option value="Pending">Pending</option>
                             <option value="Approved">Approved</option>
                             <option value="Rejected">Rejected</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
                         </select>
                     </div>
                 </div>

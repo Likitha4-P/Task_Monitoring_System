@@ -313,7 +313,7 @@ export async function exportReportData(req, res) {
       totalEvents: events.length,
       pendingApprovals: events.filter(e => e.status === "Pending").length,
       upcomingDeadlines: tasks.filter(t => new Date(t.dueDate) >= new Date()).length,
-      overdueItems: tasks.filter(t => new Date(t.dueDate) < new Date()).length,
+      overdueItems: tasks.filter(t => (new Date(t.dueDate) < new Date() && t.status !== "Closed")).length,
       completedTasks: tasks.filter(t => t.status === "Closed").length
     };
     console.log(`📊 Generated summary: ${JSON.stringify(summary)}`);
