@@ -281,42 +281,42 @@ function closeEventModal() {
   document.querySelector('.events-modal-header h2').innerHTML = '<i class="fas fa-calendar-plus"></i> Propose New Event';
   document.querySelector('.events-btn-submit').textContent = 'Propose Event';
 }
-async function createEvent(form) {
-  const title = form.eventTitle?.value;
-  const event_date = form.eventDate?.value;
-  const participants = Number(form.eventParticipants?.value || 0);
-  const venue = form.eventVenue?.value || null;
-  const department_id = currentUser?.department_id;
+  async function createEvent(form) {
+    const title = form.eventTitle?.value;
+    const event_date = form.eventDate?.value;
+    const participants = Number(form.eventParticipants?.value || 0);
+    const venue = form.eventVenue?.value || null;
+    const department_id = currentUser?.department_id;
 
- 
-  if (!title || !event_date || !department_id) {
-    alert("Missing required fields");
-    return;
+  
+    if (!title || !event_date || !department_id) {
+      alert("Missing required fields");
+      return;
+    }
+
+    const res = await fetch(`${API_BASE}/events`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        title,
+        department_id,
+        event_date,
+        participants,
+        venue
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      alert(err.message || "Failed to create event");
+      return;
+    }
+
+    alert("Event Proposed!");
+    closeEventModal();
+    loadEvents();
+  
   }
-
-  const res = await fetch(`${API_BASE}/events`, {
-    method: "POST",
-    headers: getHeaders(),
-    body: JSON.stringify({
-      title,
-      department_id,
-      event_date,
-      participants,
-      venue
-    })
-  });
-
-  if (!res.ok) {
-    const err = await res.json();
-    alert(err.message || "Failed to create event");
-    return;
-  }
-
-  alert("Event Proposed!");
-  closeEventModal();
-  loadEvents();
- 
-}
 
 
 
